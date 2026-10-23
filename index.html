@@ -2618,6 +2618,20 @@
 .legacy-note button { border: 1.5px solid var(--amber); background: #fff; color: var(--amber-dk); border-radius: 999px; padding: 5px 12px; font: 600 12px var(--fb); cursor: pointer; }
 .legacy-flag { font-size: 11px; color: var(--amber-dk); margin-top: 2px; }
 .vc-tools { display: flex; gap: 10px; align-items: center; }
+
+/* ── Hero background image (set in Admin → Settings) ── */
+.hero { background-size: cover; background-position: center; }
+.hero.has-bg .hero-inner { padding-top: 64px; padding-bottom: 58px; }
+.hero.has-bg .hero-title, .hero.has-bg .hero-sub { text-shadow: 0 2px 14px rgba(0,0,0,.45); }
+.set-hero-preview { height: 120px; border-radius: var(--radius-sm); border: 1.5px dashed var(--border); background: var(--cream) center / cover no-repeat; display: flex; align-items: center; justify-content: center; margin-bottom: 8px; overflow: hidden; }
+.set-hero-preview-empty { font-size: 12px; color: var(--muted); padding: 0 12px; text-align: center; }
+.set-hero-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.set-hero-err { font-size: 12px; color: var(--red); margin: 6px 0 2px; line-height: 1.5; }
+.set-hero-err.warn { color: #b9770e; }
+#set-hero-image.invalid { border-color: var(--red); }
+#set-hero-image.valid { border-color: var(--green); }
+#set-hero-preview { margin-top: 8px; }
+.btn-admin-util:disabled { opacity: .5; cursor: not-allowed; }
 </style>
 </head>
 <body>
@@ -2629,7 +2643,7 @@
 
   <header class="site-header">
     <div class="header-inner">
-      <div class="logo">🌸 Janice<span>FlowerShop</span></div>
+      <div class="logo" id="site-logo">🌸 Janice <span>FlowerShop</span></div>
       <div class="search-wrap">
         <input type="text" id="search-input" placeholder="Search roses, bouquets, plants…" autocomplete="off">
       </div>
@@ -2679,7 +2693,7 @@
       <p class="hero-sub" id="hero-sub">Fuzzy Wires made bouquets, potted plants and gift sets, made to order.</p>
       <a class="hero-cta" href="#product-grid" id="hero-cta">Browse flowers</a>
     </div>
-  </section>h
+  </section>
   <div class="cat-bar">
     <div class="cat-scroll" id="category-nav"></div>
   </div>
@@ -2733,7 +2747,7 @@
   </main>
 
   <footer class="site-footer">
-    <p>© 2025 Bana Blooms · Fresh flowers, hand-tied to order.</p>
+    <p>© 2025 <span id="footer-store-name">Janice FlowerShop</span> · Fresh flowers, hand-tied to order.</p>
     <a href="#" id="admin-toggle-link">Admin</a>
   </footer>
 
@@ -2844,7 +2858,7 @@
 <div id="app-admin" style="display:none">
 
   <div class="admin-bar">
-    <div class="admin-bar-title">🏪 <span id="admin-bar-store-name">Bana Blooms</span><span class="sync-indicator" id="sync-indicator" style="display:none"><span class="sync-dot" id="sync-dot"></span></span></div>
+    <div class="admin-bar-title">🏪 <span id="admin-bar-store-name">Janice FlowerShop</span><span class="sync-indicator" id="sync-indicator" style="display:none"><span class="sync-dot" id="sync-dot"></span></span></div>
     <div class="admin-bar-actions">
       <button class="btn-refresh" id="btn-refresh-dashboard" style="display:none" title="Refresh data">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
@@ -3003,7 +3017,7 @@
             <div class="settings-card-title">🏪 Store information</div>
             <div class="set-row">
               <label class="set-label">Store name</label>
-              <input type="text" class="set-input" id="set-store-name" placeholder="e.g. Bana Blooms" maxlength="80">
+              <input type="text" class="set-input" id="set-store-name" placeholder="e.g. Janice FlowerShop" maxlength="80">
             </div>
             <div class="set-row set-2col">
               <div>
@@ -3040,6 +3054,20 @@
                 <option value="normal" selected>Normal</option>
                 <option value="fast">Fast</option>
               </select>
+            </div>
+            <div class="set-row">
+              <label class="set-label" for="set-hero-image">Homepage banner background <span class="set-hint">(Google Drive picture link, optional)</span></label>
+              <input type="url" class="set-input" id="set-hero-image" placeholder="Paste Google Drive link here, e.g. https://drive.google.com/file/d/…/view" autocomplete="off" spellcheck="false">
+              <div class="set-hero-err" id="set-hero-err" style="display:none"></div>
+              <div class="set-hero-preview" id="set-hero-preview">
+                <span class="set-hero-preview-empty" id="set-hero-preview-empty">No picture — the pink gradient is used</span>
+              </div>
+              <div class="set-hero-actions">
+                <button type="button" class="btn-admin-util" id="btn-hero-remove" disabled>Remove picture</button>
+              </div>
+              <div class="set-hint" style="margin-top:6px;line-height:1.55">
+                How to get the link: in Google Drive, right-click your picture → <strong>Share</strong> → under General access choose <strong>Anyone with the link</strong> → <strong>Copy link</strong>. Paste it above, then press <strong>Save Settings</strong>.
+              </div>
             </div>
           </div>
 
@@ -3918,6 +3946,8 @@ function _hydrateFromSnapshot(snap, isFirstLoad) {
     _writeLocalSettings({ ..._readLocalSettings(), ...snap.settings });
   }
   renderAnnouncementBanner();
+  applyStoreBranding();
+  applyHeroBackground();
 }
 
 function renderAnnouncementBanner() {
@@ -5978,8 +6008,8 @@ window.addEventListener('resize', () => {
 // doesn't support it yet (see Code.gs notes).
 // ─────────────────────────────────────────────
 const DEFAULT_SETTINGS = {
-  storeName: 'Bana Blooms', storePhone: '', storeEmail: '', storeAddress: '',
-  storeOpen: '', storeClose: '', announcement: '', announcementSpeed: 'normal',
+  storeName: 'Janice FlowerShop', storePhone: '', storeEmail: '', storeAddress: '',
+  storeOpen: '', storeClose: '', announcement: '', announcementSpeed: 'normal', heroImage: '',
   liveSync: true, syncSpeed: 'normal', soundOrder: false, soundMsg: false,
 };
 let _settingsCache = null;
@@ -5991,12 +6021,136 @@ function _writeLocalSettings(s) {
   lsSet('storeSettings', s);
 }
 
+// ── Store branding (header logo, footer, page title) — driven by Settings → Store name ──
+function applyStoreBranding() {
+  const s    = _readLocalSettings();
+  const name = (s.storeName || '').trim() || DEFAULT_SETTINGS.storeName;
+
+  const logo = document.getElementById('site-logo');
+  if (logo) {
+    // First word in the accent colour, the rest in white (same look as before).
+    const i     = name.indexOf(' ');
+    const first = i === -1 ? name : name.slice(0, i);
+    const rest  = i === -1 ? ''   : name.slice(i + 1).trim();
+    logo.innerHTML = '🌸 ' + esc(first) + (rest ? ' <span>' + esc(rest) + '</span>' : '');
+  }
+  const foot = document.getElementById('footer-store-name');
+  if (foot) foot.textContent = name;
+  const bar = document.getElementById('admin-bar-store-name');
+  if (bar) bar.textContent = name;
+  document.title = name;
+}
+
+// ── Hero background image (Settings → Homepage banner background) ──
+function _cssUrl(u) {
+  return 'url("' + String(u).replace(/["\\\n\r]/g, c => encodeURIComponent(c)) + '")';
+}
+function heroImgUrl(url) {
+  const u = driveImgUrl(url || '');
+  // Ask Google for a web-sized version so the banner loads fast.
+  return /^https:\/\/lh3\.googleusercontent\.com\/d\/[^=?]+$/.test(u) ? u + '=w1600' : u;
+}
+function applyHeroBackground() {
+  const hero = document.querySelector('.hero');
+  if (!hero) return;
+  const url = (_readLocalSettings().heroImage || '').trim();
+  if (!url || !isDriveImageLink(url)) {
+    hero._bgReq = '';
+    hero.style.backgroundImage = '';
+    hero.classList.remove('has-bg');
+    return;
+  }
+  const src = heroImgUrl(url);
+  if (hero._bgReq === src) return;          // already showing / loading this one
+  hero._bgReq = src;
+  const img = new Image();
+  img.onload = () => {
+    if (hero._bgReq !== src) return;        // setting changed while loading
+    hero.style.backgroundImage =
+      'linear-gradient(115deg, rgba(42,16,33,.80) 0%, rgba(74,29,58,.50) 100%), ' + _cssUrl(src);
+    hero.classList.add('has-bg');
+  };
+  img.onerror = () => {                     // bad link → keep the pink gradient
+    if (hero._bgReq !== src) return;
+    hero.style.backgroundImage = '';
+    hero.classList.remove('has-bg');
+  };
+  img.src = src;
+}
+
+// Only Google Drive picture links are accepted for the banner.
+function isDriveImageLink(url) {
+  const u = String(url || '').trim();
+  if (/^https?:\/\/drive\.google\.com\//i.test(u)) {
+    return /\/d\/[a-zA-Z0-9_-]{15,}|[?&]id=[a-zA-Z0-9_-]{15,}/.test(u);
+  }
+  return /^https:\/\/lh3\.googleusercontent\.com\/d\/[a-zA-Z0-9_-]{15,}/.test(u);
+}
+
+// Settings form: validate the pasted link and show a live preview. Returns true if the box is empty or valid.
+function refreshHeroLinkUI() {
+  const input = document.getElementById('set-hero-image');
+  if (!input) return true;
+  const url   = input.value.trim();
+  const err   = document.getElementById('set-hero-err');
+  const prev  = document.getElementById('set-hero-preview');
+  const empty = document.getElementById('set-hero-preview-empty');
+  const rm    = document.getElementById('btn-hero-remove');
+  const showErr = (msg, warn) => { err.textContent = msg; err.className = 'set-hero-err' + (warn ? ' warn' : ''); err.style.display = msg ? '' : 'none'; };
+
+  input._previewReq = '';
+  prev.style.backgroundImage = '';
+  if (empty) empty.style.display = '';
+  if (rm) rm.disabled = !url;
+  input.classList.remove('valid', 'invalid');
+  showErr('');
+
+  if (!url) return true;
+
+  if (!isDriveImageLink(url)) {
+    input.classList.add('invalid');
+    showErr(/\/folders\//i.test(url)
+      ? 'That is a folder link. Open the picture itself, then copy its link.'
+      : 'This is not a Google Drive picture link. Copy the link of the picture from Google Drive and paste it here.');
+    return false;
+  }
+
+  input.classList.add('valid');
+  const src = heroImgUrl(url);
+  input._previewReq = src;
+  const test = new Image();
+  test.onload = () => {
+    if (input._previewReq !== src) return;
+    prev.style.backgroundImage = _cssUrl(src);
+    if (empty) empty.style.display = 'none';
+  };
+  test.onerror = () => {
+    if (input._previewReq !== src) return;
+    showErr('The picture cannot be shown. In Google Drive, set sharing to "Anyone with the link" and make sure the file is a picture (JPG/PNG).', true);
+  };
+  test.src = src;
+  return true;
+}
+
+function setHeroImageInForm(url) {
+  const input = document.getElementById('set-hero-image');
+  if (!input) return;
+  input.value = url || '';
+  refreshHeroLinkUI();
+}
+
 async function loadSettingsIntoForm() {
   let settings = _settingsCache || _readLocalSettings();
   const statusEl = document.getElementById('set-sync-status');
   try {
     const res = await api('adminGetSettings', { token: STATE.adminToken });
-    if (res && res.settings) { settings = { ...DEFAULT_SETTINGS, ...res.settings }; _settingsCache = settings; _writeLocalSettings(settings); }
+    if (res && res.settings) {
+      const localHero = _readLocalSettings().heroImage || '';
+      settings = { ...DEFAULT_SETTINGS, ...res.settings };
+      // If the server doesn't store the hero picture, keep this device's copy rather than losing it.
+      if (!('heroImage' in res.settings)) settings.heroImage = localHero;
+      _settingsCache = settings; _writeLocalSettings(settings);
+    }
     if (statusEl) { statusEl.textContent = '☁ Synced with server'; statusEl.className = 'set-sync-status ok'; statusEl.style.display = ''; }
   } catch (err) {
     // Backend action not deployed/reachable — fall back to this device's local copy.
@@ -6004,8 +6158,9 @@ async function loadSettingsIntoForm() {
   }
 
   document.getElementById('set-store-name').value    = settings.storeName || '';
-  const adminBarName = document.getElementById('admin-bar-store-name');
-  if (adminBarName) adminBarName.textContent = settings.storeName || 'Bana Blooms';
+  setHeroImageInForm(settings.heroImage || '');
+  applyStoreBranding();
+  applyHeroBackground();
   document.getElementById('set-store-phone').value   = settings.storePhone || '';
   document.getElementById('set-store-email').value   = settings.storeEmail || '';
   document.getElementById('set-store-address').value = settings.storeAddress || '';
@@ -6029,6 +6184,7 @@ function _readSettingsFromForm() {
     storeClose:   document.getElementById('set-store-close').value,
     announcement:      document.getElementById('set-announcement').value.trim(),
     announcementSpeed: document.getElementById('set-announcement-speed').value,
+    heroImage:    (document.getElementById('set-hero-image').value || '').trim(),
     liveSync:     document.getElementById('set-live-sync').checked,
     syncSpeed:    document.getElementById('set-sync-speed').value,
     soundOrder:   document.getElementById('set-sound-order').checked,
@@ -6041,6 +6197,11 @@ async function saveSettings() {
   const msg = document.getElementById('set-saved-msg');
   const statusEl = document.getElementById('set-sync-status');
   const settings = _readSettingsFromForm();
+  if (!refreshHeroLinkUI()) {
+    showToast('The banner picture link is not a Google Drive picture link. Fix it or remove it, then save.', 'error', 5000);
+    document.getElementById('set-hero-image')?.focus();
+    return;
+  }
   btn.disabled = true; btn.textContent = 'Saving…'; msg.style.display = 'none';
   let serverSaveFailed = null;
   try {
@@ -6052,8 +6213,8 @@ async function saveSettings() {
     SyncEngine.applySpeedPreset(settings.syncSpeed);
     SyncEngine.setLiveSyncEnabled(settings.liveSync);
     renderAnnouncementBanner();
-    const adminBarName = document.getElementById('admin-bar-store-name');
-    if (adminBarName) adminBarName.textContent = settings.storeName || 'Bana Blooms';
+    applyStoreBranding();
+    applyHeroBackground();
     msg.style.display = 'inline';
     if (serverSaveFailed) {
       if (statusEl) { statusEl.textContent = `⚠ Saved on this device only — server sync failed (${serverSaveFailed})`; statusEl.className = 'set-sync-status warn'; statusEl.style.display = ''; }
@@ -6070,6 +6231,18 @@ async function saveSettings() {
   }
 }
 document.getElementById('btn-save-settings')?.addEventListener('click', saveSettings);
+(function wireHeroLinkBox() {
+  const input = document.getElementById('set-hero-image');
+  if (input) {
+    let t;
+    input.addEventListener('input', () => { clearTimeout(t); t = setTimeout(refreshHeroLinkUI, 350); });
+    input.addEventListener('change', refreshHeroLinkUI);
+  }
+  document.getElementById('btn-hero-remove')?.addEventListener('click', () => {
+    setHeroImageInForm('');
+    showToast('Picture removed — press Save Settings to apply.', 'info', 3500);
+  });
+})();
 
 // ─────────────────────────────────────────────
 // ADMIN TABS
@@ -7457,6 +7630,8 @@ const _origLoadAdminChatMessages = typeof _loadAdminChatMessages !== 'undefined'
   initCustomerAutosave();
   restoreViewMode();
   renderAnnouncementBanner(); // show cached announcement immediately from localStorage
+  applyStoreBranding();       // logo / footer name from saved settings
+  applyHeroBackground();      // hero picture from saved settings
 
   // ── Keep the sticky category bar flush under the header ─────────
   // Header height changes at the 640px breakpoint (search bar wraps to its
