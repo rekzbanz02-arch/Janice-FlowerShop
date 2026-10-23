@@ -2585,15 +2585,11 @@
 .hero-sub { margin: 12px 0 18px; max-width: 50ch; color: rgba(255,255,255,.78); line-height: 1.5; }
 .hero-cta { display: inline-block; background: var(--amber); color: #fff; font-weight: 700; padding: 11px 20px; border-radius: 999px; text-decoration: none; }
 .hero-cta:hover { background: var(--amber-dk); }
-.occ-row { display: flex; gap: 10px; align-items: center; justify-content: space-between; flex-wrap: wrap; margin-bottom: 16px; }
-.occ-chips { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 2px; max-width: 100%; }
-.occ-chip { flex: none; border: 1.5px solid var(--border); background: var(--card); color: var(--dark); font: 600 13px var(--fb); padding: 7px 14px; border-radius: 999px; cursor: pointer; }
-.occ-chip.active { background: var(--dark); border-color: var(--dark); color: #fff; }
 #sort-select, .fl-box select, .fl-box input[type=date] { border: 1.5px solid var(--border); border-radius: var(--radius-sm); padding: 8px 10px; font: 14px var(--fb); background: #fff; color: var(--dark); }
 .product-img-wrap { position: relative; }
 .fav-btn { position: absolute; top: 8px; right: 8px; width: 34px; height: 34px; border-radius: 50%; border: 0; background: rgba(255,255,255,.92); color: #9a8590; font-size: 17px; cursor: pointer; display: grid; place-items: center; z-index: 2; }
 .fav-btn.on { color: var(--amber); }
-.fav-btn:focus-visible, .occ-chip:focus-visible { outline: 2px solid var(--amber); outline-offset: 2px; }
+.fav-btn:focus-visible { outline: 2px solid var(--amber); outline-offset: 2px; }
 .cart-footer { max-height: 62vh; overflow-y: auto; }
 .fl-box { display: flex; flex-direction: column; gap: 8px; margin: 2px 0 4px; }
 .fl-box input[type=text], .fl-box input[type=tel], .fl-box textarea, .fl-box select, .fl-box input[type=date] { width: 100%; border: 1.5px solid var(--border); border-radius: var(--radius-sm); padding: 9px 11px; font: 14px var(--fb); outline: none; background: #fff; }
@@ -2633,6 +2629,63 @@
 #set-hero-preview { margin-top: 8px; }
 .btn-admin-util:disabled { opacity: .5; cursor: not-allowed; }
 </style>
+
+  <style>
+    /* ── Flower photo viewer + "View" button + gallery link boxes ───────── */
+    .view-btn { position: absolute; left: 8px; bottom: 8px; z-index: 2; display: inline-flex; align-items: center; gap: 5px;
+      border: 0; border-radius: 999px; padding: 6px 11px; background: rgba(42,16,33,.74); color: #fff;
+      font: 700 12px var(--fb); cursor: pointer; transition: background .15s, transform .15s; }
+    .view-btn:hover { background: rgba(42,16,33,.92); transform: scale(1.05); }
+    .view-btn:focus-visible { outline: 2px solid var(--amber); outline-offset: 2px; }
+    .product-card[data-id] .product-img-wrap { cursor: zoom-in; }
+    .product-grid.list-view .view-btn { padding: 0; width: 28px; height: 28px; justify-content: center; left: 5px; bottom: 5px; }
+    .product-grid.list-view .view-btn .vb-txt { display: none; }
+
+    .fv-overlay { position: fixed; inset: 0; z-index: 9990; background: rgba(20,8,16,.95); display: none; flex-direction: column;
+      -webkit-user-select: none; user-select: none; }
+    .fv-overlay.open { display: flex; animation: fv-in .18s ease-out; }
+    @keyframes fv-in { from { opacity: 0; } to { opacity: 1; } }
+    .fv-close { position: absolute; top: max(12px, env(safe-area-inset-top)); right: 14px; z-index: 4; width: 42px; height: 42px; border-radius: 50%;
+      border: 0; background: rgba(255,255,255,.16); color: #fff; font-size: 20px; line-height: 1; cursor: pointer; }
+    .fv-close:hover { background: rgba(255,255,255,.3); }
+    .fv-counter { position: absolute; top: max(18px, env(safe-area-inset-top)); left: 16px; z-index: 4; color: #fff; font: 700 13px var(--fb);
+      background: rgba(255,255,255,.16); padding: 6px 12px; border-radius: 999px; }
+    .fv-stage { flex: 1; min-height: 0; position: relative; overflow: hidden; touch-action: pan-y pinch-zoom; cursor: grab; }
+    .fv-stage.dragging { cursor: grabbing; }
+    .fv-track { display: flex; height: 100%; will-change: transform; transition: transform .32s cubic-bezier(.22,.8,.25,1); }
+    .fv-slide { flex: 0 0 100%; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;
+      padding: 64px 64px 6px; position: relative; }
+    .fv-slide img { max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 10px; box-shadow: 0 12px 50px rgba(0,0,0,.5);
+      pointer-events: none; -webkit-user-drag: none; opacity: 0; transition: opacity .25s; }
+    .fv-slide.loaded img { opacity: 1; }
+    .fv-slide.loading::after { content: ''; position: absolute; top: 50%; left: 50%; width: 34px; height: 34px; margin: -17px 0 0 -17px;
+      border: 3px solid rgba(255,255,255,.25); border-top-color: #fff; border-radius: 50%; animation: fv-spin .8s linear infinite; }
+    @keyframes fv-spin { to { transform: rotate(360deg); } }
+    .fv-slide .fv-ph { color: rgba(255,255,255,.75); text-align: center; font-size: 14px; }
+    .fv-slide .fv-ph b { display: block; font-size: 80px; font-weight: 400; margin-bottom: 8px; }
+    .fv-nav { position: absolute; top: 50%; transform: translateY(-50%); z-index: 3; width: 46px; height: 46px; border-radius: 50%; border: 0;
+      background: rgba(255,255,255,.16); color: #fff; font-size: 30px; line-height: 1; cursor: pointer; display: grid; place-items: center; padding-bottom: 4px; }
+    .fv-nav:hover:not([disabled]) { background: rgba(255,255,255,.3); }
+    .fv-nav[disabled] { opacity: .22; cursor: default; }
+    .fv-prev { left: 12px; } .fv-next { right: 12px; }
+    .fv-caption { padding: 8px 18px calc(16px + env(safe-area-inset-bottom)); text-align: center; color: #fff; }
+    .fv-title { font: 600 17px var(--fd); }
+    .fv-sub { font-size: 13px; color: rgba(255,255,255,.72); margin-top: 2px; max-width: 60ch; margin-inline: auto;
+      display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .fv-dots { display: flex; gap: 9px; justify-content: center; margin-top: 10px; min-height: 10px; }
+    .fv-dot { width: 9px; height: 9px; border-radius: 50%; border: 0; padding: 0; background: rgba(255,255,255,.35); cursor: pointer; transition: transform .15s, background .15s; }
+    .fv-dot.on { background: var(--amber); transform: scale(1.3); }
+    @media (hover: none) { .fv-nav { display: none; } }
+    @media (max-width: 640px) { .fv-slide { padding: 60px 6px 4px; } }
+
+    .apf-gal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .apf-gal-item { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+    .apf-gal-thumb { height: 64px; border: 1.5px dashed var(--border); border-radius: var(--radius-sm); background: var(--cream);
+      display: flex; align-items: center; justify-content: center; overflow: hidden; color: var(--muted); font-size: 11px; }
+    .apf-gal-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .apf-gal-item.bad .apf-input { border-color: var(--red); }
+    @media (max-width: 480px) { .apf-gal-grid { grid-template-columns: 1fr; } }
+  </style>
 </head>
 <body>
 
@@ -2700,23 +2753,12 @@
 
   <main class="main-content">
 
-    <div class="occ-row">
-      <div class="occ-chips" id="occ-chips" role="group" aria-label="Shop by occasion">
-        <button class="occ-chip" data-occ="birthday">Birthday</button>
-        <button class="occ-chip" data-occ="anniversary,love,romantic,valentine">Love &amp; Anniversary</button>
-        <button class="occ-chip" data-occ="wedding,bridal,event">Wedding &amp; Events</button>
-        <button class="occ-chip" data-occ="graduation,congrat,celebrat">Congrats</button>
-        <button class="occ-chip" data-occ="get well,recovery,cheer">Get Well</button>
-        <button class="occ-chip" data-occ="sympathy,funeral,condolence,wreath">Sympathy</button>
-        <button class="occ-chip" data-fav="1" id="chip-fav">♥ Saved</button>
-      </div>
+    <div class="view-controls">
+      <h1 class="section-title" id="section-title" style="margin-bottom:0">All <span>Flowers</span></h1>
       <select id="sort-select" aria-label="Sort flowers">
         <option value="">Featured</option><option value="price-asc">Price: low to high</option>
         <option value="price-desc">Price: high to low</option><option value="name">Name A–Z</option>
       </select>
-    </div>
-    <div class="view-controls">
-      <h1 class="section-title" id="section-title" style="margin-bottom:0">All <span>Flowers</span></h1>
       <div class="view-toggle" role="group" aria-label="View mode">
         <button class="view-toggle-btn active" id="btn-view-grid" title="Grid view" aria-pressed="true">
           <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
@@ -3241,8 +3283,8 @@
       <div class="apf-row apf-2col">
         <div>
           <label class="apf-label">Category <span class="apf-req">*</span></label>
-          <input type="text" class="apf-input" id="apf-category" placeholder="e.g. Bouquets" maxlength="60" list="apf-cat-list">
-          <datalist id="apf-cat-list"></datalist>
+          <select class="apf-input" id="apf-category"><option value="">Loading categories…</option></select>
+          <input type="text" class="apf-input" id="apf-category-new" placeholder="New category name" maxlength="60" style="display:none;margin-top:6px">
         </div>
         <div>
           <label class="apf-label">Price <span class="apf-req">*</span></label>
@@ -3263,6 +3305,10 @@
         </div>
       </div>
       <div class="apf-row">
+        <label class="apf-label">Search tags <span style="font-size:11px;color:var(--muted)">(optional · comma-separated · for search only, never shown to customers)</span></label>
+        <input type="text" class="apf-input" id="apf-tags" placeholder="e.g. birthday, anniversary, red roses, romantic" maxlength="300" autocomplete="off">
+      </div>
+      <div class="apf-row">
         <label class="apf-label">Description</label>
         <textarea class="apf-input apf-textarea" id="apf-desc" placeholder="Short product description (optional)…" maxlength="300" rows="2"></textarea>
       </div>
@@ -3271,6 +3317,27 @@
         <input type="url" class="apf-input" id="apf-image" placeholder="https://drive.google.com/file/d/…/view">
         <div class="apf-img-preview-wrap" id="apf-img-preview-wrap" style="display:none">
           <img id="apf-img-preview" src="" alt="Preview">
+        </div>
+      </div>
+      <div class="apf-row">
+        <label class="apf-label">More photos <span style="font-size:11px;color:var(--muted)">(optional — up to 4 more image links; shoppers swipe through them when they open the flower)</span></label>
+        <div class="apf-gal-grid">
+          <div class="apf-gal-item" id="apf-gal-item-1">
+            <input type="url" class="apf-input apf-gal-input" id="apf-gal-1" data-gal="1" placeholder="Extra photo 1 — image link" autocomplete="off">
+            <div class="apf-gal-thumb" id="apf-gal-thumb-1">No preview</div>
+          </div>
+          <div class="apf-gal-item" id="apf-gal-item-2">
+            <input type="url" class="apf-input apf-gal-input" id="apf-gal-2" data-gal="2" placeholder="Extra photo 2 — image link" autocomplete="off">
+            <div class="apf-gal-thumb" id="apf-gal-thumb-2">No preview</div>
+          </div>
+          <div class="apf-gal-item" id="apf-gal-item-3">
+            <input type="url" class="apf-input apf-gal-input" id="apf-gal-3" data-gal="3" placeholder="Extra photo 3 — image link" autocomplete="off">
+            <div class="apf-gal-thumb" id="apf-gal-thumb-3">No preview</div>
+          </div>
+          <div class="apf-gal-item" id="apf-gal-item-4">
+            <input type="url" class="apf-input apf-gal-input" id="apf-gal-4" data-gal="4" placeholder="Extra photo 4 — image link" autocomplete="off">
+            <div class="apf-gal-thumb" id="apf-gal-thumb-4">No preview</div>
+          </div>
         </div>
       </div>
       <div class="apf-err" id="apf-err" style="display:none"></div>
@@ -3356,6 +3423,24 @@
 </div>
 
 <!-- Toast -->
+<!-- ════════════════════════════════════════════════════════════
+     FLOWER PHOTO VIEWER  (double-click a flower, or press its "View" button)
+════════════════════════════════════════════════════════════ -->
+<div class="fv-overlay" id="fv-overlay" role="dialog" aria-modal="true" aria-label="Flower photos" aria-hidden="true">
+  <div class="fv-counter" id="fv-counter"></div>
+  <button type="button" class="fv-close" id="fv-close" aria-label="Close photo viewer">✕</button>
+  <div class="fv-stage" id="fv-stage">
+    <div class="fv-track" id="fv-track"></div>
+    <button type="button" class="fv-nav fv-prev" id="fv-prev" aria-label="Previous photo">‹</button>
+    <button type="button" class="fv-nav fv-next" id="fv-next" aria-label="Next photo">›</button>
+  </div>
+  <div class="fv-caption">
+    <div class="fv-title" id="fv-title"></div>
+    <div class="fv-sub" id="fv-sub"></div>
+    <div class="fv-dots" id="fv-dots"></div>
+  </div>
+</div>
+
 <div class="toast" id="toast" role="alert" aria-live="polite"></div>
 
 
@@ -3586,12 +3671,61 @@ const FLOWER_CAT_ORDER = ['Bouquets','Roses','Sunflowers','Tulips','Lilies','Orc
 function _catKey(s) { return String(s == null ? '' : s).toLowerCase().replace(/[^a-z0-9]+/g, ''); }
 const _LEGACY_KEYS = new Set(LEGACY_CATEGORIES.map(_catKey));
 function _isLegacyCat(name) { return _LEGACY_KEYS.has(_catKey(name)); }
+function _slugifyCat(s) {
+  return String(s == null ? '' : s).toLowerCase().replace(/&/g, ' and ').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+}
+/**
+ * Builds the shop's category tabs.
+ *  • A tab exists for every category that has at least one visible flower.
+ *  • The Categories sheet supplies its display name / slug / order when it has a row for it.
+ *  • A category that only exists on a flower (typed in Admin → Add/Edit flower and not yet
+ *    in the sheet) still gets a tab — previously those flowers were invisible in the shop.
+ *  • Spelling variants ("roses", "Roses ") are one tab, not two.
+ */
 function _flowerCategories(cats, prods) {
-  const used = new Set((prods || []).map(p => _catKey(p.category)));
   const rank = c => { const i = FLOWER_CAT_ORDER.findIndex(x => _catKey(x) === _catKey(c.name)); return i < 0 ? 999 : i; };
-  return (cats || [])
-    .filter(c => !_isLegacyCat(c.name) && (used.has(_catKey(c.name)) || used.has(_catKey(c.slug))))
-    .sort((a, b) => rank(a) - rank(b) || String(a.name).localeCompare(String(b.name)));
+
+  // key -> display name, for every category that has a visible flower
+  const used = new Map();
+  (prods || []).forEach(p => {
+    const k = _catKey(p.category);
+    if (k && !_isLegacyCat(p.category) && !used.has(k)) used.set(k, String(p.category).replace(/\s+/g, ' ').trim());
+  });
+
+  const out = [], taken = new Set(), slugs = new Set();
+  const take = c => {
+    let slug = String(c.slug || '').toLowerCase().trim() || _slugifyCat(c.name) || ('cat-' + (out.length + 1));
+    const base = slug; let n = 2;
+    while (slugs.has(slug)) slug = base + '-' + (n++);
+    slugs.add(slug);
+    out.push({ id: String(c.id || ('auto-' + slug)), name: c.name, slug, sortOrder: Number(c.sortOrder) || 0 });
+  };
+
+  // 1) rows from the Categories sheet that are in use
+  (cats || []).forEach(c => {
+    if (!c || !c.name || _isLegacyCat(c.name)) return;
+    const kn = _catKey(c.name), ks = _catKey(c.slug);
+    const key = used.has(kn) ? kn : (used.has(ks) ? ks : null);
+    if (!key || taken.has(key)) return;           // no flowers (or duplicate row) → no tab
+    taken.add(key); taken.add(kn); if (ks) taken.add(ks);
+    take(c);
+  });
+
+  // 2) categories that exist only on flowers → synthesize a tab
+  used.forEach((name, key) => {
+    if (taken.has(key)) return;
+    taken.add(key);
+    take({ name, slug: _slugifyCat(name), sortOrder: 9999 });
+  });
+
+  return out.sort((a, b) => rank(a) - rank(b) || (a.sortOrder - b.sortOrder) || String(a.name).localeCompare(String(b.name)));
+}
+/** Signature of everything the storefront shows — used to decide if a background refresh must redraw. */
+function _catalogSig(prods, cats) {
+  return JSON.stringify([
+    (prods || []).map(p => [p.id, p.stock, p.price, p.name, p.category, p.description, p.imageUrl, (p.gallery || []).join('|'), p.packQty]),
+    (cats  || []).map(c => [c.slug, c.name])
+  ]);
 }
 
 const STATE = {
@@ -3915,12 +4049,10 @@ function _hydrateFromSnapshot(snap, isFirstLoad) {
   const catsChanged = JSON.stringify(newCats) !== JSON.stringify(STATE.categories);
   if (catsChanged) STATE.categories = newCats;
 
-  // No "All" tab: make sure the active category is a real tab (first one by default).
-  // 'all' is kept only as an internal fallback when the shop has no categories at all.
+  // "All Flowers" is always a valid tab; if the active category no longer exists, fall back to it.
   const _hasActive = STATE.activeCategory === 'all'
-    ? newCats.length === 0
-    : newCats.some(c => c.slug === STATE.activeCategory);
-  if (!_hasActive) STATE.activeCategory = newCats.length ? newCats[0].slug : 'all';
+    || newCats.some(c => c.slug === STATE.activeCategory);
+  if (!_hasActive) STATE.activeCategory = 'all';
   if (catsChanged || !_hasActive || !document.getElementById('category-nav').dataset.built) _buildCategoryNav(newCats);
 
   // ── Products ─────────────────────────────────────────────────
@@ -3990,7 +4122,14 @@ function _buildCategoryNav(cats) {
   nav.innerHTML = '';
   nav.dataset.built = '1';
 
-  const seen = new Set();
+  // First tab: All Flowers
+  const allBtn = document.createElement('button');
+  allBtn.className    = 'cat-btn' + (STATE.activeCategory === 'all' ? ' active' : '');
+  allBtn.dataset.slug = 'all';
+  allBtn.textContent  = 'All Flowers';
+  nav.appendChild(allBtn);
+
+  const seen = new Set(['all']);
   cats.forEach(cat => {
     if (seen.has(cat.slug)) return; // skip dupe
     seen.add(cat.slug);
@@ -4011,11 +4150,11 @@ function _buildCategoryNav(cats) {
 
 async function refreshPublicProducts() {
   try {
-    const { data } = await api('getProducts', { category: 'all' });
-    STATE.products = (data || []).filter(p => !_isLegacyCat(p.category));
     DataCache.del('store_snapshot');
-    applyFilters();
-    _patchProductGrid();
+    // One snapshot = categories + products, so a new/changed category gets its tab straight away
+    const snap = await api('getStoreSnapshot');
+    DataCache.set('store_snapshot', snap, 55000);
+    _hydrateFromSnapshot(snap, false);
   } catch (err) {
     console.error('refreshPublicProducts:', err);
   }
@@ -4032,46 +4171,29 @@ function _patchProductGrid() {
   // If no cards yet (empty state showing), do a full render
   if (!grid.querySelector('.product-card')) { renderProducts(); return; }
 
-  // Build a map of existing cards by product ID
-  const existingCards = new Map();
-  grid.querySelectorAll('.product-card[data-id]').forEach(el => {
-    existingCards.set(el.dataset.id, el);
-  });
+  const cards   = Array.from(grid.querySelectorAll('.product-card[data-id]'));
+  const wantIds = STATE.filteredProducts.map(p => String(p.id));
 
-  // Patch each product that changed, collect new ones, remove stale ones
-  const keepIds    = new Set();
-  const newCards   = [];
+  // A flower was added, removed, moved to another category or the order changed → redraw
+  if (cards.length !== wantIds.length || cards.some((el, i) => el.dataset.id !== wantIds[i])) {
+    renderProducts();
+    return;
+  }
+
+  // Same flowers, same order: re-create cards whose details changed (name, category, photo,
+  // description, price) and patch only stock / button on the rest.
   const isListView = STATE.viewMode === 'list';
-
-  STATE.filteredProducts.forEach(p => {
-    const pid  = String(p.id);
-    keepIds.add(pid);
-    const card = existingCards.get(pid);
-    if (!card) {
-      // New product — create and remember position
-      newCards.push(p);
-      return;
+  STATE.filteredProducts.forEach((p, i) => {
+    const card = cards[i];
+    if (card.dataset.sig !== _productSig(p)) {
+      const tmp = document.createElement('div');
+      tmp.innerHTML = isListView ? productListHTML(p) : productCardHTML(p);
+      const fresh = tmp.firstElementChild;
+      if (fresh) card.replaceWith(fresh);
+    } else {
+      _patchProductCard(card, p);
     }
-    // Patch only changed fields
-    _patchProductCard(card, p);
   });
-
-  // Remove cards for products no longer in filtered set
-  existingCards.forEach((el, pid) => {
-    if (!keepIds.has(pid)) el.remove();
-  });
-
-  // Append new product cards
-  newCards.forEach(p => {
-    const html = isListView ? productListHTML(p) : productCardHTML(p);
-    const tmp  = document.createElement('div');
-    tmp.innerHTML = html;
-    const newCard = tmp.firstElementChild;
-    if (newCard) grid.appendChild(newCard);
-  });
-
-  // If all products disappeared, show empty state
-  if (STATE.filteredProducts.length === 0) renderProducts();
 }
 
 /**
@@ -4112,9 +4234,9 @@ function _patchProductCard(card, p) {
   }
 }
 
-// With no "All" tab, searching / occasion chips / ♥ Saved look across every category.
+// Searching always looks across every category.
 function _isCrossCategory() {
-  return !!((STATE.searchQuery || '').trim() || STATE.occasion || STATE.favOnly);
+  return !!(STATE.searchQuery || '').trim();
 }
 
 function applyFilters() {
@@ -4126,14 +4248,11 @@ function applyFilters() {
 
   STATE.filteredProducts = STATE.products.filter(p => {
     const matchCat = cross || cat === 'all' || catKeys.includes(_catKey(p.category));
-    const matchQ = !q ||
-      p.name.toLowerCase().includes(q) ||
-      p.category.toLowerCase().includes(q) ||
-      (p.description || '').toLowerCase().includes(q);
-    const hay = (p.name + ' ' + p.category + ' ' + (p.description || '')).toLowerCase();
-    const matchOcc = !STATE.occasion || STATE.occasion.some(k => hay.includes(k));
-    const matchFav = !STATE.favOnly || isFav(p.id);
-    return matchCat && matchQ && matchOcc && matchFav;
+    // Search looks at name, category, description AND the hidden tags (tags are never displayed).
+    // Every word typed must be found somewhere, so "birthday roses" matches a rose tagged "birthday".
+    const hay = (p.name + ' ' + p.category + ' ' + (p.description || '') + ' ' + (p.tags || '')).toLowerCase();
+    const matchQ = !q || q.split(/\s+/).every(w => hay.includes(w));
+    return matchCat && matchQ;
   });
   const s = STATE.sortMode;
   if (s === 'price-asc')  STATE.filteredProducts.sort((a, b) => (parseFloat(a.price)||0) - (parseFloat(b.price)||0));
@@ -4152,7 +4271,7 @@ function renderProducts() {
     ? 'Matching <span>Flowers</span>'
     : _cat
       ? `<span>${esc(_cat.name)}</span>`
-      : 'Our <span>Flowers</span>';
+      : 'All <span>Flowers</span>';
 
   if (STATE.filteredProducts.length === 0) {
     grid.style.display  = 'none';
@@ -4191,12 +4310,12 @@ function productCardHTML(p) {
   const imgSrc  = driveImgUrl(p.imageUrl);
   const imgHtml = imgSrc
     ? `<img src="${esc(imgSrc)}" alt="${esc(p.name)}" loading="lazy"
-           onerror="this.parentElement.innerHTML='<div class=&quot;product-img-placeholder&quot;>🌸</div>'">`
+           onerror="this.outerHTML='<div class=&quot;product-img-placeholder&quot;>🌸</div>'">`
     : `<div class="product-img-placeholder">🌸</div>`;
 
   return `
-    <div class="product-card" data-id="${esc(String(p.id))}">
-      <div class="product-img-wrap">${imgHtml}${favBtnHTML(p.id)}</div>
+    <div class="product-card" data-id="${esc(String(p.id))}" data-sig="${esc(_productSig(p))}">
+      <div class="product-img-wrap">${imgHtml}${favBtnHTML(p.id)}${viewBtnHTML(p)}</div>
       <div class="product-body">
         <div class="product-cat-tag">${esc(p.category)}</div>
         <div class="product-name">${esc(p.name)}</div>
@@ -4233,12 +4352,12 @@ function productListHTML(p) {
   const imgSrc  = driveImgUrl(p.imageUrl);
   const imgHtml = imgSrc
     ? `<img src="${esc(imgSrc)}" alt="${esc(p.name)}" loading="lazy"
-           onerror="this.parentElement.innerHTML='<div class=&quot;product-img-placeholder&quot;>🌸</div>'">`
+           onerror="this.outerHTML='<div class=&quot;product-img-placeholder&quot;>🌸</div>'">`
     : `<div class="product-img-placeholder">🌸</div>`;
 
   return `
-    <div class="product-card" data-id="${esc(String(p.id))}">
-      <div class="product-img-wrap">${imgHtml}${favBtnHTML(p.id)}</div>
+    <div class="product-card" data-id="${esc(String(p.id))}" data-sig="${esc(_productSig(p))}">
+      <div class="product-img-wrap">${imgHtml}${favBtnHTML(p.id)}${viewBtnHTML(p)}</div>
       <div class="product-body">
         <div class="product-info-col">
           <div class="product-cat-tag">${esc(p.category)}</div>
@@ -4773,14 +4892,15 @@ async function _revalidateCustomerOrders(phone, cacheKey) {
 async function _syncProducts() {
   if (document.getElementById('app-store').style.display === 'none') return;
   try {
-    const { data } = await api('getProducts', { category: 'all' });
-    const newSig = (data || []).filter(p => !_isLegacyCat(p.category)).map(p => p.id + ':' + p.stock + ':' + p.price).join(',');
-    const oldSig = (STATE.products || []).map(p => p.id + ':' + p.stock + ':' + p.price).join(',');
+    // Compares names, categories, photos and descriptions too (it used to look at
+    // id/stock/price only, so edits to a flower never reached the shop until a reload).
+    const snap  = await api('getStoreSnapshot');
+    const prods = (snap.products || []).filter(p => !_isLegacyCat(p.category));
+    const newSig = _catalogSig(prods, _flowerCategories(snap.categories, prods));
+    const oldSig = _catalogSig(STATE.products, STATE.categories);
     if (newSig === oldSig) return; // nothing changed
-    STATE.products = (data || []).filter(p => !_isLegacyCat(p.category));
-    DataCache.del('store_snapshot');
-    applyFilters();
-    _patchProductGrid();
+    DataCache.set('store_snapshot', snap, 55000);
+    _hydrateFromSnapshot(snap, false);
   } catch { /* silent */ }
 }
 
@@ -6063,19 +6183,27 @@ function applyHeroBackground() {
   const src = heroImgUrl(url);
   if (hero._bgReq === src) return;          // already showing / loading this one
   hero._bgReq = src;
-  const img = new Image();
-  img.onload = () => {
+  _loadHeroPicture(src, shownSrc => {
     if (hero._bgReq !== src) return;        // setting changed while loading
     hero.style.backgroundImage =
-      'linear-gradient(115deg, rgba(42,16,33,.80) 0%, rgba(74,29,58,.50) 100%), ' + _cssUrl(src);
+      'linear-gradient(115deg, rgba(42,16,33,.80) 0%, rgba(74,29,58,.50) 100%), ' + _cssUrl(shownSrc);
     hero.classList.add('has-bg');
-  };
-  img.onerror = () => {                     // bad link → keep the pink gradient
+  }, () => {                                // bad link → keep the pink gradient
     if (hero._bgReq !== src) return;
     hero.style.backgroundImage = '';
     hero.classList.remove('has-bg');
+  });
+}
+
+// Load a picture; if the resized Drive version fails, try the plain Drive link once before giving up.
+function _loadHeroPicture(src, ok, fail) {
+  const tryLoad = (u, retry) => {
+    const img = new Image();
+    img.onload  = () => ok(u);
+    img.onerror = () => { if (retry) tryLoad(retry); else fail(); };
+    img.src = u;
   };
-  img.src = src;
+  tryLoad(src, src.endsWith('=w1600') ? src.slice(0, -6) : null);
 }
 
 // Only Google Drive picture links are accepted for the banner.
@@ -6118,17 +6246,14 @@ function refreshHeroLinkUI() {
   input.classList.add('valid');
   const src = heroImgUrl(url);
   input._previewReq = src;
-  const test = new Image();
-  test.onload = () => {
+  _loadHeroPicture(src, shownSrc => {
     if (input._previewReq !== src) return;
-    prev.style.backgroundImage = _cssUrl(src);
+    prev.style.backgroundImage = _cssUrl(shownSrc);
     if (empty) empty.style.display = 'none';
-  };
-  test.onerror = () => {
+  }, () => {
     if (input._previewReq !== src) return;
     showErr('The picture cannot be shown. In Google Drive, set sharing to "Anyone with the link" and make sure the file is a picture (JPG/PNG).', true);
-  };
-  test.src = src;
+  });
   return true;
 }
 
@@ -6192,6 +6317,22 @@ function _readSettingsFromForm() {
   };
 }
 
+// After saving, ask the server for the same public data every customer gets and confirm the banner link is in it.
+async function _verifyHeroOnServer(link) {
+  if (!link) return;
+  const statusEl = document.getElementById('set-sync-status');
+  try {
+    const snap = await api('getStoreSnapshot');
+    const pub  = String((snap && snap.settings && snap.settings.heroImage) || '').trim();
+    if (pub === link) {
+      if (statusEl) { statusEl.textContent = '☁ Synced — customers will see the banner picture'; statusEl.className = 'set-sync-status ok'; statusEl.style.display = ''; }
+    } else {
+      if (statusEl) { statusEl.textContent = '⚠ Banner picture saved on this device only — the server (Code.gs) did not keep it, so customers cannot see it yet'; statusEl.className = 'set-sync-status warn'; statusEl.style.display = ''; }
+      showToast('Banner picture is saved on this device only. The server code (Code.gs) must also save "heroImage".', 'error', 9000);
+    }
+  } catch { /* silent — the normal save message above already shown */ }
+}
+
 async function saveSettings() {
   const btn = document.getElementById('btn-save-settings');
   const msg = document.getElementById('set-saved-msg');
@@ -6222,6 +6363,7 @@ async function saveSettings() {
     } else {
       if (statusEl) { statusEl.textContent = '☁ Synced with server'; statusEl.className = 'set-sync-status ok'; statusEl.style.display = ''; }
       showToast('Settings saved.', 'success', 2000);
+      _verifyHeroOnServer(settings.heroImage);   // checks what customers will really receive
     }
   } catch (err) {
     showToast('Could not save settings: ' + err.message, 'error');
@@ -7410,13 +7552,11 @@ let _apfEditingId = null; // null = Add mode; product id = Edit mode
 function openAddProductModal(prefillBarcode) {
   _apfEditingId = null;
 
-  // Pre-fill categories datalist from existing products
-  const cats = [...new Set([...FLOWER_CATS, ...(STATE.adminProducts||[]).map(p => p.category||'').filter(c => c && !_isLegacyCat(c))])].sort();
-  const dl = document.getElementById('apf-cat-list');
-  if (dl) dl.innerHTML = cats.map(c => `<option value="${esc(c)}">`).join('');
+  // Category dropdown: fresh from the Categories sheet, nothing selected
+  _apfFillCategoryList('');
 
   // Clear form
-  ['apf-name','apf-barcode','apf-category','apf-price','apf-stock','apf-desc','apf-image'].forEach(id => {
+  ['apf-name','apf-barcode','apf-category-new','apf-price','apf-stock','apf-desc','apf-image','apf-tags'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.value = '';
   });
@@ -7428,6 +7568,7 @@ function openAddProductModal(prefillBarcode) {
   if (statusEl) statusEl.value = 'true';
   const prevWrap = document.getElementById('apf-img-preview-wrap');
   if (prevWrap) prevWrap.style.display = 'none';
+  _apfSetGallery([]);
   const errEl = document.getElementById('apf-err');
   if (errEl) errEl.style.display = 'none';
 
@@ -7446,14 +7587,12 @@ function openEditProductModal(productId) {
 
   _apfEditingId = p.id;
 
-  // Pre-fill categories datalist from existing products
-  const cats = [...new Set([...FLOWER_CATS, ...(STATE.adminProducts||[]).map(x => x.category||'').filter(c => c && !_isLegacyCat(c))])].sort();
-  const dl = document.getElementById('apf-cat-list');
-  if (dl) dl.innerHTML = cats.map(c => `<option value="${esc(c)}">`).join('');
+  // Category dropdown, with this flower's current category pre-selected
+  _apfFillCategoryList(p.category || '');
 
   document.getElementById('apf-name').value     = p.name || '';
   document.getElementById('apf-barcode').value  = p.barcode || '';
-  document.getElementById('apf-category').value = p.category || '';
+  document.getElementById('apf-tags').value     = p.tags || '';
   document.getElementById('apf-price').value    = p.price != null ? p.price : '';
   document.getElementById('apf-stock').value    = p.stock != null ? p.stock : '';
   document.getElementById('apf-status').value   = p.isActive ? 'true' : 'false';
@@ -7469,6 +7608,8 @@ function openEditProductModal(productId) {
   } else {
     prevWrap.style.display = 'none';
   }
+
+  _apfSetGallery(Array.isArray(p.gallery) ? p.gallery : []);
 
   const errEl = document.getElementById('apf-err');
   if (errEl) errEl.style.display = 'none';
@@ -7491,22 +7632,34 @@ async function submitAddProduct() {
   const isEdit   = !!_apfEditingId;
   const name     = (document.getElementById('apf-name')?.value || '').trim();
   const barcode  = (document.getElementById('apf-barcode')?.value || '').trim();
-  const category = (document.getElementById('apf-category')?.value || '').trim();
+  const catSel   = document.getElementById('apf-category')?.value || '';
+  const category = catSel === '__new__'
+    ? _apfCanonCategory(document.getElementById('apf-category-new')?.value || '')
+    : catSel;
+  const tags     = (document.getElementById('apf-tags')?.value || '').trim();
   const price    = parseFloat(document.getElementById('apf-price')?.value || '');
   const stock    = parseInt(document.getElementById('apf-stock')?.value || '');
   const isActive = document.getElementById('apf-status')?.value === 'true';
   const desc     = (document.getElementById('apf-desc')?.value || '').trim();
   const imageUrl = (document.getElementById('apf-image')?.value || '').trim();
+  const gallery  = _apfGetGallery();
 
   const errEl = document.getElementById('apf-err');
   errEl.style.display = 'none';
 
   if (!name)           { errEl.textContent = 'Product name is required.'; errEl.style.display = ''; return; }
-  if (!category)       { errEl.textContent = 'Category is required.'; errEl.style.display = ''; return; }
+  if (!category)       { errEl.textContent = 'Please choose a category.'; errEl.style.display = ''; return; }
   if (isNaN(price) || price < 0) { errEl.textContent = 'Please enter a valid price.'; errEl.style.display = ''; return; }
   if (isNaN(stock) || stock < 0) { errEl.textContent = 'Please enter a valid stock quantity.'; errEl.style.display = ''; return; }
   if (barcode && (STATE.adminProducts||[]).some(p => (p.barcode||'') === barcode && String(p.id) !== String(_apfEditingId))) {
     errEl.textContent = 'This product code is already used by another product.'; errEl.style.display = ''; return;
+  }
+  const badGal = gallery.findIndex(u => u && !isValidImageUrl(u));
+  if (badGal >= 0) {
+    errEl.textContent = 'Extra photo ' + (badGal + 1) + ' is not a valid image link. Paste a Google Drive share link or a direct https:// image URL.';
+    errEl.style.display = '';
+    document.getElementById('apf-gal-' + (badGal + 1))?.focus();
+    return;
   }
 
   const saveBtn = document.getElementById('btn-apf-save');
@@ -7517,16 +7670,17 @@ async function submitAddProduct() {
     if (isEdit) {
       await api('adminUpdateProduct', {
         token: STATE.adminToken,
-        product: { id: _apfEditingId, name, barcode, category, price, stock, isActive, description: desc, imageUrl },
+        product: { id: _apfEditingId, name, barcode, category, price, stock, isActive, description: desc, imageUrl, gallery, tags },
       });
     } else {
       await api('adminAddProduct', {
         token: STATE.adminToken,
-        product: { name, barcode, category, price, stock, isActive, description: desc, imageUrl },
+        product: { name, barcode, category, price, stock, isActive, description: desc, imageUrl, gallery, tags },
       });
     }
 
     // Refresh product list
+    STATE.sheetCategories = null;   // a new category may have been registered — reload the dropdown next time
     const { data: products } = await api('adminGetProducts', { token: STATE.adminToken });
     STATE.adminProducts = products || [];
     DataCache.del('admin_snapshot');
@@ -7657,9 +7811,6 @@ const _origLoadAdminChatMessages = typeof _loadAdminChatMessages !== 'undefined'
     btn.classList.add('active');
     STATE.activeCategory = btn.dataset.slug;
     STATE.searchQuery    = '';
-    STATE.occasion       = null;
-    STATE.favOnly        = false;
-    document.querySelectorAll('.occ-chip.active').forEach(c => c.classList.remove('active'));
     document.getElementById('search-input').value = '';
     applyFilters();
     renderProducts();
@@ -7906,16 +8057,6 @@ function resetFlowerFields() {
   _flRefreshMode();
   const refresh = () => { applyFilters(); renderProducts(); };
   document.getElementById('sort-select').addEventListener('change', e => { STATE.sortMode = e.target.value; refresh(); });
-  document.getElementById('occ-chips').addEventListener('click', e => {
-    const b = e.target.closest('.occ-chip'); if (!b) return;
-    const wasOn = b.classList.contains('active');
-    if (b.dataset.fav) { STATE.favOnly = !wasOn; b.classList.toggle('active', !wasOn); }
-    else {
-      document.querySelectorAll('.occ-chip[data-occ]').forEach(x => x.classList.remove('active'));
-      STATE.occasion = wasOn ? null : b.dataset.occ.split(','); b.classList.toggle('active', !wasOn);
-    }
-    refresh();
-  });
 })();
 </script>
 <script>
@@ -7936,6 +8077,263 @@ function _updateLegacyNote() {
 (function () {
   const vt = document.querySelector('.view-toggle'), ss = document.getElementById('sort-select');
   if (vt && ss) { const w = document.createElement('div'); w.className = 'vc-tools'; vt.parentNode.insertBefore(w, vt); w.append(ss, vt); }
+})();
+</script>
+<script>
+/* ── Category list helpers for the Add/Edit popup ───────────────────────── */
+function _adminCategoryNames() {
+  const seen = new Map();
+  const push = n => {
+    n = String(n == null ? '' : n).replace(/\s+/g, ' ').trim();
+    const k = _catKey(n);
+    if (k && !_isLegacyCat(n) && !seen.has(k)) seen.set(k, n);   // first spelling wins (flower list first)
+  };
+  FLOWER_CATS.forEach(push);
+  (STATE.categories || []).forEach(c => push(c.name));
+  (STATE.adminProducts || []).forEach(p => push(p.category));
+  const rank = n => { const i = FLOWER_CAT_ORDER.findIndex(x => _catKey(x) === _catKey(n)); return i < 0 ? 999 : i; };
+  return [...seen.values()].sort((a, b) => rank(a) - rank(b) || a.localeCompare(b));
+}
+/**
+ * Category dropdown for the Add/Edit popup. The options come straight from the
+ * Categories sheet (getCategories), in the sheet's sort order. Old shop leftovers listed in
+ * LEGACY_CATEGORIES are skipped. A flower whose current category is not in the sheet keeps it
+ * as an extra option, so editing never silently changes it.
+ */
+function _apfRenderCategorySelect(selected) {
+  const sel = document.getElementById('apf-category');
+  if (!sel) return;
+  const names = [], keys = new Set();
+  (STATE.sheetCategories || []).forEach(c => {
+    const n = String(c && c.name || '').replace(/\s+/g, ' ').trim();
+    const k = _catKey(n);
+    if (n && k && !keys.has(k) && !_isLegacyCat(n)) { keys.add(k); names.push(n); }
+  });
+  const cur = String(selected == null ? '' : selected).replace(/\s+/g, ' ').trim();
+  let html = '<option value="">Select a category…</option>' +
+    names.map(n => `<option value="${esc(n)}">${esc(n)}</option>`).join('');
+  if (cur && !keys.has(_catKey(cur))) html += `<option value="${esc(cur)}">${esc(cur)} (not in Categories sheet)</option>`;
+  html += '<option value="__new__">＋ New category…</option>';
+  sel.innerHTML = html;
+  const hit = cur ? [...sel.options].find(o => o.value && o.value !== '__new__' && _catKey(o.value) === _catKey(cur)) : null;
+  sel.value = hit ? hit.value : '';
+  _apfToggleNewCategory();
+}
+function _apfToggleNewCategory() {
+  const sel = document.getElementById('apf-category'), box = document.getElementById('apf-category-new');
+  if (!sel || !box) return;
+  const isNew = sel.value === '__new__';
+  box.style.display = isNew ? '' : 'none';
+  if (isNew) box.focus(); else box.value = '';
+}
+function _apfFillCategoryList(selected) {
+  // Show what we already have straight away, then refresh from the sheet.
+  if (!STATE.sheetCategories) STATE.sheetCategories = (STATE.categories || []).map(c => ({ name: c.name }));
+  _apfRenderCategorySelect(selected);
+  api('getCategories').then(res => {
+    STATE.sheetCategories = (res && res.data) || [];
+    const sel = document.getElementById('apf-category');
+    // keep whatever the admin has picked in the meantime
+    const picked = sel && sel.value && sel.value !== '__new__' ? sel.value : selected;
+    _apfRenderCategorySelect(picked);
+  }).catch(() => { /* keep the list we already show */ });
+}
+document.getElementById('apf-category')?.addEventListener('change', _apfToggleNewCategory);
+/** Typed category → the spelling the shop already uses ("roses " → "Roses"); a new all-lowercase name is Title-Cased. */
+function _apfCanonCategory(raw) {
+  const typed = String(raw == null ? '' : raw).replace(/\s+/g, ' ').trim();
+  if (!typed) return '';
+  const hit = _adminCategoryNames().find(n => _catKey(n) === _catKey(typed));
+  if (hit) return hit;
+  return typed === typed.toLowerCase() ? typed.replace(/(^|[\s(\-\/&])([a-z])/g, (m, a, b) => a + b.toUpperCase()) : typed;
+}
+
+/* ── Gallery link boxes (Add / Edit popup) ──────────────────────────────── */
+function _apfGalPreview(n) {
+  const input = document.getElementById('apf-gal-' + n);
+  const thumb = document.getElementById('apf-gal-thumb-' + n);
+  const item  = document.getElementById('apf-gal-item-' + n);
+  if (!input || !thumb) return;
+  const val = input.value.trim();
+  item && item.classList.remove('bad');
+  if (!val) { thumb.textContent = 'No preview'; return; }
+  if (!isValidImageUrl(val)) { thumb.textContent = 'Not a valid link'; item && item.classList.add('bad'); return; }
+  const img = new Image();
+  img.alt = 'Extra photo ' + n;
+  img.onload  = () => { thumb.innerHTML = ''; thumb.appendChild(img); };
+  img.onerror = () => { thumb.textContent = 'Can\u2019t load this link'; item && item.classList.add('bad'); };
+  thumb.textContent = 'Loading…';
+  img.src = driveImgUrl(val);
+}
+function _apfSetGallery(list) {
+  for (let n = 1; n <= 4; n++) {
+    const el = document.getElementById('apf-gal-' + n);
+    if (el) el.value = (list && list[n - 1]) ? String(list[n - 1]) : '';
+    _apfGalPreview(n);
+  }
+}
+function _apfGetGallery() {
+  const out = [];
+  for (let n = 1; n <= 4; n++) out.push((document.getElementById('apf-gal-' + n)?.value || '').trim());
+  return out;
+}
+(function () {
+  for (let n = 1; n <= 4; n++) {
+    document.getElementById('apf-gal-' + n)?.addEventListener('input', () => _apfGalPreview(n));
+  }
+})();
+
+/* ── Flower photo viewer ────────────────────────────────────────────────── */
+function _productSig(p) {
+  return [p.name, p.category, p.description, p.imageUrl, (Array.isArray(p.gallery) ? p.gallery : []).join('|'), p.price].join('¦');
+}
+/** Main photo first, then the extra gallery links — de-duplicated, Drive links converted. */
+function _flowerImages(p) {
+  const raw  = [p && p.imageUrl].concat(p && Array.isArray(p.gallery) ? p.gallery : []);
+  const seen = new Set(), out = [];
+  raw.forEach(u => {
+    u = String(u == null ? '' : u).trim();
+    if (!u) return;
+    const src = driveImgUrl(u);
+    if (src && !seen.has(src)) { seen.add(src); out.push(src); }
+  });
+  return out;
+}
+function viewBtnHTML(p) {
+  const n = _flowerImages(p).length;
+  if (!n) return '';
+  return `<button type="button" class="view-btn" onclick="openFlowerViewer('${esc(String(p.id))}')" aria-label="View ${n > 1 ? 'photos' : 'photo'} of ${esc(p.name)}">🔍<span class="vb-txt">View${n > 1 ? ' · ' + n : ''}</span></button>`;
+}
+
+const FV = { imgs: [], i: 0, isOpen: false, drag: null, lastFocus: null, prevOverflow: '' };
+
+function openFlowerViewer(productId, startIndex) {
+  const p = (STATE.products || []).find(x => String(x.id) === String(productId));
+  if (!p) return;
+  const imgs = _flowerImages(p);
+  if (!imgs.length) { showToast('No photos added for this flower yet.', 'info'); return; }
+
+  FV.imgs = imgs;
+  FV.i = Math.min(Math.max(parseInt(startIndex) || 0, 0), imgs.length - 1);
+  FV.lastFocus = document.activeElement;
+
+  const track = document.getElementById('fv-track');
+  track.style.transition = 'none';
+  track.innerHTML = imgs.map((src, k) =>
+    `<div class="fv-slide loading" data-k="${k}"><img alt="${esc(p.name)} — photo ${k + 1} of ${imgs.length}" draggable="false"></div>`).join('');
+  imgs.forEach((src, k) => { const slide = track.children[k]; slide.dataset.src = src; });
+
+  document.getElementById('fv-title').textContent = p.name || '';
+  document.getElementById('fv-sub').textContent   = [p.category, p.description].filter(Boolean).join(' · ');
+  document.getElementById('fv-dots').innerHTML = imgs.length > 1
+    ? imgs.map((_, k) => `<button type="button" class="fv-dot" data-k="${k}" aria-label="Photo ${k + 1}"></button>`).join('') : '';
+
+  const ov = document.getElementById('fv-overlay');
+  ov.classList.add('open'); ov.setAttribute('aria-hidden', 'false');
+  FV.prevOverflow = document.body.style.overflow;
+  document.body.style.overflow = 'hidden';
+  FV.isOpen = true;
+
+  _fvShow(FV.i, true);
+  setTimeout(() => { track.style.transition = ''; }, 30);
+  document.getElementById('fv-close').focus({ preventScroll: true });
+}
+
+function closeFlowerViewer() {
+  if (!FV.isOpen) return;
+  FV.isOpen = false;
+  const ov = document.getElementById('fv-overlay');
+  ov.classList.remove('open'); ov.setAttribute('aria-hidden', 'true');
+  document.body.style.overflow = FV.prevOverflow || '';
+  document.getElementById('fv-track').innerHTML = '';      // stop any in-flight image loads
+  try { if (FV.lastFocus && FV.lastFocus.focus) FV.lastFocus.focus({ preventScroll: true }); } catch (e) {}
+}
+
+function _fvLoad(k) {
+  const slide = document.getElementById('fv-track').children[k];
+  if (!slide || slide.dataset.started) return;
+  slide.dataset.started = '1';
+  const img = slide.querySelector('img');
+  img.onload  = () => { slide.classList.remove('loading'); slide.classList.add('loaded'); };
+  img.onerror = () => {
+    slide.classList.remove('loading');
+    slide.innerHTML = '<div class="fv-ph"><b>🌸</b>This photo can\u2019t be loaded</div>';
+  };
+  img.src = slide.dataset.src;
+}
+
+function _fvShow(k, instant) {
+  const n = FV.imgs.length;
+  FV.i = Math.min(Math.max(k, 0), n - 1);
+  const track = document.getElementById('fv-track');
+  if (instant) track.style.transition = 'none';
+  track.style.transform = `translateX(${-FV.i * 100}%)`;
+  if (instant) { void track.offsetWidth; track.style.transition = ''; }
+  [FV.i - 1, FV.i, FV.i + 1].forEach(j => { if (j >= 0 && j < n) _fvLoad(j); });   // current + neighbours
+  document.getElementById('fv-counter').textContent = n > 1 ? `${FV.i + 1} / ${n}` : '1 photo';
+  document.getElementById('fv-prev').disabled = FV.i === 0;
+  document.getElementById('fv-next').disabled = FV.i === n - 1;
+  document.querySelectorAll('#fv-dots .fv-dot').forEach((d, j) => d.classList.toggle('on', j === FV.i));
+}
+function _fvStep(d) { if (FV.isOpen && FV.imgs.length > 1) _fvShow(FV.i + d); }
+
+(function initFlowerViewer() {
+  const ov = document.getElementById('fv-overlay'), stage = document.getElementById('fv-stage'), track = document.getElementById('fv-track');
+  if (!ov || !stage) return;
+
+  document.getElementById('fv-close').addEventListener('click', closeFlowerViewer);
+  document.getElementById('fv-prev').addEventListener('click', e => { e.stopPropagation(); _fvStep(-1); });
+  document.getElementById('fv-next').addEventListener('click', e => { e.stopPropagation(); _fvStep(1); });
+  document.getElementById('fv-dots').addEventListener('click', e => {
+    const d = e.target.closest('.fv-dot'); if (d) _fvShow(parseInt(d.dataset.k));
+  });
+
+  document.addEventListener('keydown', e => {
+    if (!FV.isOpen) return;
+    if (e.key === 'Escape')           { e.preventDefault(); closeFlowerViewer(); }
+    else if (e.key === 'ArrowLeft')   { e.preventDefault(); _fvStep(-1); }
+    else if (e.key === 'ArrowRight')  { e.preventDefault(); _fvStep(1); }
+  });
+
+  // Swipe / drag (touch, pen and mouse)
+  stage.addEventListener('pointerdown', e => {
+    if (e.target.closest('.fv-nav')) return;
+    if (e.pointerType === 'mouse' && e.button !== 0) return;
+    FV.drag = { id: e.pointerId, x: e.clientX, t: Date.now(), dx: 0, moved: false, w: stage.clientWidth || 1 };
+    try { stage.setPointerCapture(e.pointerId); } catch (_) {}
+  });
+  stage.addEventListener('pointermove', e => {
+    const d = FV.drag; if (!d || d.id !== e.pointerId || FV.imgs.length < 2) return;
+    d.dx = e.clientX - d.x;
+    if (!d.moved && Math.abs(d.dx) > 6) { d.moved = true; stage.classList.add('dragging'); track.style.transition = 'none'; }
+    if (!d.moved) return;
+    let dx = d.dx;
+    if ((FV.i === 0 && dx > 0) || (FV.i === FV.imgs.length - 1 && dx < 0)) dx *= 0.3;     // rubber-band at the ends
+    track.style.transform = `translateX(calc(${-FV.i * 100}% + ${dx}px))`;
+  });
+  const endDrag = e => {
+    const d = FV.drag; if (!d || d.id !== e.pointerId) return;
+    FV.drag = null; stage.classList.remove('dragging'); track.style.transition = '';
+    try { stage.releasePointerCapture(e.pointerId); } catch (_) {}
+    if (d.moved) {
+      const fast = Math.abs(d.dx) / Math.max(1, Date.now() - d.t) > 0.45;
+      if (Math.abs(d.dx) > Math.max(50, d.w * 0.15) || (fast && Math.abs(d.dx) > 20)) _fvShow(FV.i + (d.dx < 0 ? 1 : -1));
+      else _fvShow(FV.i);                                                                 // snap back
+    } else if (e.type === 'pointerup' && !e.target.closest('img')) {
+      closeFlowerViewer();                                                                // tap on the dark area closes
+    }
+  };
+  stage.addEventListener('pointerup', endDrag);
+  stage.addEventListener('pointercancel', endDrag);
+
+  // Double-click a flower card → open the viewer (buttons keep their own behaviour)
+  document.getElementById('product-grid')?.addEventListener('dblclick', e => {
+    if (e.target.closest('button, a, input, select, textarea, label')) return;
+    const card = e.target.closest('.product-card[data-id]');
+    if (!card) return;
+    try { window.getSelection && window.getSelection().removeAllRanges(); } catch (_) {}
+    openFlowerViewer(card.dataset.id);
+  });
 })();
 </script>
 </body>
