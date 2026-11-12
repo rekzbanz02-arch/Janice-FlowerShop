@@ -5795,8 +5795,6 @@ function renderAdminProducts() {
       ? `<img src="${esc(imgSrc)}" alt="${esc(p.name)}"
               onerror="this.parentElement.innerHTML='📷'">`
       : `📷`;
-    const removeDis = imgSrc ? '' : 'disabled';
-
     return `
     <tr>
       <td style="font-size:12px;color:var(--muted)">${safeId}</td>
@@ -5812,12 +5810,6 @@ function renderAdminProducts() {
       </span></td>
       <td class="img-mgmt-cell">
         <div class="admin-img-preview">${thumbHtml}</div>
-        <div class="img-action-btns">
-          <button class="btn-img-change"
-            onclick="openImagePicker('${safeId}')">Change</button>
-          <button class="btn-img-remove" ${removeDis}
-            onclick="removeProductImage('${safeId}')">Delete</button>
-        </div>
       </td>
       <td>
         <div class="product-action-btns">
@@ -5826,10 +5818,36 @@ function renderAdminProducts() {
             onclick="toggleProduct('${safeId}')">
             ${p.isActive ? 'Deactivate' : 'Activate'}
           </button>
+          <button class="btn-toggle deactivate btn-delete-product"
+            onclick="deleteProduct('${safeId}')">🗑 Delete</button>
         </div>
       </td>
     </tr>`;
   }).join('');
+}
+
+/**
+ * Permanently deletes a flower/product (Admin → Flowers → Action → Delete).
+ * Asks for confirmation first, then calls the backend 'adminDeleteProduct' action.
+ */
+async function deleteProduct(productId) {
+  const p = STATE.adminProducts.find(x => String(x.id) === String(productId));
+  if (!p) { showToast('Product not found.', 'error'); return; }
+
+  const ok = confirm(`Delete "${p.name || 'this product'}"?\n\nThis will permanently remove it from the store and cannot be undone.\n(Tip: use "Deactivate" instead if you only want to hide it.)`);
+  if (!ok) return;
+
+  try {
+    await api('adminDeleteProduct', { token: STATE.adminToken, id: productId });
+    STATE.adminProducts = STATE.adminProducts.filter(x => String(x.id) !== String(productId));
+    renderAdminProducts();
+    updateAdminStats();
+    DataCache.del('admin_snapshot');
+    showToast(`"${p.name || 'Product'}" deleted.`, 'success');
+    refreshPublicProducts();
+  } catch (err) {
+    showToast('Delete failed: ' + err.message, 'error', 6000);
+  }
 }
 
 async function toggleProduct(productId) {
