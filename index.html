@@ -2585,6 +2585,27 @@
 .hero-sub { margin: 12px 0 18px; max-width: 50ch; color: rgba(255,255,255,.78); line-height: 1.5; }
 .hero-cta { display: inline-block; background: var(--amber); color: #fff; font-weight: 700; padding: 11px 20px; border-radius: 999px; text-decoration: none; }
 .hero-cta:hover { background: var(--amber-dk); }
+.hero-actions { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+.hero-loc { display: none; align-items: center; gap: 6px; background: none; border: 0; padding: 8px 2px; color: #fff; font: 700 14px var(--fb); text-decoration: underline; text-underline-offset: 4px; cursor: pointer; }
+.hero-loc.show { display: inline-flex; }
+.hero-loc:hover { color: var(--amber-lt); }
+.hero-loc:focus-visible { outline: 2px solid var(--amber); outline-offset: 3px; border-radius: 4px; }
+.loc-overlay { display: none; position: fixed; inset: 0; background: rgba(42,16,33,.6); z-index: 700; backdrop-filter: blur(3px); align-items: center; justify-content: center; padding: 16px; }
+.loc-overlay.open { display: flex; }
+.loc-modal { background: var(--card); border-radius: var(--radius); width: 640px; max-width: 100%; max-height: 92vh; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 20px 60px rgba(42,16,33,.35); animation: pickerIn .22s cubic-bezier(.4,0,.2,1); }
+.loc-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; padding: 16px 18px 12px; border-bottom: 1px solid var(--border); }
+.loc-title { font-family: var(--fd); font-size: 18px; font-weight: 700; color: var(--dark); }
+.loc-addr { font-size: 13px; color: var(--muted); margin-top: 3px; line-height: 1.4; }
+.loc-close { background: none; border: none; font-size: 20px; cursor: pointer; color: var(--muted); padding: 4px 8px; border-radius: 6px; line-height: 1; }
+.loc-close:hover { color: var(--dark); background: var(--border); }
+.loc-map-wrap { position: relative; height: min(56vh, 420px); background: var(--border); }
+.loc-map-wrap iframe { width: 100%; height: 100%; border: 0; display: block; }
+.loc-foot { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; padding: 12px 18px 14px; border-top: 1px solid var(--border); }
+.loc-coords { font: 12px monospace; color: var(--muted); }
+.loc-open { font-weight: 700; font-size: 13px; color: var(--amber-dk); text-decoration: underline; text-underline-offset: 3px; }
+.loc-open:hover { color: var(--dark); }
+#set-store-lat.invalid, #set-store-lng.invalid { border-color: var(--red); }
+#set-store-lat.valid, #set-store-lng.valid { border-color: var(--green); }
 #sort-select, .fl-box select, .fl-box input[type=date] { border: 1.5px solid var(--border); border-radius: var(--radius-sm); padding: 8px 10px; font: 14px var(--fb); background: #fff; color: var(--dark); }
 .product-img-wrap { position: relative; }
 .fav-btn { position: absolute; top: 8px; right: 8px; width: 34px; height: 34px; border-radius: 50%; border: 0; background: rgba(255,255,255,.92); color: #9a8590; font-size: 17px; cursor: pointer; display: grid; place-items: center; z-index: 2; }
@@ -2744,7 +2765,10 @@
     <div class="hero-inner">
       <h2 class="hero-title">Beautiful Flowers, delivered the day you choose.</h2>
       <p class="hero-sub" id="hero-sub">Fuzzy Wires made bouquets, potted plants and gift sets, made to order.</p>
-      <a class="hero-cta" href="#product-grid" id="hero-cta">Browse flowers</a>
+      <div class="hero-actions">
+        <a class="hero-cta" href="#product-grid" id="hero-cta">Browse flowers</a>
+        <button type="button" class="hero-loc" id="hero-loc" aria-haspopup="dialog">📍 Store location</button>
+      </div>
     </div>
   </section>
   <div class="cat-bar">
@@ -3098,6 +3122,27 @@
               </select>
             </div>
             <div class="set-row">
+              <label class="set-label">Store location on map <span class="set-hint">(adds a "Store location" link on the homepage, optional)</span></label>
+              <div class="set-2col">
+                <div>
+                  <label class="set-label" for="set-store-lat">Latitude</label>
+                  <input type="text" inputmode="decimal" class="set-input" id="set-store-lat" placeholder="e.g. 14.5995" autocomplete="off" spellcheck="false">
+                </div>
+                <div>
+                  <label class="set-label" for="set-store-lng">Longitude</label>
+                  <input type="text" inputmode="decimal" class="set-input" id="set-store-lng" placeholder="e.g. 120.9842" autocomplete="off" spellcheck="false">
+                </div>
+              </div>
+              <div class="set-hero-err" id="set-loc-err" style="display:none"></div>
+              <div class="set-hero-actions" style="margin-top:8px">
+                <button type="button" class="btn-admin-util" id="btn-loc-test" disabled>Check on map</button>
+                <button type="button" class="btn-admin-util" id="btn-loc-clear" disabled>Remove location</button>
+              </div>
+              <div class="set-hint" style="margin-top:6px;line-height:1.55">
+                How to get the numbers: open <strong>Google Maps</strong>, right-click your shop on the map (on a phone, press and hold). Two numbers appear — tap them to copy. You can paste both numbers into the Latitude box and they will be split for you. Then press <strong>Save Settings</strong>. Leave both empty to hide the link.
+              </div>
+            </div>
+            <div class="set-row">
               <label class="set-label" for="set-hero-image">Homepage banner background <span class="set-hint">(Google Drive picture link, optional)</span></label>
               <input type="url" class="set-input" id="set-hero-image" placeholder="Paste Google Drive link here, e.g. https://drive.google.com/file/d/…/view" autocomplete="off" spellcheck="false">
               <div class="set-hero-err" id="set-hero-err" style="display:none"></div>
@@ -3438,6 +3483,24 @@
     <div class="fv-title" id="fv-title"></div>
     <div class="fv-sub" id="fv-sub"></div>
     <div class="fv-dots" id="fv-dots"></div>
+  </div>
+</div>
+
+<!-- ════════════ STORE LOCATION MAP POPUP ════════════ -->
+<div class="loc-overlay" id="loc-overlay" role="dialog" aria-modal="true" aria-labelledby="loc-title">
+  <div class="loc-modal">
+    <div class="loc-head">
+      <div>
+        <div class="loc-title" id="loc-title">📍 Store location</div>
+        <div class="loc-addr" id="loc-addr" style="display:none"></div>
+      </div>
+      <button type="button" class="loc-close" id="loc-close" aria-label="Close map">✕</button>
+    </div>
+    <div class="loc-map-wrap"><iframe id="loc-frame" title="Store location map" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe></div>
+    <div class="loc-foot">
+      <span class="loc-coords" id="loc-coords"></span>
+      <a class="loc-open" id="loc-open" href="#" target="_blank" rel="noopener">Open in Google Maps ↗</a>
+    </div>
   </div>
 </div>
 
@@ -6147,7 +6210,7 @@ window.addEventListener('resize', () => {
 // ─────────────────────────────────────────────
 const DEFAULT_SETTINGS = {
   storeName: 'Janice FlowerShop', storePhone: '', storeEmail: '', storeAddress: '',
-  storeOpen: '', storeClose: '', announcement: '', announcementSpeed: 'normal', heroImage: '',
+  storeOpen: '', storeClose: '', announcement: '', announcementSpeed: 'normal', heroImage: '', storeLat: '', storeLng: '',
   liveSync: true, syncSpeed: 'normal', soundOrder: false, soundMsg: false,
 };
 let _settingsCache = null;
@@ -6158,6 +6221,104 @@ function _readLocalSettings() {
 function _writeLocalSettings(s) {
   lsSet('storeSettings', s);
 }
+
+// ── Store location: homepage "Store location" link + map popup (coordinates set in Admin → Settings) ──
+function _coordNum(v, max) {
+  const s = String(v == null ? '' : v).trim();
+  if (!/^[-+]?\d{1,3}(\.\d+)?$/.test(s)) return null;
+  const n = parseFloat(s);
+  return Math.abs(n) <= max ? n : null;
+}
+function _storeCoords(src) {
+  const s = src || _readLocalSettings();
+  const lat = _coordNum(s.storeLat, 90), lng = _coordNum(s.storeLng, 180);
+  return (lat == null || lng == null) ? null : { lat: lat, lng: lng };
+}
+function applyStoreLocationLink() {
+  const b = document.getElementById('hero-loc');
+  if (b) b.classList.toggle('show', !!_storeCoords());
+}
+let _locLastFocus = null, _locPrevOverflow = '';
+function openStoreMap(coords, address) {
+  const c = coords || _storeCoords();
+  if (!c) { showToast('The store location has not been set yet.', 'info'); return; }
+  const addr = address != null ? String(address).trim() : String(_readLocalSettings().storeAddress || '').trim();
+  const ll = c.lat + ',' + c.lng;
+  const addrEl = document.getElementById('loc-addr');
+  addrEl.textContent = addr;
+  addrEl.style.display = addr ? '' : 'none';
+  document.getElementById('loc-coords').textContent = ll;
+  document.getElementById('loc-open').href = 'https://www.google.com/maps/search/?api=1&query=' + ll;
+  document.getElementById('loc-frame').src = 'https://maps.google.com/maps?q=' + ll + '&z=16&output=embed';
+  _locLastFocus = document.activeElement;
+  _locPrevOverflow = document.body.style.overflow;
+  document.body.style.overflow = 'hidden';
+  document.getElementById('loc-overlay').classList.add('open');
+  document.getElementById('loc-close').focus({ preventScroll: true });
+}
+function closeStoreMap() {
+  const ov = document.getElementById('loc-overlay');
+  if (!ov || !ov.classList.contains('open')) return;
+  ov.classList.remove('open');
+  document.getElementById('loc-frame').src = 'about:blank';
+  document.body.style.overflow = _locPrevOverflow || '';
+  try { if (_locLastFocus && _locLastFocus.focus) _locLastFocus.focus({ preventScroll: true }); } catch (e) {}
+}
+
+// Admin → Settings: latitude / longitude boxes
+function refreshLocUI() {
+  const a = document.getElementById('set-store-lat'), b = document.getElementById('set-store-lng');
+  const err = document.getElementById('set-loc-err');
+  const test = document.getElementById('btn-loc-test'), clr = document.getElementById('btn-loc-clear');
+  if (!a || !b) return true;
+  const la = a.value.trim(), lo = b.value.trim();
+  const okLa = _coordNum(la, 90) != null, okLo = _coordNum(lo, 180) != null;
+  a.classList.remove('valid', 'invalid'); b.classList.remove('valid', 'invalid');
+  let msg = '';
+  if (la || lo) {
+    if (la) a.classList.add(okLa ? 'valid' : 'invalid');
+    if (lo) b.classList.add(okLo ? 'valid' : 'invalid');
+    if (la && !okLa) msg = 'Latitude must be a number between -90 and 90, for example 14.5995.';
+    else if (lo && !okLo) msg = 'Longitude must be a number between -180 and 180, for example 120.9842.';
+    else if (!la || !lo) msg = 'Please fill in both Latitude and Longitude, or clear both to hide the link.';
+  }
+  if (err) { err.textContent = msg; err.style.display = msg ? '' : 'none'; }
+  if (test) test.disabled = !(okLa && okLo);
+  if (clr) clr.disabled = !(la || lo);
+  return !msg;
+}
+function setLocationInForm(lat, lng) {
+  const a = document.getElementById('set-store-lat'), b = document.getElementById('set-store-lng');
+  if (!a || !b) return;
+  a.value = lat == null ? '' : String(lat);
+  b.value = lng == null ? '' : String(lng);
+  refreshLocUI();
+}
+(function wireStoreLocation() {
+  const a = document.getElementById('set-store-lat'), b = document.getElementById('set-store-lng');
+  if (a && b) {
+    a.addEventListener('input', () => {
+      // Google Maps gives "14.5995, 120.9842" - if both numbers were pasted into the first box, split them.
+      const m = a.value.match(/^\s*([-+]?\d+(?:\.\d+)?)\s*[,;\s]\s*([-+]?\d+(?:\.\d+)?)\s*$/);
+      if (m) { a.value = m[1]; b.value = m[2]; }
+      refreshLocUI();
+    });
+    b.addEventListener('input', refreshLocUI);
+  }
+  document.getElementById('btn-loc-test')?.addEventListener('click', () => {
+    const c = _storeCoords({ storeLat: a.value, storeLng: b.value });
+    if (!c) { refreshLocUI(); return; }
+    openStoreMap(c, (document.getElementById('set-store-address') || {}).value || '');
+  });
+  document.getElementById('btn-loc-clear')?.addEventListener('click', () => {
+    setLocationInForm('', '');
+    showToast('Location removed — press Save Settings to apply.', 'info', 3500);
+  });
+  document.getElementById('hero-loc')?.addEventListener('click', () => openStoreMap());
+  document.getElementById('loc-close')?.addEventListener('click', closeStoreMap);
+  document.getElementById('loc-overlay')?.addEventListener('click', e => { if (e.target === e.currentTarget) closeStoreMap(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeStoreMap(); });
+})();
 
 // ── Store branding (header logo, footer, page title) — driven by Settings → Store name ──
 function applyStoreBranding() {
@@ -6177,6 +6338,7 @@ function applyStoreBranding() {
   const bar = document.getElementById('admin-bar-store-name');
   if (bar) bar.textContent = name;
   document.title = name;
+  if (typeof applyStoreLocationLink === 'function') applyStoreLocationLink();
 }
 
 // ── Hero background image (Settings → Homepage banner background) ──
@@ -6292,6 +6454,9 @@ async function loadSettingsIntoForm() {
       settings = { ...DEFAULT_SETTINGS, ...res.settings };
       // If the server doesn't store the hero picture, keep this device's copy rather than losing it.
       if (!('heroImage' in res.settings)) settings.heroImage = localHero;
+      const _loc = _readLocalSettings();
+      if (!('storeLat' in res.settings)) settings.storeLat = _loc.storeLat || '';
+      if (!('storeLng' in res.settings)) settings.storeLng = _loc.storeLng || '';
       _settingsCache = settings; _writeLocalSettings(settings);
     }
     if (statusEl) { statusEl.textContent = '☁ Synced with server'; statusEl.className = 'set-sync-status ok'; statusEl.style.display = ''; }
@@ -6302,6 +6467,7 @@ async function loadSettingsIntoForm() {
 
   document.getElementById('set-store-name').value    = settings.storeName || '';
   setHeroImageInForm(settings.heroImage || '');
+  setLocationInForm(settings.storeLat, settings.storeLng);
   applyStoreBranding();
   applyHeroBackground();
   document.getElementById('set-store-phone').value   = settings.storePhone || '';
@@ -6328,6 +6494,8 @@ function _readSettingsFromForm() {
     announcement:      document.getElementById('set-announcement').value.trim(),
     announcementSpeed: document.getElementById('set-announcement-speed').value,
     heroImage:    (document.getElementById('set-hero-image').value || '').trim(),
+    storeLat:     (document.getElementById('set-store-lat').value || '').trim(),
+    storeLng:     (document.getElementById('set-store-lng').value || '').trim(),
     liveSync:     document.getElementById('set-live-sync').checked,
     syncSpeed:    document.getElementById('set-sync-speed').value,
     soundOrder:   document.getElementById('set-sound-order').checked,
@@ -6351,6 +6519,22 @@ async function _verifyHeroOnServer(link) {
   } catch { /* silent — the normal save message above already shown */ }
 }
 
+// After saving, confirm the server also kept the store location (otherwise only this device would show the link).
+async function _verifyLocationOnServer(lat, lng) {
+  if (!lat || !lng) return;
+  const statusEl = document.getElementById('set-sync-status');
+  try {
+    const snap = await api('getStoreSnapshot');
+    const p = (snap && snap.settings) || {};
+    const sLat = parseFloat(p.storeLat), sLng = parseFloat(p.storeLng);
+    const ok = isFinite(sLat) && isFinite(sLng) && Math.abs(sLat - parseFloat(lat)) < 1e-9 && Math.abs(sLng - parseFloat(lng)) < 1e-9;
+    if (!ok) {
+      if (statusEl) { statusEl.textContent = '⚠ Store location saved on this device only — the server (Code.gs) did not keep it, so customers cannot see it yet'; statusEl.className = 'set-sync-status warn'; statusEl.style.display = ''; }
+      showToast('Store location is saved on this device only. The server code (Code.gs) must also save "storeLat" and "storeLng".', 'error', 9000);
+    }
+  } catch { /* silent */ }
+}
+
 async function saveSettings() {
   const btn = document.getElementById('btn-save-settings');
   const msg = document.getElementById('set-saved-msg');
@@ -6359,6 +6543,11 @@ async function saveSettings() {
   if (!refreshHeroLinkUI()) {
     showToast('The banner picture link is not a Google Drive picture link. Fix it or remove it, then save.', 'error', 5000);
     document.getElementById('set-hero-image')?.focus();
+    return;
+  }
+  if (!refreshLocUI()) {
+    showToast('Please fix the store location numbers (Latitude / Longitude), then save.', 'error', 5000);
+    document.getElementById('set-store-lat')?.focus();
     return;
   }
   btn.disabled = true; btn.textContent = 'Saving…'; msg.style.display = 'none';
@@ -6382,6 +6571,7 @@ async function saveSettings() {
       if (statusEl) { statusEl.textContent = '☁ Synced with server'; statusEl.className = 'set-sync-status ok'; statusEl.style.display = ''; }
       showToast('Settings saved.', 'success', 2000);
       _verifyHeroOnServer(settings.heroImage);   // checks what customers will really receive
+      _verifyLocationOnServer(settings.storeLat, settings.storeLng);
     }
   } catch (err) {
     showToast('Could not save settings: ' + err.message, 'error');
