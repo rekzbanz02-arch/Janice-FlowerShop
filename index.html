@@ -14,7 +14,7 @@
   -->
   <script>
     // Injected by GAS template — DO NOT REMOVE THIS LINE
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxCRynrtDPn_AJcgJm4pIOKrzRyArNq_Kl-LXRrUfxMdHP1tg63TdX34D1wCQVGl1XTNQ/exec';
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxIByJViCWgE2L2vk-nrRWkublGQsmYtCj53zlZmSxD_9WBqz3tueAAh-y-iWyNhl4STw/exec';
   </script>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -2762,6 +2762,54 @@
 .disc-empty { font-size: 13px; color: var(--muted); padding: 14px; text-align: center; border: 1.5px dashed var(--border); border-radius: var(--radius-sm); }
 @media (max-width: 640px) { .set-3col { grid-template-columns: 1fr 1fr; } }
 </style>
+<style id="promo-css">
+/* ── Promo ads, badges, original prices ───────────────────────── */
+.promo-strip { max-width: 1200px; margin: 0 auto; padding: 14px 20px 2px; display: flex; gap: 12px; overflow-x: auto; scroll-snap-type: x proximity; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+.promo-strip::-webkit-scrollbar { display: none; }
+.promo-ad { flex: 0 0 auto; width: min(330px, 84vw); scroll-snap-align: start; display: flex; align-items: center; gap: 12px; text-align: left; border: 0; border-radius: var(--radius); padding: 12px 14px; color: #fff; background: linear-gradient(135deg, var(--amber) 0%, var(--amber-dk) 100%); box-shadow: var(--shadow); cursor: pointer; font-family: var(--fb); transition: transform .15s, box-shadow .15s; }
+.promo-ad:hover { transform: translateY(-2px); box-shadow: var(--shadow-h); }
+.promo-ad.ship { background: linear-gradient(135deg, #16A34A 0%, #166534 100%); }
+.promo-ad:focus-visible { outline: 3px solid var(--dark); outline-offset: 2px; }
+.pa-big { flex: 0 0 auto; min-width: 66px; text-align: center; font: 800 25px/1 var(--fd); }
+.pa-big small { display: block; font: 800 11px var(--fb); letter-spacing: .08em; margin-top: 3px; opacity: .92; }
+.pa-body { min-width: 0; flex: 1; }
+.pa-title { font-weight: 700; font-size: 14px; line-height: 1.25; }
+.pa-sub { font-size: 12px; opacity: .93; margin-top: 2px; line-height: 1.35; }
+.pa-cta { display: inline-block; margin-top: 7px; font-size: 12px; font-weight: 800; background: rgba(255,255,255,.22); padding: 3px 11px; border-radius: 999px; }
+.promo-badge { position: absolute; top: 8px; left: 8px; z-index: 2; border: 0; border-radius: 999px; padding: 4px 10px; font: 800 11px var(--fb); letter-spacing: .03em; color: #fff; background: var(--amber-dk); box-shadow: 0 2px 8px rgba(0,0,0,.25); max-width: calc(100% - 60px); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.promo-badge.ship { background: var(--green); }
+button.promo-badge { cursor: pointer; }
+span.promo-badge { cursor: default; }
+.product-price.has-sale { display: flex; flex-direction: column; line-height: 1.15; }
+.product-price.has-sale .price-now { color: var(--amber-dk); }
+.price-old { font: 500 12.5px var(--fb); color: var(--muted); text-decoration: line-through; }
+.promo-notes { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 4px; }
+.promo-chip { display: inline-block; max-width: 100%; border: 0; border-radius: 12px; padding: 3px 9px; font: 700 11px/1.3 var(--fb); text-align: left; color: var(--amber-dk); background: var(--amber-lt); white-space: normal; overflow-wrap: anywhere; }
+.promo-chip.ship { color: #166534; background: var(--green-lt); }
+button.promo-chip { cursor: pointer; }
+button.promo-chip:hover { filter: brightness(.96); }
+.promo-filter-bar { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin: 0 0 16px; padding: 10px 14px; border-radius: var(--radius-sm); background: var(--amber-lt); border: 1.5px solid var(--amber); font-size: 13.5px; color: var(--dark); }
+.promo-filter-bar button { border: 1.5px solid var(--amber); background: #fff; color: var(--amber-dk); border-radius: 999px; padding: 5px 13px; font: 700 12.5px var(--fb); cursor: pointer; }
+.view-controls, .promo-filter-bar { scroll-margin-top: 120px; }
+.product-grid:not(.list-view) .product-footer { flex-wrap: wrap; }
+.product-grid.list-view .promo-badge { display: none; }
+.product-footer > div { min-width: 0; }
+@media (max-width: 480px) {
+  .product-price { font-size: 18px; }
+  .btn-add { padding: 8px 12px; }
+}
+.cart-item-promo { font-size: 11px; font-weight: 700; color: var(--amber-dk); margin-top: 2px; }
+.dc-scope { display: flex; gap: 18px; flex-wrap: wrap; margin-bottom: 6px; }
+.dc-pick-tools { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin: 8px 0 6px; }
+.dc-pick-tools .set-input { flex: 1 1 180px; }
+.dc-pick-count { font-size: 12px; color: var(--muted); }
+.dc-pick-list { max-height: 230px; overflow-y: auto; border: 1.5px solid var(--border); border-radius: var(--radius-sm); background: #fff; }
+.dc-pick-row { display: flex; align-items: center; gap: 9px; padding: 8px 10px; border-bottom: 1px solid var(--border); cursor: pointer; font-size: 13px; }
+.dc-pick-row:last-child { border-bottom: 0; }
+.dc-pick-row:hover { background: var(--cream); }
+.dc-pick-name { font-weight: 600; flex: 1; min-width: 0; }
+.dc-pick-meta { font-size: 11.5px; color: var(--muted); white-space: nowrap; }
+</style>
 </head>
 <body>
 
@@ -2826,6 +2874,7 @@
       </div>
     </div>
   </section>
+  <div class="promo-strip" id="promo-strip" style="display:none" aria-label="Current promos"></div>
   <div class="cat-bar">
     <div class="cat-scroll" id="category-nav"></div>
   </div>
@@ -2856,6 +2905,7 @@
         </button>
       </div>
     </div>
+    <div class="promo-filter-bar" id="promo-filter-bar" style="display:none"></div>
     <div id="loading-state">
       <div class="skeleton-grid" id="skeleton-grid"></div>
     </div>
@@ -3325,9 +3375,26 @@
               <label class="set-label" for="dc-desc">Message customers see <span class="set-hint">(optional)</span></label>
               <input type="text" class="set-input" id="dc-desc" placeholder="e.g. 10% off for Valentine's week" maxlength="120" autocomplete="off">
             </div>
+            <div class="set-row">
+              <label class="set-label">This promo is for</label>
+              <div class="dc-scope">
+                <label class="set-check"><input type="radio" name="dc-scope" value="all" checked> All flowers</label>
+                <label class="set-check"><input type="radio" name="dc-scope" value="selected"> Selected flowers only</label>
+              </div>
+              <div id="dc-pick-wrap" style="display:none">
+                <div class="dc-pick-tools">
+                  <input type="text" class="set-input" id="dc-pick-search" placeholder="Search flowers…" autocomplete="off">
+                  <button type="button" class="btn-admin-util" id="dc-pick-all">Tick all shown</button>
+                  <button type="button" class="btn-admin-util" id="dc-pick-none">Clear</button>
+                  <span class="dc-pick-count" id="dc-pick-count">0 selected</span>
+                </div>
+                <div class="dc-pick-list" id="dc-pick-list"></div>
+                <div class="set-hint" style="margin-top:6px">Automatic promos show the original price crossed out on these flowers. Tapping the promo ad on the shop page shows only these flowers.</div>
+              </div>
+            </div>
             <div class="set-row set-3col">
               <div>
-                <label class="set-label" for="dc-min">Smallest order (₱) <span class="set-hint">optional</span></label>
+                <label class="set-label" for="dc-min">Smallest order (₱) <span class="set-hint" id="dc-min-hint">optional</span></label>
                 <input type="text" inputmode="decimal" class="set-input" id="dc-min" placeholder="e.g. 1500" maxlength="8" autocomplete="off">
               </div>
               <div id="dc-cap-wrap">
@@ -3351,6 +3418,7 @@
             </div>
             <div class="set-row" style="display:flex;gap:18px;flex-wrap:wrap">
               <label class="set-check"><input type="checkbox" id="dc-auto"> Apply automatically (no code needed)</label>
+              <label class="set-check"><input type="checkbox" id="dc-show"> Show this promo on the shop page <span class="set-hint">(automatic ones always show)</span></label>
               <label class="set-check"><input type="checkbox" id="dc-once"> Each phone number can use it only once</label>
               <label class="set-check"><input type="checkbox" id="dc-active" checked> Active</label>
             </div>
@@ -3968,7 +4036,8 @@ const STATE = {
   adminProducts:    [],
   cartTab:          'cart',   // 'cart' | 'orders'
   promo:            null,     // promo code accepted by the server (public details), or null
-  autoDiscounts:    [],       // automatic discounts from the store snapshot
+  autoDiscounts:    [],       // promos from the store snapshot (automatic ones + code promos the admin advertises)
+  promoFilter:      '',       // code of the promo the customer tapped (shows only its flowers)
   _customerOrders:  [],       // full unfiltered orders list
   ordersFilter:     'all',    // current filter key
   _ordersLastPhone: null,     // last successfully-fetched phone (normalized)
@@ -4312,6 +4381,13 @@ function _hydrateFromSnapshot(snap, isFirstLoad) {
   const newProds = (snap.products || []).filter(p => !_isLegacyCat(p.category));
   const newCats  = _flowerCategories(snap.categories, newProds);
 
+  // ── Promos + delivery settings first: the flower cards draw their badges / original prices from them ──
+  if (snap.settings && typeof snap.settings === 'object' && Object.keys(snap.settings).length) {
+    _writeLocalSettings({ ..._readLocalSettings(), ...snap.settings });
+  }
+  STATE.autoDiscounts = Array.isArray(snap.discounts) ? snap.discounts : [];
+  STATE._promoSig = _promoSigOf(snap);
+
   // ── Categories ────────────────────────────────────────────────
   const catsChanged = JSON.stringify(newCats) !== JSON.stringify(STATE.categories);
   if (catsChanged) STATE.categories = newCats;
@@ -4340,14 +4416,11 @@ function _hydrateFromSnapshot(snap, isFirstLoad) {
   if (STATE.cart.length !== _before) { updateCartBadge(); renderCartDrawer(); saveCartDraft(); }
 
   // ── Announcement Banner ───────────────────────────────────────
-  // Public store settings come with the snapshot so every visitor sees the banner.
-  if (snap.settings && typeof snap.settings === 'object' && Object.keys(snap.settings).length) {
-    _writeLocalSettings({ ..._readLocalSettings(), ...snap.settings });
-  }
-  // Delivery fee settings + automatic discounts → cart prices
-  STATE.autoDiscounts = Array.isArray(snap.discounts) ? snap.discounts : [];
+  // (public store settings were saved above, so every visitor sees the banner)
+  // Delivery fee settings + automatic discounts → cart prices + promo ads
   _fillZoneSelect();
   _updateCartTotals();
+  renderPromoStrip();
   renderAnnouncementBanner();
   applyStoreBranding();
   applyHeroBackground();
@@ -4497,22 +4570,23 @@ function _patchProductCard(card, p) {
     if (btn.textContent !== wantText)   btn.textContent = wantText;
   }
 
-  // Patch price (rarely changes but handle it)
-  const priceEl = card.querySelector('.product-price');
-  if (priceEl) {
-    const txt = `${(parseFloat(p.price)||0).toFixed(2)}`;
-    if (priceEl.textContent !== txt) priceEl.textContent = txt;
-  }
+  // (price and promo changes are covered by the card signature: the card is redrawn)
 }
 
 // Searching always looks across every category.
 function _isCrossCategory() {
-  return !!(STATE.searchQuery || '').trim();
+  return !!(STATE.searchQuery || '').trim() || !!STATE.promoFilter;
 }
 
 function applyFilters() {
   const q   = STATE.searchQuery.trim().toLowerCase();
   const cat = STATE.activeCategory;
+  // The promo the customer tapped (dropped automatically when it has ended)
+  let promo = null;
+  if (STATE.promoFilter) {
+    promo = _shopPromos().find(d => d.code === STATE.promoFilter) || null;
+    if (!promo) STATE.promoFilter = '';
+  }
   const cross = _isCrossCategory();
   const catObj  = STATE.categories.find(c => c.slug === cat);
   const catKeys = catObj ? [_catKey(catObj.slug), _catKey(catObj.name)] : [_catKey(cat)];
@@ -4523,7 +4597,7 @@ function applyFilters() {
     // Every word typed must be found somewhere, so "birthday roses" matches a rose tagged "birthday".
     const hay = (p.name + ' ' + p.category + ' ' + (p.description || '') + ' ' + (p.tags || '')).toLowerCase();
     const matchQ = !q || q.split(/\s+/).every(w => hay.includes(w));
-    return matchCat && matchQ;
+    return matchCat && matchQ && (!promo || _promoCovers(promo, p));
   });
   const s = STATE.sortMode;
   if (s === 'price-asc')  STATE.filteredProducts.sort((a, b) => (parseFloat(a.price)||0) - (parseFloat(b.price)||0));
@@ -4536,9 +4610,12 @@ function renderProducts() {
   const empty   = document.getElementById('empty-state');
   const loading = document.getElementById('loading-state');
   loading.style.display = 'none';
+  _renderPromoFilterBar();
 
   const _cat = STATE.categories.find(c => c.slug === STATE.activeCategory);
-  document.getElementById('section-title').innerHTML = _isCrossCategory()
+  document.getElementById('section-title').innerHTML = STATE.promoFilter
+    ? '🏷️ <span>Promo</span> Flowers'
+    : _isCrossCategory()
     ? 'Matching <span>Flowers</span>'
     : _cat
       ? `<span>${esc(_cat.name)}</span>`
@@ -4584,16 +4661,18 @@ function productCardHTML(p) {
            onerror="this.outerHTML='<div class=&quot;product-img-placeholder&quot;>🌸</div>'">`
     : `<div class="product-img-placeholder">🌸</div>`;
 
+  const info = _promoInfo(p);
   return `
     <div class="product-card" data-id="${esc(String(p.id))}" data-sig="${esc(_productSig(p))}">
-      <div class="product-img-wrap">${imgHtml}${favBtnHTML(p.id)}${viewBtnHTML(p)}</div>
+      <div class="product-img-wrap">${imgHtml}${promoBadgeHTML(info)}${favBtnHTML(p.id)}${viewBtnHTML(p)}</div>
       <div class="product-body">
         <div class="product-cat-tag">${esc(p.category)}</div>
         <div class="product-name">${esc(p.name)}</div>
         ${p.description ? `<div class="product-desc">${esc(p.description)}</div>` : ''}
+        ${promoNotesHTML(info)}
         <div class="product-footer">
           <div>
-            <div class="product-price">${price.toFixed(2)}</div>
+            ${_priceBlockHTML(p, info)}
             ${stockTag}
           </div>
           <button class="btn-add"
@@ -4626,17 +4705,19 @@ function productListHTML(p) {
            onerror="this.outerHTML='<div class=&quot;product-img-placeholder&quot;>🌸</div>'">`
     : `<div class="product-img-placeholder">🌸</div>`;
 
+  const info = _promoInfo(p);
   return `
     <div class="product-card" data-id="${esc(String(p.id))}" data-sig="${esc(_productSig(p))}">
-      <div class="product-img-wrap">${imgHtml}${favBtnHTML(p.id)}${viewBtnHTML(p)}</div>
+      <div class="product-img-wrap">${imgHtml}${promoBadgeHTML(info)}${favBtnHTML(p.id)}${viewBtnHTML(p)}</div>
       <div class="product-body">
         <div class="product-info-col">
           <div class="product-cat-tag">${esc(p.category)}</div>
           <div class="product-name">${esc(p.name)}</div>
           ${p.description ? `<div class="product-desc">${esc(p.description)}</div>` : ''}
+          ${promoNotesHTML(info)}
         </div>
         <div class="product-footer">
-          <div class="product-price">${price.toFixed(2)}</div>
+          ${_priceBlockHTML(p, info)}
           ${stockTag}
           <button class="btn-add"
             onclick="addToCart('${esc(String(p.id))}', this)"
@@ -4814,10 +4895,13 @@ function cartSelectedTotal() {
 /* ==== PRICING (keep identical to Code.gs) ==== */
 const ZONE_OTHER = '__other__';
 function _round2(n) { return Math.round((Number(n) || 0) * 100 + 1e-7) / 100; }
+
 function _num(v) {
   const n = parseFloat(String(v == null ? '' : v).replace(/,/g, ''));
   return isFinite(n) ? n : 0;
 }
+
+/** "Poblacion = 80" (one per line) → [{ name, fee }]. Bad lines are skipped. */
 function _parseZones(text) {
   const out = [], seen = {};
   String(text == null ? '' : text).split(/\r?\n/).forEach(function (line) {
@@ -4830,6 +4914,8 @@ function _parseZones(text) {
   });
   return out;
 }
+
+/** Delivery fee for one order. Pickup is always free. Returns { fee, zoneName, free } or { error }. */
 function _deliveryFeeFor(cfg, mode, zoneInput, afterDiscount) {
   if (mode !== 'delivery') return { fee: 0, zoneName: '', free: false };
   const zones   = _parseZones(cfg.deliveryZones);
@@ -4847,22 +4933,45 @@ function _deliveryFeeFor(cfg, mode, zoneInput, afterDiscount) {
   const free    = fee > 0 && freeMin > 0 && afterDiscount >= freeMin;
   return { fee: free ? 0 : fee, zoneName: zoneName, free: free };
 }
+
+/**
+ * The part of the cart a discount works on: the whole cart, or - for a promo made for
+ * selected flowers (d.productIds) - only the price of those flowers.
+ * lines = [{ id, price, qty }]
+ */
+function _eligibleSubtotal(d, subtotal, lines) {
+  const ids = (d && Array.isArray(d.productIds)) ? d.productIds : [];
+  if (!ids.length) return subtotal;
+  let sum = 0;
+  (lines || []).forEach(function (l) {
+    if (ids.indexOf(String(l.id)) !== -1) sum += _num(l.price) * Math.max(1, parseInt(l.qty) || 1);
+  });
+  return _round2(sum);
+}
+
+/** Pesos a percent / fixed discount takes off the flowers it works on (0 if the minimum spend is not met). */
 function _itemsDiscount(d, subtotal) {
   if (!d || d.type === 'freeship') return 0;
-  if (subtotal < _num(d.minSubtotal)) return 0;
+  if (subtotal <= 0 || subtotal < _num(d.minSubtotal)) return 0;
   const val = _num(d.value);
   let amt = d.type === 'fixed' ? val : subtotal * Math.min(100, Math.max(0, val)) / 100;
   const cap = _num(d.maxDiscount);
   if (d.type !== 'fixed' && cap > 0) amt = Math.min(amt, cap);
   return Math.max(0, _round2(Math.min(amt, subtotal)));
 }
-function _computeTotals(subtotal, mode, zoneInput, cfg, disc) {
+
+/**
+ * Everything the customer pays. Always:  total = subtotal + deliveryFee − discount
+ * (a free-delivery code shows the fee AND the same amount as a discount).
+ */
+function _computeTotals(subtotal, mode, zoneInput, cfg, disc, lines) {
   subtotal = _round2(subtotal);
-  const itemsOff = _itemsDiscount(disc, subtotal);
+  const elig = _eligibleSubtotal(disc, subtotal, lines);
+  const itemsOff = _itemsDiscount(disc, elig);
   const f = _deliveryFeeFor(cfg, mode, zoneInput, _round2(subtotal - itemsOff));
   if (f.error) return { error: f.error };
   let saving = itemsOff;
-  if (disc && disc.type === 'freeship' && subtotal >= _num(disc.minSubtotal)) saving = f.fee;
+  if (disc && disc.type === 'freeship' && elig > 0 && elig >= _num(disc.minSubtotal)) saving = f.fee;
   return {
     subtotal:       subtotal,
     deliveryFee:    f.fee,
@@ -4872,10 +4981,12 @@ function _computeTotals(subtotal, mode, zoneInput, cfg, disc) {
     freeByMinimum:  f.free,
   };
 }
-function _bestDiscount(cands, subtotal, mode, zoneInput, cfg, typedCode) {
+
+/** The discount that saves the customer the most. A typed code wins a tie. */
+function _bestDiscount(cands, subtotal, mode, zoneInput, cfg, typedCode, lines) {
   let best = null, bestSave = 0;
   (cands || []).forEach(function (d) {
-    const t = _computeTotals(subtotal, mode, zoneInput, cfg, d);
+    const t = _computeTotals(subtotal, mode, zoneInput, cfg, d, lines);
     if (t.error) return;
     const isTyped = typedCode && d.code.toLowerCase() === String(typedCode).toLowerCase();
     if (t.discount > bestSave || (t.discount === bestSave && t.discount > 0 && isTyped)) {
@@ -4884,6 +4995,7 @@ function _bestDiscount(cands, subtotal, mode, zoneInput, cfg, typedCode) {
   });
   return best;
 }
+
 /* ==== END PRICING ==== */
 
 const peso = n => '₱' + formatMoney(n);
@@ -4900,11 +5012,182 @@ function _isActiveToday(d) {
 }
 /** Short sentence describing what a discount does, for hints and the admin list. */
 function discountText(d) {
-  const min = _num(d.minSubtotal) > 0 ? ` on orders of ${peso(d.minSubtotal)} or more` : '';
-  if (d.type === 'freeship') return 'Free delivery' + min;
-  if (d.type === 'fixed')    return `${peso(d.value)} off` + min;
+  const scoped = _promoIsScoped(d);
+  const min = _num(d.minSubtotal) > 0
+    ? (scoped ? ` when you spend ${peso(d.minSubtotal)} on the promo flowers` : ` on orders of ${peso(d.minSubtotal)} or more`) : '';
+  const on  = scoped ? ' on selected flowers' : '';
+  if (d.type === 'freeship') return 'Free delivery' + (scoped ? ' with selected flowers' : '') + min;
+  if (d.type === 'fixed')    return `${peso(d.value)} off${on}` + min;
   const cap = _num(d.maxDiscount) > 0 ? ` (up to ${peso(d.maxDiscount)})` : '';
-  return `${_num(d.value)}% off${cap}` + min;
+  return `${_num(d.value)}% off${cap}${on}` + min;
+}
+
+/* ── Promo display on the shop page (ads, badges, original prices, tap-to-filter) ─────────── */
+const _pesoShort = n => '₱' + (Number(n) || 0).toLocaleString('en-PH', { maximumFractionDigits: 2 });
+/** An old cached snapshot has no "auto" field: those promos were all automatic. */
+function _isAutoPromo(d) { return d.auto !== false; }
+function _promoIsScoped(d) { return !!(d && d.productIds && d.productIds.length); }
+function _promoCovers(d, p) { return !_promoIsScoped(d) || d.productIds.map(String).indexOf(String(p.id)) !== -1; }
+
+let _spMemo = { a: null, p: null, day: '', v: [] };
+/** Promos customers can see today. A promo whose selected flowers are all gone is hidden. */
+function _shopPromos() {
+  const day = _localYmd(new Date());
+  if (_spMemo.a === STATE.autoDiscounts && _spMemo.p === STATE.products && _spMemo.day === day) return _spMemo.v;
+  const ids = new Set((STATE.products || []).map(x => String(x.id)));
+  const v = (STATE.autoDiscounts || []).filter(_isActiveToday)
+    .filter(d => !_promoIsScoped(d) || d.productIds.some(x => ids.has(String(x))));
+  _spMemo = { a: STATE.autoDiscounts, p: STATE.products, day, v };
+  return v;
+}
+function _promoBadgeText(d) {
+  if (d.type === 'freeship') return '🚚 FREE DELIVERY';
+  return d.type === 'fixed' ? _pesoShort(d.value) + ' OFF' : _num(d.value) + '% OFF';
+}
+function _promoEnds(d) {
+  const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(String(d.expiresOn || ''));
+  if (!m) return '';
+  if (d.expiresOn === _localYmd(new Date())) return 'Ends today';
+  return 'Until ' + new Date(+m[1], +m[2] - 1, +m[3]).toLocaleDateString('en-PH', { month: 'short', day: 'numeric' });
+}
+/** Free delivery from the shop's own setting ("Free delivery from ₱X" in Settings), if there is one. */
+function _storeFreeShipMin() {
+  const cfg = _feeCfg();
+  return (_feeConfigured(cfg) && _num(cfg.freeDeliveryMin) > 0) ? _num(cfg.freeDeliveryMin) : 0;
+}
+/** What the promos mean for one flower: the promos that cover it and, when the price really drops, the sale price. */
+function _promoInfo(p) {
+  const price  = parseFloat(p.price) || 0;
+  const promos = _shopPromos().filter(d => _promoCovers(d, p));
+  let sale = null;
+  promos.forEach(d => {
+    // only automatic promos change the price by themselves, and only when one flower already reaches the minimum
+    if (!_isAutoPromo(d) || d.type === 'freeship' || _num(d.minSubtotal) > price) return;
+    let off = d.type === 'fixed' ? _num(d.value) : price * Math.min(100, Math.max(0, _num(d.value))) / 100;
+    const cap = _num(d.maxDiscount);
+    if (d.type !== 'fixed' && cap > 0) off = Math.min(off, cap);
+    off = _round2(Math.min(off, price));
+    if (off > 0 && (!sale || off > sale.off)) sale = { off, now: _round2(price - off), promo: d };
+  });
+  const main = sale ? sale.promo : (promos.filter(d => d.type !== 'freeship')[0] || null);
+  const ship = promos.filter(d => d.type === 'freeship')[0] || null;
+  return { promos, sale, main, ship };
+}
+/** Part of the card signature: when a promo changes, the card is redrawn. */
+function _promoSig(p) {
+  const i = _promoInfo(p);
+  return JSON.stringify([i.promos.map(d => [d.code, d.type, d.value, d.minSubtotal, d.maxDiscount, d.expiresOn, d.description, d.auto]), _storeFreeShipMin()]);
+}
+function _priceBlockHTML(p, info) {
+  const price = parseFloat(p.price) || 0;
+  return info.sale
+    ? `<div class="product-price has-sale"><s class="price-old" title="Original price">${peso(price)}</s><span class="price-now">${peso(info.sale.now)}</span></div>`
+    : `<div class="product-price"><span class="price-now">${peso(price)}</span></div>`;
+}
+/** Badge on the photo. Tapping it shows only the flowers of that promo (when the promo is for selected flowers). */
+function promoBadgeHTML(info) {
+  const d = info.main || info.ship;
+  if (!d) return '';
+  const cls = 'promo-badge' + (d.type === 'freeship' ? ' ship' : '');
+  return _promoIsScoped(d)
+    ? `<button type="button" class="${cls}" data-promo="${esc(d.code)}" onclick="filterByPromo(this.dataset.promo)" title="See all flowers in this promo">🏷️ ${esc(_promoBadgeText(d))}</button>`
+    : `<span class="${cls}">${d.type === 'freeship' ? '' : '🏷️ '}${esc(_promoBadgeText(d))}</span>`;
+}
+/** Small chips under the flower name: what the promo is, and the free-delivery information. */
+function promoNotesHTML(info) {
+  const chips = [];
+  const d = info.main;
+  if (d) {
+    const txt = '🏷️ ' + (d.description || discountText(d)) + (_isAutoPromo(d) ? '' : ' · code ' + d.code) + (_promoEnds(d) ? ' · ' + _promoEnds(d) : '');
+    chips.push(_promoIsScoped(d)
+      ? `<button type="button" class="promo-chip" data-promo="${esc(d.code)}" onclick="filterByPromo(this.dataset.promo)" title="See all flowers in this promo">${esc(txt)}</button>`
+      : `<span class="promo-chip">${esc(txt)}</span>`);
+  }
+  if (info.ship) {
+    chips.push(`<span class="promo-chip ship">🚚 ${esc(info.ship.description || discountText(info.ship))}${_promoEnds(info.ship) ? ' · ' + esc(_promoEnds(info.ship)) : ''}</span>`);
+  } else if (_storeFreeShipMin() > 0) {
+    chips.push(`<span class="promo-chip ship">🚚 Free delivery on orders of ${esc(_pesoShort(_storeFreeShipMin()))}+</span>`);
+  }
+  return chips.length ? `<div class="promo-notes">${chips.join('')}</div>` : '';
+}
+
+/** The promo "ads" row under the hero. */
+function renderPromoStrip() {
+  const box = document.getElementById('promo-strip');
+  if (!box) return;
+  const cards = [];
+  _shopPromos().slice(0, 8).forEach(d => {
+    const scoped = _promoIsScoped(d);
+    const nFl = scoped ? (STATE.products || []).filter(x => _promoCovers(d, x)).length : 0;
+    const big = d.type === 'freeship' ? '🚚' : (d.type === 'fixed' ? esc(_pesoShort(d.value)) : esc(_num(d.value) + '%'));
+    const title = d.description || (d.type === 'freeship' ? (scoped ? 'Free delivery with selected flowers' : 'Free delivery') : (scoped ? 'Special price on selected flowers' : 'Special price on all flowers'));
+    const sub = [
+      scoped ? nFl + ' flower' + (nFl === 1 ? '' : 's') + ' on promo' : '',
+      _num(d.minSubtotal) > 0 ? (scoped ? 'spend ' : 'orders of ') + _pesoShort(d.minSubtotal) + '+' : '',
+      d.type === 'percent' && _num(d.maxDiscount) > 0 ? 'save up to ' + _pesoShort(d.maxDiscount) : '',
+      _isAutoPromo(d) ? '' : 'use code ' + d.code,
+      _promoEnds(d),
+    ].filter(Boolean).join(' · ');
+    cards.push(`<button type="button" class="promo-ad${d.type === 'freeship' ? ' ship' : ''}" data-promo="${esc(d.code)}" onclick="promoAdTap(this)">
+      <span class="pa-big">${big}${d.type === 'freeship' ? '' : '<small>OFF</small>'}</span>
+      <span class="pa-body"><span class="pa-title">${esc(title)}</span><br><span class="pa-sub">${esc(sub)}</span><br>
+      <span class="pa-cta">${scoped ? 'See promo flowers ›' : 'Shop now ›'}</span></span></button>`);
+  });
+  const fm = _storeFreeShipMin();
+  if (fm > 0) {
+    cards.push(`<button type="button" class="promo-ad ship" onclick="promoAdTap(this)">
+      <span class="pa-big">🚚</span>
+      <span class="pa-body"><span class="pa-title">Free delivery on orders of ${esc(_pesoShort(fm))} or more</span><br>
+      <span class="pa-sub">Choose Delivery at checkout. Pickup is always free.</span><br><span class="pa-cta">Shop now ›</span></span></button>`);
+  }
+  box.innerHTML = cards.join('');
+  box.style.display = cards.length ? '' : 'none';
+}
+function promoAdTap(el) {
+  const code = el && el.dataset ? el.dataset.promo : '';
+  if (code) { filterByPromo(code); return; }
+  clearPromoFilter();
+  _scrollToProducts();
+}
+function _scrollToProducts() {
+  const t = document.getElementById('promo-filter-bar');
+  const target = (t && t.style.display !== 'none') ? t : document.querySelector('.view-controls');
+  if (target) try { target.scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch (_) { target.scrollIntoView(); }
+}
+/** Customer tapped a promo ad / badge: show only the flowers that promo is for. */
+function filterByPromo(code) {
+  const d = _shopPromos().find(x => x.code === code);
+  if (!d) return;
+  if (!_promoIsScoped(d)) { clearPromoFilter(); _scrollToProducts(); return; }   // promo is for every flower
+  STATE.promoFilter    = d.code;
+  STATE.activeCategory = 'all';
+  STATE.searchQuery    = '';
+  const si = document.getElementById('search-input'); if (si) si.value = '';
+  document.querySelectorAll('.cat-btn').forEach(b => b.classList.toggle('active', b.dataset.slug === 'all'));
+  applyFilters();
+  renderProducts();
+  _scrollToProducts();
+}
+function clearPromoFilter() {
+  if (!STATE.promoFilter) return;
+  STATE.promoFilter = '';
+  applyFilters();
+  renderProducts();
+}
+function _renderPromoFilterBar() {
+  const bar = document.getElementById('promo-filter-bar');
+  if (!bar) return;
+  const d = STATE.promoFilter ? _shopPromos().find(x => x.code === STATE.promoFilter) : null;
+  if (!d) { bar.style.display = 'none'; bar.innerHTML = ''; return; }
+  const n = STATE.filteredProducts.length;
+  bar.innerHTML = `<span>🏷️ Showing <strong>${n}</strong> flower${n === 1 ? '' : 's'} on promo: <strong>${esc(d.description || discountText(d))}</strong></span>
+    <button type="button" onclick="clearPromoFilter()">Show all flowers ✕</button>`;
+  bar.style.display = '';
+}
+/** Changes in promos or delivery settings (so the shop notices them without a reload). */
+function _promoSigOf(snap) {
+  const s = (snap && snap.settings) || {};
+  return JSON.stringify([snap && snap.discounts || [], s.freeDeliveryMin, s.deliveryFee, s.deliveryZones]);
 }
 
 /** Everything shown in the cart for the current cart, delivery choice and promo code. */
@@ -4914,17 +5197,19 @@ function currentPricing() {
   const zone  = (document.getElementById('fl-zone') || {}).value || '';
   const cfg   = _feeCfg();
   const typed = STATE.promo ? STATE.promo.code : '';
-  const cands = (STATE.autoDiscounts || []).filter(_isActiveToday).slice();
+  // only automatic promos apply by themselves (a promo code the shop advertises still has to be typed)
+  const cands = (STATE.autoDiscounts || []).filter(d => _isAutoPromo(d) && _isActiveToday(d)).slice();
   if (STATE.promo) cands.unshift(STATE.promo);
-  let disc = _bestDiscount(cands, sub, mode, zone, cfg, typed);
-  let t    = _computeTotals(sub, mode, zone, cfg, disc);
+  const lines = STATE.cart.filter(i => i.selected !== false).map(i => ({ id: i.id, price: parseFloat(i.price) || 0, qty: i.qty }));
+  let disc = _bestDiscount(cands, sub, mode, zone, cfg, typed, lines);
+  let t    = _computeTotals(sub, mode, zone, cfg, disc, lines);
   let needZone = false;
   if (t.error) {   // delivery area not chosen yet: show the flower discount now, the fee after they pick
     needZone = true;
-    disc = _bestDiscount(cands, sub, 'pickup', '', cfg, typed);
-    t    = _computeTotals(sub, 'pickup', '', cfg, disc);
+    disc = _bestDiscount(cands, sub, 'pickup', '', cfg, typed, lines);
+    t    = _computeTotals(sub, 'pickup', '', cfg, disc, lines);
   }
-  return { sub, mode, zone, cfg, cands, disc, totals: t, needZone };
+  return { sub, mode, zone, cfg, cands, disc, totals: t, needZone, lines };
 }
 
 /** Is a delivery fee set up at all? (If not, the cart hides the fee line completely.) */
@@ -4990,14 +5275,24 @@ function _renderPriceSummary() {
     }
   }
 
+  // Nothing ticked in the cart: no delivery fee and nothing to pay
+  const nothingPicked = !STATE.cart.some(i => i.selected !== false);
+  if (nothingPicked) {
+    if (configured) $('cs-fee-val').textContent = peso(0);
+    dRow.style.display = 'none';
+  }
+
   // Total
-  $('cart-total').textContent = peso(t.total);
-  if ($('cart-total-mini')) $('cart-total-mini').textContent = peso(t.total);
+  const shownTotal = nothingPicked ? 0 : t.total;
+  $('cart-total').textContent = peso(shownTotal);
+  if ($('cart-total-mini')) $('cart-total-mini').textContent = peso(shownTotal);
 
   // Hints: why a code does nothing / how close the customer is to a saving
   if (STATE.promo && !(t.discount > 0 && p.disc && p.disc.code === STATE.promo.code)) {
     const d = STATE.promo, min = _num(d.minSubtotal);
-    if (p.sub < min)                                  hints.push(`Add ${peso(min - p.sub)} more to use ${d.code}.`);
+    const scoped = _promoIsScoped(d), elig = _eligibleSubtotal(d, p.sub, p.lines);
+    if (scoped && elig <= 0)                          hints.push(`${d.code} is only for selected flowers. Add one of them to use it.`);
+    else if (elig < min)                              hints.push(`Add ${peso(min - elig)} more ${scoped ? 'of the promo flowers ' : ''}to use ${d.code}.`);
     else if (d.type === 'freeship' && p.mode !== 'delivery') hints.push(`${d.code} gives free delivery — choose Delivery to use it.`);
     else if (d.type === 'freeship' && t.freeByMinimum) hints.push('Delivery is already free on this order.');
   }
@@ -5006,13 +5301,41 @@ function _renderPriceSummary() {
     const gap = _round2(freeMin - (p.sub - (t.discount > 0 && p.disc && p.disc.type !== 'freeship' ? t.discount : 0)));
     if (gap > 0) hints.push(`Add ${peso(gap)} more for FREE delivery! 🚚`);
   }
-  const next = (p.cands || []).filter(d => !(STATE.promo && d.code === STATE.promo.code) && _num(d.minSubtotal) > p.sub)
-    .sort((a, b) => _num(a.minSubtotal) - _num(b.minSubtotal))[0];
-  if (next && p.sub > 0) hints.push(`Add ${peso(_num(next.minSubtotal) - p.sub)} more to get ${discountText(next)}.`);
+  const next = (p.cands || []).filter(d => !(STATE.promo && d.code === STATE.promo.code))
+    .map(d => ({ d, elig: _eligibleSubtotal(d, p.sub, p.lines) }))
+    .filter(x => x.elig > 0 && _num(x.d.minSubtotal) > x.elig)
+    .sort((a, b) => _num(a.d.minSubtotal) - _num(b.d.minSubtotal))[0];
+  if (next && p.sub > 0) hints.push(`Add ${peso(_num(next.d.minSubtotal) - next.elig)} more${_promoIsScoped(next.d) ? ' of the promo flowers' : ''} to get ${discountText(next.d)}.`);
 
+  if (nothingPicked) hints.length = 0;
   const h = $('cs-hint');
   h.textContent = hints.slice(0, 2).join('\n');
   h.style.display = hints.length ? '' : 'none';
+  _refreshCartPromoTags(p);
+}
+
+/** Small "🏷️ 10% OFF" tag under each cart flower the applied promo works on. */
+function _refreshCartPromoTags(p) {
+  const dd = (p && p.disc && p.totals && p.totals.discount > 0 && p.disc.type !== 'freeship') ? p.disc : null;
+  STATE.cart.forEach(item => {
+    const info = document.querySelector(`.cart-item[data-id="${cssId(String(item.id))}"] .cart-item-info`);
+    if (!info) return;
+    let tag = info.querySelector('.cart-item-promo');
+    const on = dd && item.selected !== false && _promoCovers(dd, item);
+    if (!on) { if (tag) tag.remove(); return; }
+    if (!tag) { tag = document.createElement('div'); tag.className = 'cart-item-promo'; info.appendChild(tag); }
+    tag.textContent = '🏷️ ' + _promoBadgeText(dd);
+  });
+}
+
+/** The code to send with the order: only when it really works for what is ticked in the cart. */
+function _promoCodeToSend(pr) {
+  const d = STATE.promo;
+  if (!d) return '';
+  const elig = _eligibleSubtotal(d, pr.sub, pr.lines);
+  if (_promoIsScoped(d) && elig <= 0) return '';
+  if (elig < _num(d.minSubtotal)) return '';
+  return d.code;
 }
 
 function _setPromoMsg(text, kind) {
@@ -5145,7 +5468,7 @@ function _renderCartItems() {
         ${imgEl}
         <div class="cart-item-info">
           <div class="cart-item-name">${esc(item.name)}</div>
-          <div class="cart-item-price">${((parseFloat(item.price)||0) * item.qty).toFixed(2)}</div>
+          <div class="cart-item-price">${peso((parseFloat(item.price)||0) * item.qty)}</div>
         </div>
         <div class="qty-control">
           <button class="qty-btn" onclick="updateQty('${esc(String(item.id))}', -1)">−</button>
@@ -5264,7 +5587,7 @@ async function _placeOrderCore() {
         })),
         subtotal: cartSelectedTotal(),
         deliveryZone:  pr.mode === 'delivery' ? pr.zone : '',
-        discountCode:  STATE.promo ? STATE.promo.code : '',
+        discountCode:  _promoCodeToSend(pr),
         expectedTotal: pr.totals.total,       // the server refuses if the real total is different
         ...fl.data,
       }
@@ -5480,7 +5803,7 @@ async function _syncProducts() {
     const prods = (snap.products || []).filter(p => !_isLegacyCat(p.category));
     const newSig = _catalogSig(prods, _flowerCategories(snap.categories, prods));
     const oldSig = _catalogSig(STATE.products, STATE.categories);
-    if (newSig === oldSig) return; // nothing changed
+    if (newSig === oldSig && _promoSigOf(snap) === STATE._promoSig) return; // nothing changed
     DataCache.set('store_snapshot', snap, 55000);
     _hydrateFromSnapshot(snap, false);
   } catch { /* silent */ }
@@ -5945,7 +6268,8 @@ function _renderOrdersFilterBar(orders) {
       const isActive = currentFilter === f.key;
       const countLabel = f.key === 'all' ? ` (${cnt})` : cnt ? ` (${cnt})` : '';
       return `<button class="orders-filter-btn${isActive ? ' active' : ''}"
-                onclick="setOrdersFilter(${JSON.stringify(f.key)})"
+                data-filter="${esc(f.key)}"
+                onclick="setOrdersFilter(this.dataset.filter)"
               >${esc(f.label)}${countLabel}</button>`;
     }).join('')}
   </div>`;
@@ -8603,6 +8927,7 @@ const _origLoadAdminChatMessages = typeof _loadAdminChatMessages !== 'undefined'
     document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     STATE.activeCategory = btn.dataset.slug;
+    STATE.promoFilter    = '';
     STATE.searchQuery    = '';
     document.getElementById('search-input').value = '';
     applyFilters();
@@ -8978,7 +9303,7 @@ function _apfGetGallery() {
 
 /* ── Flower photo viewer ────────────────────────────────────────────────── */
 function _productSig(p) {
-  return [p.name, p.category, p.description, p.imageUrl, (Array.isArray(p.gallery) ? p.gallery : []).join('|'), p.price].join('¦');
+  return [p.name, p.category, p.description, p.imageUrl, (Array.isArray(p.gallery) ? p.gallery : []).join('|'), p.price, _promoSig(p)].join('¦');
 }
 /** Main photo first, then the extra gallery links — de-duplicated, Drive links converted. */
 function _flowerImages(p) {
@@ -9151,6 +9476,36 @@ STATE.adminDiscounts = [];
 let _dcEditing = null;                       // code being edited (null = adding a new one)
 const _dcEl = id => document.getElementById(id);
 
+/* Promo for selected flowers: the flower picker */
+let _dcPicked = new Set();
+function _dcProducts() {
+  return (STATE.adminProducts && STATE.adminProducts.length) ? STATE.adminProducts : (STATE.products || []);
+}
+function _dcScope() {
+  const r = document.querySelector('input[name="dc-scope"]:checked');
+  return r ? r.value : 'all';
+}
+function _dcPickCount() {
+  const el = _dcEl('dc-pick-count');
+  if (el) el.textContent = _dcPicked.size + ' selected';
+}
+function _dcRenderPicker() {
+  const box = _dcEl('dc-pick-list'); if (!box) return;
+  const q = (_dcEl('dc-pick-search').value || '').trim().toLowerCase();
+  const list = _dcProducts().filter(p => !q || (String(p.name) + ' ' + String(p.category || '')).toLowerCase().includes(q));
+  box.innerHTML = list.length
+    ? list.map(p => `<label class="dc-pick-row"><input type="checkbox" data-pid="${esc(String(p.id))}"${_dcPicked.has(String(p.id)) ? ' checked' : ''}>
+        <span class="dc-pick-name">${esc(p.name)}</span>
+        <span class="dc-pick-meta">${esc(p.category || '')} · ${esc(peso(p.price))}${p.isActive === false ? ' · hidden' : ''}</span></label>`).join('')
+    : '<div class="disc-empty">No flowers found.</div>';
+  _dcPickCount();
+}
+function _dcSyncScopeUI() {
+  const sel = _dcScope() === 'selected';
+  _dcEl('dc-pick-wrap').style.display = sel ? '' : 'none';
+  _dcEl('dc-min-hint').textContent = sel ? 'counted on the selected flowers · optional' : 'optional';
+  if (sel) _dcRenderPicker();
+}
 function _dcSyncTypeUI() {
   const t = _dcEl('dc-type').value;
   _dcEl('dc-value-wrap').style.display = t === 'freeship' ? 'none' : '';
@@ -9167,6 +9522,10 @@ function _dcReset() {
   ['dc-code','dc-value','dc-desc','dc-min','dc-cap','dc-uses','dc-starts','dc-expires'].forEach(id => { _dcEl(id).value = ''; });
   _dcEl('dc-type').value = 'percent';
   _dcEl('dc-auto').checked = false; _dcEl('dc-once').checked = false; _dcEl('dc-active').checked = true;
+  _dcEl('dc-show').checked = false;
+  document.querySelector('input[name="dc-scope"][value="all"]').checked = true;
+  _dcPicked = new Set(); _dcEl('dc-pick-search').value = '';
+  _dcSyncScopeUI();
   _dcEl('btn-dc-save').textContent = 'Save discount';
   _dcEl('btn-dc-cancel').style.display = 'none';
   _dcSyncTypeUI();
@@ -9182,6 +9541,11 @@ function _dcFill(d) {
   _dcEl('dc-starts').value  = d.startsOn || '';
   _dcEl('dc-expires').value = d.expiresOn || '';
   _dcEl('dc-auto').checked = !!d.auto; _dcEl('dc-once').checked = !!d.onePerCustomer; _dcEl('dc-active').checked = d.isActive !== false;
+  _dcEl('dc-show').checked = !!d.showOnShop;
+  _dcPicked = new Set((d.productIds || []).map(String));
+  document.querySelector(`input[name="dc-scope"][value="${_dcPicked.size ? 'selected' : 'all'}"]`).checked = true;
+  _dcEl('dc-pick-search').value = '';
+  _dcSyncScopeUI();
   _dcEl('btn-dc-save').textContent = 'Update discount';
   _dcEl('btn-dc-cancel').style.display = '';
   _dcSyncTypeUI();
@@ -9201,6 +9565,9 @@ function _dcRead(overrides) {
     auto:           _dcEl('dc-auto').checked,
     onePerCustomer: _dcEl('dc-once').checked,
     isActive:       _dcEl('dc-active').checked,
+    showOnShop:     _dcEl('dc-show').checked,
+    scope:          _dcScope(),
+    productIds:     _dcScope() === 'selected' ? Array.from(_dcPicked) : [],
   }, overrides || {});
 }
 function _dcStatus(d) {
@@ -9210,6 +9577,11 @@ function _dcStatus(d) {
   if (d.startsOn && d.startsOn > t)   return { cls: '',    text: 'Starts ' + _fmtYmd(d.startsOn) };
   if (d.maxUses > 0 && d.used >= d.maxUses) return { cls: 'bad', text: 'Fully used' };
   return { cls: 'auto', text: 'Running' };
+}
+function _dcNames(d) {
+  const byId = {}; _dcProducts().forEach(p => { byId[String(p.id)] = p.name; });
+  const names = (d.productIds || []).map(id => byId[String(id)] || ('#' + id));
+  return names.slice(0, 3).join(', ') + (names.length > 3 ? ` (+${names.length - 3} more)` : '');
 }
 function renderDiscountList() {
   const box = _dcEl('disc-list'); if (!box) return;
@@ -9221,11 +9593,13 @@ function renderDiscountList() {
       d.startsOn || d.expiresOn ? ((d.startsOn ? _fmtYmd(d.startsOn) : 'now') + ' → ' + (d.expiresOn ? _fmtYmd(d.expiresOn) : 'no end date')) : '',
       d.maxUses > 0 ? `Used ${d.used} of ${d.maxUses}` : `Used ${d.used} time${d.used === 1 ? '' : 's'}`,
       d.onePerCustomer ? 'once per phone number' : '',
+      _promoIsScoped(d) ? 'Flowers: ' + _dcNames(d) : '',
     ].filter(Boolean).join(' · ');
     return `<div class="disc-item${d.isActive ? '' : ' off'}">
       <div class="disc-main">
         <div><span class="disc-code">${esc(d.code)}</span>
           ${d.auto ? '<span class="disc-tag auto">AUTOMATIC</span>' : '<span class="disc-tag">PROMO CODE</span>'}
+          ${_promoIsScoped(d) ? '<span class="disc-tag">SELECTED FLOWERS</span> ' : ''}${(!d.auto && d.showOnShop) ? '<span class="disc-tag auto">ON SHOP PAGE</span>' : ''}
           <span class="disc-tag ${st.cls}">${esc(st.text)}</span></div>
         <div class="disc-desc">${esc(discountText(d))}${d.description ? ' — ' + esc(d.description) : ''}</div>
         <div class="disc-meta">${esc(meta)}</div>
@@ -9255,6 +9629,7 @@ async function saveDiscount() {
   if (d.type !== 'freeship' && !(_num(d.value) > 0)) { _dcMsg('Please enter how much the discount is.', true); _dcEl('dc-value').focus(); return; }
   if (d.type === 'percent' && _num(d.value) > 100) { _dcMsg('Percent off cannot be more than 100.', true); return; }
   if (d.startsOn && d.expiresOn && d.startsOn > d.expiresOn) { _dcMsg('The last day is before the start date.', true); return; }
+  if (d.scope === 'selected' && !d.productIds.length) { _dcMsg('Please tick at least one flower, or choose "All flowers".', true); return; }
   btn.disabled = true; _dcMsg('Saving…');
   try {
     const res = await api('adminSaveDiscount', { token: STATE.adminToken, discount: d, originalCode: _dcEditing || '' });
@@ -9267,6 +9642,18 @@ async function saveDiscount() {
   finally { btn.disabled = false; }
 }
 _dcEl('dc-type')?.addEventListener('change', _dcSyncTypeUI);
+document.querySelectorAll('input[name="dc-scope"]').forEach(r => r.addEventListener('change', _dcSyncScopeUI));
+_dcEl('dc-pick-search')?.addEventListener('input', _dcRenderPicker);
+_dcEl('dc-pick-list')?.addEventListener('change', e => {
+  const c = e.target.closest('input[data-pid]'); if (!c) return;
+  if (c.checked) _dcPicked.add(c.dataset.pid); else _dcPicked.delete(c.dataset.pid);
+  _dcPickCount();
+});
+_dcEl('dc-pick-all')?.addEventListener('click', () => {
+  _dcEl('dc-pick-list').querySelectorAll('input[data-pid]').forEach(c => { c.checked = true; _dcPicked.add(c.dataset.pid); });
+  _dcPickCount();
+});
+_dcEl('dc-pick-none')?.addEventListener('click', () => { _dcPicked = new Set(); _dcRenderPicker(); });
 _dcEl('btn-dc-save')?.addEventListener('click', saveDiscount);
 _dcEl('btn-dc-cancel')?.addEventListener('click', () => { _dcReset(); _dcMsg(''); });
 _dcEl('disc-list')?.addEventListener('click', async e => {
