@@ -14,7 +14,7 @@
   -->
   <script>
     // Injected by GAS template — DO NOT REMOVE THIS LINE
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxCRynrtDPn_AJcgJm4pIOKrzRyArNq_Kl-LXRrUfxMdHP1tg63TdX34D1wCQVGl1XTNQ/exec';
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxIByJViCWgE2L2vk-nrRWkublGQsmYtCj53zlZmSxD_9WBqz3tueAAh-y-iWyNhl4STw/exec';
   </script>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -2707,6 +2707,61 @@
     .apf-gal-item.bad .apf-input { border-color: var(--red); }
     @media (max-width: 480px) { .apf-gal-grid { grid-template-columns: 1fr; } }
   </style>
+<style>
+/* ── Delivery fee, discounts & price summary ───────────────── */
+.checkout-bar { position: sticky; bottom: -18px; z-index: 3; margin: 6px -16px -18px; padding: 10px 16px 18px; background: var(--card); border-top: 1px solid var(--border); box-shadow: 0 -8px 16px rgba(42,16,33,.08); }
+.cb-total { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px; font-size: 13px; color: var(--muted); }
+.cb-total strong { font-size: 18px; color: var(--dark); }
+.field-error { outline: 3px solid var(--red) !important; outline-offset: 1px; border-color: var(--red) !important; animation: fieldShake .35s; }
+@keyframes fieldShake { 25% { transform: translateX(-4px); } 75% { transform: translateX(4px); } }
+.cart-summary { display: flex; flex-direction: column; gap: 5px; margin-bottom: 10px; }
+.cs-row { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; font-size: 13px; color: var(--muted); }
+.cs-row > span:last-child { color: var(--dark); font-weight: 600; white-space: nowrap; }
+.cs-row.cs-disc, .cs-row.cs-disc > span:last-child { color: var(--green); }
+.cs-row.cs-total { margin-top: 4px; padding-top: 8px; border-top: 1px dashed var(--border); font-size: 14px; font-weight: 700; color: var(--dark); }
+.cs-row.cs-total .cart-total-val { font-size: 22px; }
+.cs-hint { white-space: pre-line; font-size: 12px; line-height: 1.45; color: var(--amber-dk); background: var(--amber-lt); border-radius: var(--radius-sm); padding: 6px 9px; }
+.promo-box { margin-bottom: 10px; }
+.promo-row { display: flex; gap: 6px; }
+.promo-row input { flex: 1; min-width: 0; text-transform: uppercase; padding: 9px 12px; border: 1.5px solid var(--border); border-radius: var(--radius-sm); font: 14px var(--fb); background: var(--cream); outline: none; }
+.promo-row input:focus { border-color: var(--amber); }
+.promo-row input:disabled { background: #EEF7F0; border-color: var(--green); color: var(--green); font-weight: 700; }
+.btn-promo { padding: 0 16px; border: 1.5px solid var(--amber); border-radius: var(--radius-sm); background: var(--amber-lt); color: var(--amber-dk); font: 700 13px var(--fb); cursor: pointer; }
+.btn-promo:hover { background: var(--amber); color: #fff; }
+.btn-promo:disabled { opacity: .6; cursor: wait; }
+.promo-msg { margin-top: 5px; font-size: 12px; line-height: 1.4; }
+.promo-msg.ok { color: var(--green); }
+.promo-msg.err { color: var(--red); }
+/* order breakdown + delivery details (customer card & admin table) */
+.ord-break { margin-top: 8px; font-size: 12px; color: var(--muted); display: flex; flex-direction: column; gap: 3px; }
+.ord-break > div { display: flex; justify-content: space-between; gap: 10px; }
+.ord-break .ob-disc { color: var(--green); }
+.ord-break .ob-total { color: var(--dark); font-weight: 700; padding-top: 4px; border-top: 1px dashed var(--border); }
+.ord-ship { margin-top: 8px; padding: 8px 10px; background: var(--cream); border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 12px; line-height: 1.5; color: var(--dark); }
+.ord-ship b { font-weight: 700; }
+.ord-ship .os-card { margin-top: 4px; font-style: italic; color: var(--muted); }
+.ord-money-sub { display: block; font-size: 10.5px; font-weight: 500; color: var(--muted); white-space: normal; line-height: 1.35; }
+/* admin: discounts + delivery settings */
+.settings-card.set-wide { grid-column: 1 / -1; }
+.set-sub { font-size: 12px; color: var(--muted); line-height: 1.55; margin: -8px 0 14px; }
+.set-3col { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.set-check { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--dark); cursor: pointer; }
+.set-check input { width: 16px; height: 16px; accent-color: var(--amber); }
+.disc-form-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.disc-list { margin-top: 18px; display: flex; flex-direction: column; gap: 8px; }
+.disc-item { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 12px; border: 1.5px solid var(--border); border-radius: var(--radius-sm); background: var(--cream); flex-wrap: wrap; }
+.disc-item.off { opacity: .6; }
+.disc-main { min-width: 0; flex: 1 1 240px; }
+.disc-code { font-family: monospace; font-weight: 800; font-size: 14px; color: var(--dark); }
+.disc-tag { display: inline-block; margin-left: 6px; padding: 1px 8px; border-radius: 999px; font-size: 10.5px; font-weight: 700; background: var(--amber-lt); color: var(--amber-dk); }
+.disc-tag.auto { background: #E6F4EA; color: var(--green); }
+.disc-tag.bad { background: #FDE7E7; color: var(--red); }
+.disc-desc { font-size: 12.5px; color: var(--dark); margin-top: 2px; }
+.disc-meta { font-size: 11.5px; color: var(--muted); margin-top: 2px; line-height: 1.5; }
+.disc-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+.disc-empty { font-size: 13px; color: var(--muted); padding: 14px; text-align: center; border: 1.5px dashed var(--border); border-radius: var(--radius-sm); }
+@media (max-width: 640px) { .set-3col { grid-template-columns: 1fr 1fr; } }
+</style>
 </head>
 <body>
 
@@ -2857,9 +2912,19 @@
     </div>
     <!-- Footer -->
     <div class="cart-footer" id="cart-footer" style="display:none">
-      <div class="cart-total-row">
-        <span class="cart-total-label">Subtotal (<span id="cart-sel-count">0</span> item<span id="cart-sel-plural">s</span>)</span>
-        <span class="cart-total-val" id="cart-total">0.00</span>
+      <div class="cart-summary" id="cart-summary" aria-live="polite">
+        <div class="cs-row"><span>Subtotal (<span id="cart-sel-count">0</span> item<span id="cart-sel-plural">s</span>)</span><span id="cart-subtotal">₱0.00</span></div>
+        <div class="cs-row cs-disc" id="cs-disc-row" style="display:none"><span id="cs-disc-label">Discount</span><span id="cs-disc-val">−₱0.00</span></div>
+        <div class="cs-row" id="cs-fee-row"><span id="cs-fee-label">Delivery fee</span><span id="cs-fee-val">₱0.00</span></div>
+        <div class="cs-hint" id="cs-hint" style="display:none"></div>
+        <div class="cs-row cs-total"><span>Total</span><span class="cart-total-val" id="cart-total">₱0.00</span></div>
+      </div>
+      <div class="promo-box" id="promo-box">
+        <div class="promo-row">
+          <input type="text" id="promo-input" placeholder="Promo code (optional)" autocomplete="off" autocapitalize="characters" spellcheck="false" maxlength="30" aria-label="Promo code">
+          <button type="button" class="btn-promo" id="btn-promo-apply">Apply</button>
+        </div>
+        <div class="promo-msg" id="promo-msg" style="display:none"></div>
       </div>
       <div class="cart-form">
         <input type="text"  id="cust-name"  placeholder="Your name *"           autocomplete="name">
@@ -2876,6 +2941,10 @@
           </div>
           <div class="fl-hint" id="fl-hint"></div>
           <div id="fl-delivery-only">
+            <div id="fl-zone-wrap" style="display:none">
+              <label class="fl-lbl" for="fl-zone">Delivery area *</label>
+              <select id="fl-zone"></select>
+            </div>
             <input type="text" id="fl-rname" placeholder="Recipient's name *" autocomplete="off">
             <input type="tel" id="fl-rphone" placeholder="Recipient's phone *" autocomplete="off">
             <textarea id="fl-address" rows="2" placeholder="Delivery address (house no., street, barangay, city) *"></textarea>
@@ -2884,7 +2953,10 @@
           <div class="fl-meta"><label class="fl-anon"><input type="checkbox" id="fl-anon"> Keep my name off the card</label><span id="fl-count">0/200</span></div>
         </div>
       </div>
-      <button class="btn-checkout" id="btn-checkout">Place Order</button>
+      <div class="checkout-bar">
+        <div class="cb-total"><span>Total to pay</span><strong id="cart-total-mini">₱0.00</strong></div>
+        <button class="btn-checkout" id="btn-checkout">Place Order</button>
+      </div>
     </div>
   </div>
 
@@ -3159,6 +3231,29 @@
           </div>
 
           <div class="settings-card">
+            <div class="settings-card-title">🚚 Delivery (transport) fee</div>
+            <div class="set-sub">What customers pay to have their flowers delivered. Pickup is always free. Leave everything empty for free delivery. Press <strong>Save Settings</strong> (bottom of the page) to apply.</div>
+            <div class="set-row set-2col">
+              <div>
+                <label class="set-label" for="set-delivery-fee">Delivery fee (₱)</label>
+                <input type="text" inputmode="decimal" class="set-input" id="set-delivery-fee" placeholder="e.g. 100" maxlength="8" autocomplete="off">
+              </div>
+              <div>
+                <label class="set-label" for="set-free-min">Free delivery from (₱)</label>
+                <input type="text" inputmode="decimal" class="set-input" id="set-free-min" placeholder="e.g. 2000 (optional)" maxlength="8" autocomplete="off">
+              </div>
+            </div>
+            <div class="set-row">
+              <label class="set-label" for="set-delivery-zones">Fee per area <span class="set-hint">(optional — one area per line)</span></label>
+              <textarea class="set-input set-textarea" id="set-delivery-zones" rows="5" spellcheck="false" placeholder="Poblacion = 80&#10;Barangay Kauswagan = 120&#10;Outside town = 200"></textarea>
+              <div class="set-hint" style="margin-top:6px;line-height:1.55" id="set-zone-preview"></div>
+              <div class="set-hint" style="margin-top:6px;line-height:1.55">
+                How it works: type the area, an <strong>=</strong> sign, then the fee (example: <strong>Poblacion = 80</strong>). If you list areas, customers pick their area when they choose Delivery. The <strong>Delivery fee</strong> box above is then the price for "Other area" — leave it empty if you do not deliver outside your listed areas. If you do not list any area, the Delivery fee is the same for everyone.
+              </div>
+            </div>
+          </div>
+
+          <div class="settings-card">
             <div class="settings-card-title">🔄 Sync &amp; notifications</div>
             <div class="set-row set-toggle-row">
               <div>
@@ -3202,6 +3297,70 @@
               <button class="btn-set-save" id="btn-save-settings">Save Settings</button>
               <span class="set-saved-msg" id="set-saved-msg" style="display:none">✓ Saved</span>
             </div>
+          </div>
+
+          <div class="settings-card set-wide" id="disc-card">
+            <div class="settings-card-title">🏷️ Discounts &amp; promo codes</div>
+            <div class="set-sub">Make a <strong>promo code</strong> that customers type in the cart, or a discount that applies <strong>automatically</strong> (for example "10% off orders over ₱1,500"). A customer gets one discount per order — the one that saves them the most. Discounts are saved right away; you do not need to press Save Settings.</div>
+
+            <div class="set-row set-3col">
+              <div>
+                <label class="set-label" for="dc-code">Code or name *</label>
+                <input type="text" class="set-input" id="dc-code" placeholder="e.g. LOVE10" maxlength="30" autocomplete="off" spellcheck="false" style="text-transform:uppercase">
+              </div>
+              <div>
+                <label class="set-label" for="dc-type">Type of discount</label>
+                <select class="set-input" id="dc-type">
+                  <option value="percent">Percent off (%)</option>
+                  <option value="fixed">Pesos off (₱)</option>
+                  <option value="freeship">Free delivery</option>
+                </select>
+              </div>
+              <div id="dc-value-wrap">
+                <label class="set-label" for="dc-value" id="dc-value-lbl">Percent off *</label>
+                <input type="text" inputmode="decimal" class="set-input" id="dc-value" placeholder="e.g. 10" maxlength="8" autocomplete="off">
+              </div>
+            </div>
+            <div class="set-row">
+              <label class="set-label" for="dc-desc">Message customers see <span class="set-hint">(optional)</span></label>
+              <input type="text" class="set-input" id="dc-desc" placeholder="e.g. 10% off for Valentine's week" maxlength="120" autocomplete="off">
+            </div>
+            <div class="set-row set-3col">
+              <div>
+                <label class="set-label" for="dc-min">Smallest order (₱) <span class="set-hint">optional</span></label>
+                <input type="text" inputmode="decimal" class="set-input" id="dc-min" placeholder="e.g. 1500" maxlength="8" autocomplete="off">
+              </div>
+              <div id="dc-cap-wrap">
+                <label class="set-label" for="dc-cap">Biggest discount (₱) <span class="set-hint">optional</span></label>
+                <input type="text" inputmode="decimal" class="set-input" id="dc-cap" placeholder="e.g. 300" maxlength="8" autocomplete="off">
+              </div>
+              <div>
+                <label class="set-label" for="dc-uses">Can be used (times) <span class="set-hint">empty = no limit</span></label>
+                <input type="text" inputmode="numeric" class="set-input" id="dc-uses" placeholder="e.g. 50" maxlength="6" autocomplete="off">
+              </div>
+            </div>
+            <div class="set-row set-2col">
+              <div>
+                <label class="set-label" for="dc-starts">Starts on <span class="set-hint">optional</span></label>
+                <input type="date" class="set-input" id="dc-starts">
+              </div>
+              <div>
+                <label class="set-label" for="dc-expires">Last day <span class="set-hint">optional</span></label>
+                <input type="date" class="set-input" id="dc-expires">
+              </div>
+            </div>
+            <div class="set-row" style="display:flex;gap:18px;flex-wrap:wrap">
+              <label class="set-check"><input type="checkbox" id="dc-auto"> Apply automatically (no code needed)</label>
+              <label class="set-check"><input type="checkbox" id="dc-once"> Each phone number can use it only once</label>
+              <label class="set-check"><input type="checkbox" id="dc-active" checked> Active</label>
+            </div>
+            <div class="set-row disc-form-actions">
+              <button type="button" class="btn-set-save" id="btn-dc-save">Save discount</button>
+              <button type="button" class="btn-admin-util" id="btn-dc-cancel" style="display:none">Cancel editing</button>
+              <span class="set-hint" id="dc-msg"></span>
+            </div>
+
+            <div class="disc-list" id="disc-list"><div class="disc-empty">Loading discounts…</div></div>
           </div>
         </div>
       </div>
@@ -3568,10 +3727,15 @@ async function api(action, data = {}) {
       if (!res.ok) throw new Error(`Network error ${res.status}`);
       let json;
       try { json = await res.json(); } catch(_) { throw new Error('Invalid server response. Please redeploy the Apps Script web app.'); }
-      if (!json || json.success !== true) throw new Error((json && json.error) || 'Server error');
+      if (!json || json.success !== true) {
+        const e = new Error((json && json.error) || 'Server error');
+        e.data = json || null;          // lets callers read extra fields (e.g. the new total)
+        throw e;
+      }
       return json;
     } catch(err) {
       if (err && err.name === 'AbortError') throw new Error('Request timed out. Check your internet connection and try again.');
+      if (err instanceof TypeError) throw new Error('Cannot reach the server. Please check your internet connection and try again.');
       throw err;
     } finally { clearTimeout(timer); _inflight.delete(key); }
   })();
@@ -3803,6 +3967,8 @@ const STATE = {
   adminOrders:      [],
   adminProducts:    [],
   cartTab:          'cart',   // 'cart' | 'orders'
+  promo:            null,     // promo code accepted by the server (public details), or null
+  autoDiscounts:    [],       // automatic discounts from the store snapshot
   _customerOrders:  [],       // full unfiltered orders list
   ordersFilter:     'all',    // current filter key
   _ordersLastPhone: null,     // last successfully-fetched phone (normalized)
@@ -4005,6 +4171,44 @@ function esc(str) {
 function cssId(str){const s=String(str==null?'':str);return(window.CSS&&CSS.escape)?CSS.escape(s):s.replace(/[^a-zA-Z0-9_-]/g,'\$&');}
 function formatDateTime(value){if(!value)return '—';const d=new Date(value);if(Number.isNaN(d.getTime()))return esc(String(value));return d.toLocaleString('en-PH',{year:'numeric',month:'short',day:'numeric',hour:'numeric',minute:'2-digit',hour12:true});}
 function formatMoney(value){const n=Number(value)||0;return n.toLocaleString('en-PH',{minimumFractionDigits:2,maximumFractionDigits:2});}
+
+/** A Date → 'YYYY-MM-DD' in the viewer's own time zone (toISOString would give the UTC day). */
+function _localYmd(d) { return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
+/** What the customer paid: subtotal + delivery fee − discount. Old orders have no total → subtotal. */
+function orderTotal(o) {
+  const hasTotal = o && o.total !== '' && o.total != null && Number.isFinite(Number(o.total));
+  return hasTotal ? Number(o.total) : (Number(o && o.subtotal) || 0);
+}
+/** 'YYYY-MM-DD' → "Sat, Dec 20, 2026" (no time-zone shifting). */
+function _fmtYmd(ymd) {
+  const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(String(ymd || ''));
+  if (!m) return String(ymd || '');
+  return new Date(+m[1], +m[2] - 1, +m[3]).toLocaleDateString('en-PH', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
+}
+/** Subtotal / discount / delivery fee / total lines (only when there is a fee or a discount). */
+function orderBreakdownHtml(o) {
+  const fee = Number(o.deliveryFee) || 0, disc = Number(o.discountAmount) || 0;
+  if (!fee && !disc) return '';
+  const pe = n => '₱' + formatMoney(n);
+  return `<div class="ord-break">` +
+    `<div><span>Subtotal</span><span>${pe(o.subtotal)}</span></div>` +
+    (disc ? `<div class="ob-disc"><span>Discount${o.discountCode ? ' (' + esc(o.discountCode) + ')' : ''}</span><span>−${pe(disc)}</span></div>` : '') +
+    (fee  ? `<div><span>Delivery fee${o.deliveryZone ? ' (' + esc(o.deliveryZone) + ')' : ''}</span><span>${pe(fee)}</span></div>` : '') +
+    `<div class="ob-total"><span>Total</span><span>${pe(orderTotal(o))}</span></div></div>`;
+}
+/** Pickup/delivery date, recipient, address and card message (these were saved but never shown before). */
+function orderShipHtml(o) {
+  const mode = String(o.fulfillment || '').toLowerCase();
+  if (!mode) return '';
+  const when = [o.deliveryDate ? _fmtYmd(o.deliveryDate) : '', o.deliverySlot].filter(Boolean).join(' · ');
+  const lines = [`<div><b>${mode === 'pickup' ? '🏪 Pickup' : '🚚 Delivery'}</b>${when ? ' · ' + esc(when) : ''}</div>`];
+  if (mode === 'delivery') {
+    if (o.recipientName)   lines.push(`<div>To: <b>${esc(o.recipientName)}</b>${o.recipientPhone ? ' · ' + esc(o.recipientPhone) : ''}</div>`);
+    if (o.deliveryAddress) lines.push(`<div>📍 ${esc(o.deliveryAddress)}${o.deliveryZone ? ' <i>(' + esc(o.deliveryZone) + ')</i>' : ''}</div>`);
+  }
+  if (o.cardMessage) lines.push(`<div class="os-card">💌 “${esc(o.cardMessage)}”${o.anonymous ? ' — sent anonymously' : ''}</div>`);
+  return `<div class="ord-ship">${lines.join('')}</div>`;
+}
 function downloadTextFile(filename,text,mime='text/plain;charset=utf-8'){const blob=new Blob([text],{type:mime});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=filename;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);}
 function csvCell(value){const s=String(value==null?'':value).replace(/\r?\n/g,' ');return /[",\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s;}
 function rowsToCsv(headers,rows){return [headers.map(csvCell).join(','),...rows.map(r=>r.map(csvCell).join(','))].join('\n');}
@@ -4140,6 +4344,10 @@ function _hydrateFromSnapshot(snap, isFirstLoad) {
   if (snap.settings && typeof snap.settings === 'object' && Object.keys(snap.settings).length) {
     _writeLocalSettings({ ..._readLocalSettings(), ...snap.settings });
   }
+  // Delivery fee settings + automatic discounts → cart prices
+  STATE.autoDiscounts = Array.isArray(snap.discounts) ? snap.discounts : [];
+  _fillZoneSelect();
+  _updateCartTotals();
   renderAnnouncementBanner();
   applyStoreBranding();
   applyHeroBackground();
@@ -4597,18 +4805,272 @@ function cartSelectedTotal() {
     .reduce((s, i) => s + (parseFloat(i.price) || 0) * i.qty, 0);
 }
 
+// ─────────────────────────────────────────────
+// DELIVERY FEE + DISCOUNTS
+// The block between the two "PRICING" markers is the same code as in Code.gs
+// (section 3b). The server is the one that really decides the price; this copy
+// only lets the cart show the same numbers before the order is placed.
+// ─────────────────────────────────────────────
+/* ==== PRICING (keep identical to Code.gs) ==== */
+const ZONE_OTHER = '__other__';
+function _round2(n) { return Math.round((Number(n) || 0) * 100 + 1e-7) / 100; }
+function _num(v) {
+  const n = parseFloat(String(v == null ? '' : v).replace(/,/g, ''));
+  return isFinite(n) ? n : 0;
+}
+function _parseZones(text) {
+  const out = [], seen = {};
+  String(text == null ? '' : text).split(/\r?\n/).forEach(function (line) {
+    const m = line.match(/^\s*(.+?)\s*[=:]\s*(?:₱|PHP|P)?\s*(\d+(?:\.\d+)?)\s*$/i);
+    if (!m) return;
+    const key = m[1].toLowerCase();
+    if (seen[key]) return;
+    seen[key] = true;
+    out.push({ name: m[1].trim().slice(0, 60), fee: _round2(parseFloat(m[2])) });
+  });
+  return out;
+}
+function _deliveryFeeFor(cfg, mode, zoneInput, afterDiscount) {
+  if (mode !== 'delivery') return { fee: 0, zoneName: '', free: false };
+  const zones   = _parseZones(cfg.deliveryZones);
+  const hasBase = String(cfg.deliveryFee == null ? '' : cfg.deliveryFee).trim() !== '';
+  const base    = Math.max(0, _round2(_num(cfg.deliveryFee)));
+  let fee = base, zoneName = '';
+  if (zones.length) {
+    const want = String(zoneInput == null ? '' : zoneInput).trim().toLowerCase();
+    const z = want ? zones.filter(function (x) { return x.name.toLowerCase() === want; })[0] : null;
+    if (z)                                  { fee = z.fee; zoneName = z.name; }
+    else if (want === ZONE_OTHER && hasBase) { fee = base;  zoneName = 'Other area'; }
+    else return { error: 'Please choose your delivery area.' };
+  }
+  const freeMin = Math.max(0, _num(cfg.freeDeliveryMin));
+  const free    = fee > 0 && freeMin > 0 && afterDiscount >= freeMin;
+  return { fee: free ? 0 : fee, zoneName: zoneName, free: free };
+}
+function _itemsDiscount(d, subtotal) {
+  if (!d || d.type === 'freeship') return 0;
+  if (subtotal < _num(d.minSubtotal)) return 0;
+  const val = _num(d.value);
+  let amt = d.type === 'fixed' ? val : subtotal * Math.min(100, Math.max(0, val)) / 100;
+  const cap = _num(d.maxDiscount);
+  if (d.type !== 'fixed' && cap > 0) amt = Math.min(amt, cap);
+  return Math.max(0, _round2(Math.min(amt, subtotal)));
+}
+function _computeTotals(subtotal, mode, zoneInput, cfg, disc) {
+  subtotal = _round2(subtotal);
+  const itemsOff = _itemsDiscount(disc, subtotal);
+  const f = _deliveryFeeFor(cfg, mode, zoneInput, _round2(subtotal - itemsOff));
+  if (f.error) return { error: f.error };
+  let saving = itemsOff;
+  if (disc && disc.type === 'freeship' && subtotal >= _num(disc.minSubtotal)) saving = f.fee;
+  return {
+    subtotal:       subtotal,
+    deliveryFee:    f.fee,
+    discount:       saving,
+    total:          _round2(subtotal + f.fee - saving),
+    zoneName:       f.zoneName,
+    freeByMinimum:  f.free,
+  };
+}
+function _bestDiscount(cands, subtotal, mode, zoneInput, cfg, typedCode) {
+  let best = null, bestSave = 0;
+  (cands || []).forEach(function (d) {
+    const t = _computeTotals(subtotal, mode, zoneInput, cfg, d);
+    if (t.error) return;
+    const isTyped = typedCode && d.code.toLowerCase() === String(typedCode).toLowerCase();
+    if (t.discount > bestSave || (t.discount === bestSave && t.discount > 0 && isTyped)) {
+      best = d; bestSave = t.discount;
+    }
+  });
+  return best;
+}
+/* ==== END PRICING ==== */
+
+const peso = n => '₱' + formatMoney(n);
+
+/** Settings the cart needs (they arrive with the store snapshot). */
+function _feeCfg() {
+  const s = _readLocalSettings();
+  return { deliveryFee: s.deliveryFee, deliveryZones: s.deliveryZones, freeDeliveryMin: s.freeDeliveryMin };
+}
+function _isActiveToday(d) {
+  const n = new Date();
+  const t = n.getFullYear() + '-' + String(n.getMonth() + 1).padStart(2, '0') + '-' + String(n.getDate()).padStart(2, '0');
+  return (!d.startsOn || d.startsOn <= t) && (!d.expiresOn || d.expiresOn >= t);
+}
+/** Short sentence describing what a discount does, for hints and the admin list. */
+function discountText(d) {
+  const min = _num(d.minSubtotal) > 0 ? ` on orders of ${peso(d.minSubtotal)} or more` : '';
+  if (d.type === 'freeship') return 'Free delivery' + min;
+  if (d.type === 'fixed')    return `${peso(d.value)} off` + min;
+  const cap = _num(d.maxDiscount) > 0 ? ` (up to ${peso(d.maxDiscount)})` : '';
+  return `${_num(d.value)}% off${cap}` + min;
+}
+
+/** Everything shown in the cart for the current cart, delivery choice and promo code. */
+function currentPricing() {
+  const sub   = cartSelectedTotal();
+  const mode  = (document.querySelector('input[name="fl-mode"]:checked') || {}).value || 'delivery';
+  const zone  = (document.getElementById('fl-zone') || {}).value || '';
+  const cfg   = _feeCfg();
+  const typed = STATE.promo ? STATE.promo.code : '';
+  const cands = (STATE.autoDiscounts || []).filter(_isActiveToday).slice();
+  if (STATE.promo) cands.unshift(STATE.promo);
+  let disc = _bestDiscount(cands, sub, mode, zone, cfg, typed);
+  let t    = _computeTotals(sub, mode, zone, cfg, disc);
+  let needZone = false;
+  if (t.error) {   // delivery area not chosen yet: show the flower discount now, the fee after they pick
+    needZone = true;
+    disc = _bestDiscount(cands, sub, 'pickup', '', cfg, typed);
+    t    = _computeTotals(sub, 'pickup', '', cfg, disc);
+  }
+  return { sub, mode, zone, cfg, cands, disc, totals: t, needZone };
+}
+
+/** Is a delivery fee set up at all? (If not, the cart hides the fee line completely.) */
+function _feeConfigured(cfg) {
+  return _parseZones(cfg.deliveryZones).length > 0 || _num(cfg.deliveryFee) > 0;
+}
+
+/** Fills the "Delivery area" list from the shop's zones (hidden when the shop uses one flat fee). */
+function _fillZoneSelect() {
+  const sel  = document.getElementById('fl-zone');
+  const wrap = document.getElementById('fl-zone-wrap');
+  if (!sel || !wrap) return;
+  const cfg   = _feeCfg();
+  const zones = _parseZones(cfg.deliveryZones);
+  const mode  = (document.querySelector('input[name="fl-mode"]:checked') || {}).value || 'delivery';
+  const keep  = sel.value;
+  if (!zones.length) { sel.innerHTML = ''; wrap.style.display = 'none'; return; }
+  let html = '<option value="">Select your area…</option>' +
+    zones.map(z => `<option value="${esc(z.name)}">${esc(z.name)} — ${esc(peso(z.fee))}</option>`).join('');
+  if (String(cfg.deliveryFee == null ? '' : cfg.deliveryFee).trim() !== '') {
+    html += `<option value="${ZONE_OTHER}">Other area — ${esc(peso(_num(cfg.deliveryFee)))}</option>`;
+  }
+  sel.innerHTML = html;
+  if ([...sel.options].some(o => o.value === keep)) sel.value = keep;
+  wrap.style.display = mode === 'delivery' ? '' : 'none';
+}
+
+/** Draws the price lines in the cart (subtotal, discount, delivery fee, total, hints). */
+function _renderPriceSummary() {
+  const $ = id => document.getElementById(id);
+  if (!$('cart-total')) return;
+  const p = currentPricing(), t = p.totals, hints = [];
+  const configured = _feeConfigured(p.cfg);
+
+  $('cart-subtotal').textContent = peso(p.sub);
+
+  // Discount line
+  const dRow = $('cs-disc-row');
+  if (t.discount > 0 && p.disc) {
+    const isPromo = STATE.promo && p.disc.code === STATE.promo.code;
+    $('cs-disc-label').textContent = (p.disc.type === 'freeship' ? '🚚 Free delivery' : '🏷️ Discount') +
+      ' (' + (isPromo ? p.disc.code : (p.disc.description || p.disc.code)) + ')';
+    $('cs-disc-val').textContent = '−' + peso(t.discount);
+    dRow.style.display = '';
+  } else dRow.style.display = 'none';
+
+  // Delivery fee line
+  const fRow = $('cs-fee-row');
+  if (!configured) {
+    fRow.style.display = 'none';
+  } else {
+    fRow.style.display = '';
+    if (p.mode !== 'delivery') {
+      $('cs-fee-label').textContent = '🏪 Pickup — no delivery fee';
+      $('cs-fee-val').textContent   = peso(0);
+    } else if (p.needZone) {
+      $('cs-fee-label').textContent = '🚚 Delivery fee';
+      $('cs-fee-val').textContent   = 'choose your area';
+      hints.push('Choose your delivery area to see the delivery fee.');
+    } else {
+      $('cs-fee-label').textContent = '🚚 Delivery fee' + (t.zoneName ? ' (' + t.zoneName + ')' : '');
+      $('cs-fee-val').textContent   = t.freeByMinimum ? 'FREE' : peso(t.deliveryFee);
+    }
+  }
+
+  // Total
+  $('cart-total').textContent = peso(t.total);
+  if ($('cart-total-mini')) $('cart-total-mini').textContent = peso(t.total);
+
+  // Hints: why a code does nothing / how close the customer is to a saving
+  if (STATE.promo && !(t.discount > 0 && p.disc && p.disc.code === STATE.promo.code)) {
+    const d = STATE.promo, min = _num(d.minSubtotal);
+    if (p.sub < min)                                  hints.push(`Add ${peso(min - p.sub)} more to use ${d.code}.`);
+    else if (d.type === 'freeship' && p.mode !== 'delivery') hints.push(`${d.code} gives free delivery — choose Delivery to use it.`);
+    else if (d.type === 'freeship' && t.freeByMinimum) hints.push('Delivery is already free on this order.');
+  }
+  const freeMin = _num(p.cfg.freeDeliveryMin);
+  if (p.mode === 'delivery' && !p.needZone && freeMin > 0 && t.deliveryFee > 0) {
+    const gap = _round2(freeMin - (p.sub - (t.discount > 0 && p.disc && p.disc.type !== 'freeship' ? t.discount : 0)));
+    if (gap > 0) hints.push(`Add ${peso(gap)} more for FREE delivery! 🚚`);
+  }
+  const next = (p.cands || []).filter(d => !(STATE.promo && d.code === STATE.promo.code) && _num(d.minSubtotal) > p.sub)
+    .sort((a, b) => _num(a.minSubtotal) - _num(b.minSubtotal))[0];
+  if (next && p.sub > 0) hints.push(`Add ${peso(_num(next.minSubtotal) - p.sub)} more to get ${discountText(next)}.`);
+
+  const h = $('cs-hint');
+  h.textContent = hints.slice(0, 2).join('\n');
+  h.style.display = hints.length ? '' : 'none';
+}
+
+function _setPromoMsg(text, kind) {
+  const el = document.getElementById('promo-msg');
+  if (!el) return;
+  el.textContent = text || '';
+  el.className = 'promo-msg' + (kind ? ' ' + kind : '');
+  el.style.display = text ? '' : 'none';
+}
+
+function removePromo(silent) {
+  STATE.promo = null;
+  const input = document.getElementById('promo-input'), btn = document.getElementById('btn-promo-apply');
+  if (input) { input.disabled = false; input.value = ''; }
+  if (btn)   { btn.textContent = 'Apply'; btn.disabled = false; }
+  _setPromoMsg('');
+  if (!silent) _updateCartTotals();
+}
+
+/** Apply / Remove button next to the promo box. The server checks the code. */
+async function applyPromo() {
+  if (STATE.promo) { removePromo(); return; }
+  const input = document.getElementById('promo-input'), btn = document.getElementById('btn-promo-apply');
+  const code  = input.value.trim();
+  if (!code) { _setPromoMsg('Please type your promo code.', 'err'); return; }
+  const items = STATE.cart.filter(i => i.selected !== false).map(i => ({ id: i.id, qty: i.qty }));
+  if (!items.length) { _setPromoMsg('Please select at least one item first.', 'err'); return; }
+
+  btn.disabled = true; btn.textContent = 'Checking…';
+  try {
+    const res = await api('validateDiscount', { code, items, phone: normalizePhone(document.getElementById('cust-phone').value) });
+    STATE.promo = res.discount;
+    input.value = res.discount.code; input.disabled = true;
+    btn.textContent = 'Remove';
+    const p = currentPricing();
+    _setPromoMsg(p.disc && p.disc.code === res.discount.code && p.totals.discount > 0
+      ? `✓ ${res.discount.code} applied — you save ${peso(p.totals.discount)}`
+      : `✓ Code accepted — ${discountText(res.discount)}`, 'ok');
+  } catch (err) {
+    STATE.promo = null;
+    btn.textContent = 'Apply';
+    _setPromoMsg(err.message, 'err');
+  } finally {
+    btn.disabled = false;
+    _updateCartTotals();
+  }
+}
+
 /** Updates the subtotal display and selected count label. */
 function _updateCartTotals() {
   const selected = STATE.cart.filter(i => i.selected !== false);
-  const total    = selected.reduce((s, i) => s + (parseFloat(i.price) || 0) * i.qty, 0);
   const count    = selected.reduce((s, i) => s + i.qty, 0);
 
-  const totalEl  = document.getElementById('cart-total');
   const countEl  = document.getElementById('cart-sel-count');
   const pluralEl = document.getElementById('cart-sel-plural');
   const summEl   = document.getElementById('cart-sel-summary');
 
-  if (totalEl)  totalEl.textContent  = `${total.toFixed(2)}`;
+  _renderPriceSummary();
   if (countEl)  countEl.textContent  = count;
   if (pluralEl) pluralEl.textContent = count === 1 ? '' : 's';
   if (summEl) {
@@ -4727,25 +5189,50 @@ function renderCartDrawer() {
 // ─────────────────────────────────────────────
 // CART — PLACE ORDER (selective checkout)
 // ─────────────────────────────────────────────
+/** Scrolls to a form field inside the cart, focuses it and flashes it red so the customer sees what is missing. */
+function _flagField(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  try { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch (_) {}
+  setTimeout(() => { try { el.focus({ preventScroll: true }); } catch (_) {} }, 250);
+  el.classList.remove('field-error'); void el.offsetWidth; el.classList.add('field-error');
+  setTimeout(() => el.classList.remove('field-error'), 2800);
+}
+
+/** Button handler. Never fails silently: any unexpected error is shown to the customer. */
+let _placingOrder = false;
 async function placeOrder() {
+  if (_placingOrder) return;
+  _placingOrder = true;
+  try { await _placeOrderCore(); }
+  catch (err) {
+    console.error('placeOrder:', err);
+    showToast('Sorry, something went wrong: ' + ((err && err.message) || err) + '. Please try again.', 'error', 7000);
+  } finally { _placingOrder = false; }
+}
+
+async function _placeOrderCore() {
   const name  = document.getElementById('cust-name').value.trim();
   const rawPhone = document.getElementById('cust-phone').value.trim();
   const phone = normalizePhone(rawPhone);
 
   if (!name || !phone) {
-    showToast('Please enter your name and phone number.', 'error'); return;
+    showToast('Please enter your name and phone number.', 'error');
+    _flagField(!name ? 'cust-name' : 'cust-phone');
+    return;
   }
 
   // Basic Philippine mobile format check
   if (!/^0\d{10}$/.test(phone)) {
     showToast('Please enter a valid 11-digit Philippine mobile number (e.g. 09123456789).', 'error');
+    _flagField('cust-phone');
     return;
   }
 
   // Reflect normalized phone back into the input
   document.getElementById('cust-phone').value = phone;
   const fl = collectFlowerDetails();
-  if (fl.error) { showToast(fl.error, 'error', 4500); return; }
+  if (fl.error) { showToast(fl.error, 'error', 4500); _flagField(fl.field); return; }
 
   // Only submit checked items
   const selectedItems = STATE.cart.filter(i => i.selected !== false);
@@ -4753,12 +5240,21 @@ async function placeOrder() {
     showToast('Please select at least one item to order.', 'error'); return;
   }
 
+  // Delivery fee + discount exactly as the cart shows them (the server checks them again)
+  const pr = currentPricing();
+  if (pr.mode === 'delivery' && pr.needZone) {
+    showToast('Please choose your delivery area.', 'error');
+    _flagField('fl-zone');
+    return;
+  }
+
   const btn = document.getElementById('btn-checkout');
   btn.disabled    = true;
   btn.textContent = 'Placing order…';
 
+  let placedId = null;
   try {
-    const { orderId } = await api('addOrder', {
+    const { orderId, total } = await api('addOrder', {
       order: {
         customerName:  name,
         customerPhone: phone,
@@ -4767,9 +5263,14 @@ async function placeOrder() {
           imageUrl: i.imageUrl || '',
         })),
         subtotal: cartSelectedTotal(),
+        deliveryZone:  pr.mode === 'delivery' ? pr.zone : '',
+        discountCode:  STATE.promo ? STATE.promo.code : '',
+        expectedTotal: pr.totals.total,       // the server refuses if the real total is different
         ...fl.data,
       }
     });
+
+    placedId = orderId;   // from here on the order EXISTS — never tell the customer it failed
 
     // Remove ONLY the checked items from the cart; unchecked items stay
     const selectedIds = new Set(selectedItems.map(i => String(i.id)));
@@ -4786,14 +5287,32 @@ async function placeOrder() {
     }
 
     if (STATE.cart.length === 0) closeCart();
-    showToast(`✅ Order placed! ID: ${orderId}`, 'success', 5000);
+    showToast(`✅ Order placed! ID: ${orderId}` + (total != null ? ` · Total ${peso(total)}` : ''), 'success', 5000);
     resetFlowerFields();
+    removePromo(true);
+    _updateCartTotals();
 
     // Silently refresh public store stock
     refreshPublicProducts();
 
   } catch (err) {
-    showToast(`Order failed: ${err.message}`, 'error');
+    if (placedId) {   // the order was saved; only a screen update failed
+      console.error('after placeOrder:', err);
+      showToast(`✅ Order placed! ID: ${placedId}`, 'success', 6000);
+      return;
+    }
+    const d = err && err.data;
+    if (d && d.promoError) {
+      removePromo(true);                       // the code stopped working — let them continue without it
+      _updateCartTotals();
+      showToast(err.message + ' The code was removed — please check your total and try again.', 'error', 7000);
+    } else if (d && d.totalChanged) {
+      DataCache.del('store_snapshot');         // pick up the new prices / fee / discounts
+      _revalidateStoreSnapshot();
+      showToast(err.message, 'error', 9000);
+    } else {
+      showToast(`Order failed: ${err.message}`, 'error');
+    }
   } finally {
     btn.disabled    = false;
     btn.textContent = 'Place Order';
@@ -4935,7 +5454,7 @@ async function _revalidateCustomerOrders(phone, cacheKey) {
     const incoming = Array.isArray(data)
       ? data.map(o => ({ ...o, status: normalizeStatus(o.status) })) : [];
     const _sig = arr => JSON.stringify(arr.map(o => ({
-      id: o.orderId, status: o.status, adminComment: o.adminComment || '', subtotal: o.subtotal,
+      id: o.orderId, status: o.status, adminComment: o.adminComment || '', subtotal: o.subtotal, total: o.total,
     })));
     if (_sig(incoming) !== _sig(STATE._customerOrders)) {
       renderCustomerOrders(data);
@@ -4986,7 +5505,7 @@ async function _syncCustomerOrders() {
       ? data.map(o => ({ ...o, status: normalizeStatus(o.status) })) : [];
 
     const _sig = arr => JSON.stringify(arr.map(o => ({
-      id: o.orderId, status: o.status, adminComment: o.adminComment || '', subtotal: o.subtotal,
+      id: o.orderId, status: o.status, adminComment: o.adminComment || '', subtotal: o.subtotal, total: o.total,
     })));
     if (_sig(incoming) !== _sig(STATE._customerOrders)) {
       _patchCustomerOrderCards(incoming, data);
@@ -5564,7 +6083,7 @@ function _buildOrderCardHtml(o) {
           <div class="cust-order-id">${esc(o.orderId)}</div>
           <div class="cust-order-date">${esc(date)}</div>
         </div>
-        <div class="cust-order-total">${parseFloat(o.subtotal||0).toFixed(2)}</div>
+        <div class="cust-order-total">₱${formatMoney(orderTotal(o))}</div>
       </div>
       <div class="cust-order-status-row">
         <span class="badge ${esc(sc.cls)}">${sc.label}</span>
@@ -5574,7 +6093,9 @@ function _buildOrderCardHtml(o) {
       <div class="cust-order-items">
         <div class="cust-order-items-label">Items Ordered</div>
         ${itemsHtml}
+        ${orderBreakdownHtml(o)}
       </div>
+      ${orderShipHtml(o)}
       ${commentHtml}
       ${_buildOrderActionsHtml(o)}
     </div>`;
@@ -5754,12 +6275,12 @@ function updateAdminStats() {
 
   const revenue = o
     .filter(x => REVENUE_STATUSES.has(x.status))
-    .reduce((s, x) => s + (parseFloat(x.subtotal) || 0), 0);
+    .reduce((s, x) => s + orderTotal(x), 0);
 
   const activeCount = o.filter(x => ACTIVE_STATUSES.has(x.status)).length;
 
   document.getElementById('stat-orders').textContent   = o.length;
-  document.getElementById('stat-revenue').textContent  = `${revenue.toFixed(2)}`;
+  document.getElementById('stat-revenue').textContent  = `₱${formatMoney(revenue)}`;
   document.getElementById('stat-products').textContent = p.filter(x => x.isActive).length;
   document.getElementById('stat-pending').textContent  = activeCount;
 }
@@ -5806,8 +6327,14 @@ function renderAdminOrders() {
         <td style="white-space:nowrap;font-size:12px">${esc(date)}</td>
         <td>${esc(o.customerName  || '—')}</td>
         <td style="font-size:12px">${esc(o.customerPhone || '—')}</td>
-        <td style="max-width:160px;font-size:12px;color:var(--muted)">${esc(items)}</td>
-        <td style="color:var(--green);font-weight:700;white-space:nowrap">${parseFloat(o.subtotal||0).toFixed(2)}</td>
+        <td style="min-width:210px;max-width:280px;font-size:12px;color:var(--muted)">${esc(items)}${orderShipHtml(o)}</td>
+        <td style="color:var(--green);font-weight:700;white-space:nowrap">₱${formatMoney(orderTotal(o))}${
+          (Number(o.deliveryFee) || Number(o.discountAmount))
+            ? `<span class="ord-money-sub">Flowers ₱${formatMoney(o.subtotal)}` +
+              (Number(o.deliveryFee) ? `<br>+ Delivery ₱${formatMoney(o.deliveryFee)}` : '') +
+              (Number(o.discountAmount) ? `<br>− ${esc(o.discountCode || 'Discount')} ₱${formatMoney(o.discountAmount)}` : '') +
+              `</span>`
+            : ''}</td>
         <td style="white-space:nowrap"><span class="badge ${esc(sc.cls)}">${sc.label}</span></td>
         <td>
           <div class="order-update-cell">
@@ -6047,7 +6574,7 @@ function renderReports() {
   const orders = _rptOrdersInRange();
   const revenueOrders   = orders.filter(o => REVENUE_STATUSES.has(normalizeStatus(o.status)));
   const cancelledOrders = orders.filter(o => ['Cancelled', 'Refunded'].includes(normalizeStatus(o.status)));
-  const revenue = revenueOrders.reduce((s, o) => s + (Number(o.subtotal) || 0), 0);
+  const revenue = revenueOrders.reduce((s, o) => s + orderTotal(o), 0);
   const aov     = revenueOrders.length ? revenue / revenueOrders.length : 0;
 
   document.getElementById('rpt-stat-revenue').textContent   = formatMoney(revenue);
@@ -6069,13 +6596,13 @@ function _renderRevenueChart(orders) {
   const today = new Date();
   for (let i = days - 1; i >= 0; i--) {
     const d = new Date(today); d.setDate(d.getDate() - i);
-    buckets.set(d.toISOString().slice(0, 10), 0);
+    buckets.set(_localYmd(d), 0);
   }
   let any = false;
   orders.forEach(o => {
     if (!REVENUE_STATUSES.has(normalizeStatus(o.status))) return;
-    const key = new Date(o.timestamp).toISOString().slice(0, 10);
-    if (buckets.has(key)) { buckets.set(key, buckets.get(key) + (Number(o.subtotal) || 0)); any = true; }
+    const key = _localYmd(new Date(o.timestamp));
+    if (buckets.has(key)) { buckets.set(key, buckets.get(key) + orderTotal(o)); any = true; }
   });
 
   const ctx = canvas.getContext('2d');
@@ -6176,7 +6703,7 @@ function _renderStatusBars(orders) {
 function exportReportCsv() {
   const orders = _rptOrdersInRange();
   const revenueOrders = orders.filter(o => REVENUE_STATUSES.has(normalizeStatus(o.status)));
-  const revenue = revenueOrders.reduce((s, o) => s + (Number(o.subtotal) || 0), 0);
+  const revenue = revenueOrders.reduce((s, o) => s + orderTotal(o), 0);
   const cancelled = orders.filter(o => ['Cancelled', 'Refunded'].includes(normalizeStatus(o.status))).length;
   const range = document.getElementById('rpt-range-sel')?.selectedOptions[0]?.textContent || 'All time';
 
@@ -6211,6 +6738,7 @@ window.addEventListener('resize', () => {
 const DEFAULT_SETTINGS = {
   storeName: 'Janice FlowerShop', storePhone: '', storeEmail: '', storeAddress: '',
   storeOpen: '', storeClose: '', announcement: '', announcementSpeed: 'normal', heroImage: '', storeLat: '', storeLng: '',
+  deliveryFee: '', deliveryZones: '', freeDeliveryMin: '',
   liveSync: true, syncSpeed: 'normal', soundOrder: false, soundMsg: false,
 };
 let _settingsCache = null;
@@ -6477,6 +7005,11 @@ async function loadSettingsIntoForm() {
   document.getElementById('set-store-close').value   = settings.storeClose || '';
   document.getElementById('set-announcement').value       = settings.announcement || '';
   document.getElementById('set-announcement-speed').value = settings.announcementSpeed || 'normal';
+  document.getElementById('set-delivery-fee').value   = settings.deliveryFee == null ? '' : settings.deliveryFee;
+  document.getElementById('set-free-min').value       = settings.freeDeliveryMin == null ? '' : settings.freeDeliveryMin;
+  document.getElementById('set-delivery-zones').value = settings.deliveryZones || '';
+  refreshDeliveryPreview();
+  if (typeof loadDiscounts === 'function') loadDiscounts();
   document.getElementById('set-live-sync').checked   = settings.liveSync !== false;
   document.getElementById('set-sync-speed').value    = settings.syncSpeed || 'normal';
   document.getElementById('set-sound-order').checked = !!settings.soundOrder;
@@ -6496,6 +7029,9 @@ function _readSettingsFromForm() {
     heroImage:    (document.getElementById('set-hero-image').value || '').trim(),
     storeLat:     (document.getElementById('set-store-lat').value || '').trim(),
     storeLng:     (document.getElementById('set-store-lng').value || '').trim(),
+    deliveryFee:     (document.getElementById('set-delivery-fee').value || '').trim(),
+    freeDeliveryMin: (document.getElementById('set-free-min').value || '').trim(),
+    deliveryZones:   (document.getElementById('set-delivery-zones').value || '').replace(/\r/g, '').trim(),
     liveSync:     document.getElementById('set-live-sync').checked,
     syncSpeed:    document.getElementById('set-sync-speed').value,
     soundOrder:   document.getElementById('set-sound-order').checked,
@@ -6535,6 +7071,48 @@ async function _verifyLocationOnServer(lat, lng) {
   } catch { /* silent */ }
 }
 
+// ── Delivery fee fields (Admin → Settings) ──
+/** Shows what the shop's "Fee per area" box was understood as, so a typo is seen before saving. */
+function refreshDeliveryPreview() {
+  const box = document.getElementById('set-zone-preview'), ta = document.getElementById('set-delivery-zones');
+  if (!box || !ta) return;
+  const zones = _parseZones(ta.value);
+  const typed = ta.value.split(/\r?\n/).filter(l => l.trim()).length;
+  if (!typed) { box.textContent = ''; box.style.color = ''; return; }
+  if (zones.length === typed) {
+    box.style.color = 'var(--green)';
+    box.textContent = '✓ Understood: ' + zones.map(z => z.name + ' ' + peso(z.fee)).join(' · ');
+  } else {
+    box.style.color = 'var(--red)';
+    box.textContent = `⚠ ${typed - zones.length} line(s) not understood — each line must look like:  Poblacion = 80`;
+  }
+}
+/** Returns a plain-language problem with the delivery fields, or '' if they are fine. */
+function _deliveryFieldsError() {
+  const money = /^\d+(\.\d{1,2})?$/;
+  const fee = document.getElementById('set-delivery-fee').value.trim();
+  const min = document.getElementById('set-free-min').value.trim();
+  if (fee && !money.test(fee)) return 'Delivery fee must be a number such as 100 or 99.50.';
+  if (min && !money.test(min)) return '"Free delivery from" must be a number such as 2000.';
+  const ta = document.getElementById('set-delivery-zones').value;
+  const typed = ta.split(/\r?\n/).filter(l => l.trim()).length;
+  if (typed !== _parseZones(ta).length) return 'Some lines in "Fee per area" are not understood. Each line must look like:  Poblacion = 80';
+  return '';
+}
+/** After saving, check the server really kept the delivery settings (needs the new Code.gs). */
+async function _verifyDeliveryOnServer(settings) {
+  const statusEl = document.getElementById('set-sync-status');
+  try {
+    const snap = await api('getStoreSnapshot');
+    const p = (snap && snap.settings) || {};
+    const same = k => String(p[k] == null ? '' : p[k]).trim() === String(settings[k] == null ? '' : settings[k]).trim();
+    if (!(same('deliveryFee') && same('freeDeliveryMin') && same('deliveryZones'))) {
+      if (statusEl) { statusEl.textContent = '⚠ Delivery fee saved on this device only — the server (Code.gs) did not keep it, so customers cannot see it yet'; statusEl.className = 'set-sync-status warn'; statusEl.style.display = ''; }
+      showToast('The delivery fee did not reach the server. Update Code.gs to the new version and deploy it again.', 'error', 9000);
+    }
+  } catch { /* silent */ }
+}
+
 async function saveSettings() {
   const btn = document.getElementById('btn-save-settings');
   const msg = document.getElementById('set-saved-msg');
@@ -6548,6 +7126,12 @@ async function saveSettings() {
   if (!refreshLocUI()) {
     showToast('Please fix the store location numbers (Latitude / Longitude), then save.', 'error', 5000);
     document.getElementById('set-store-lat')?.focus();
+    return;
+  }
+  const feeProblem = _deliveryFieldsError();
+  if (feeProblem) {
+    showToast(feeProblem, 'error', 6000);
+    document.getElementById('set-delivery-fee')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
     return;
   }
   btn.disabled = true; btn.textContent = 'Saving…'; msg.style.display = 'none';
@@ -6572,6 +7156,7 @@ async function saveSettings() {
       showToast('Settings saved.', 'success', 2000);
       _verifyHeroOnServer(settings.heroImage);   // checks what customers will really receive
       _verifyLocationOnServer(settings.storeLat, settings.storeLng);
+      _verifyDeliveryOnServer(settings);
     }
   } catch (err) {
     showToast('Could not save settings: ' + err.message, 'error');
@@ -7584,7 +8169,7 @@ function _updateAdminMsgBadge() {
 
 
 // ADMIN EXPORT / PRINT HELPERS
-function exportAdminOrdersCsv(){const headers=['Date & Time','Customer','Phone','Items','Total','Status','Store Note'];const rows=(STATE.adminOrders||[]).map(o=>[formatDateTime(o.timestamp),o.customerName||'',o.customerPhone||'',Array.isArray(o.items)?o.items.map(i=>`${i.name} x${i.qty}`).join('; '):'',(Number(o.subtotal)||0).toFixed(2),normalizeStatus(o.status),o.adminComment||'']);const total=(STATE.adminOrders||[]).filter(o=>REVENUE_STATUSES.has(normalizeStatus(o.status))).reduce((s,o)=>s+(Number(o.subtotal)||0),0);rows.push(['','','','Grand Total (Received only)',total.toFixed(2),'','']);downloadTextFile(`orders-${new Date().toISOString().slice(0,10)}.csv`,rowsToCsv(headers,rows),'text/csv;charset=utf-8');}
+function exportAdminOrdersCsv(){const headers=['Date & Time','Customer','Phone','Items','Fulfillment','Pickup/Delivery Date','Time Window','Recipient','Recipient Phone','Address','Delivery Area','Flowers Subtotal','Delivery Fee','Discount Code','Discount','Total','Status','Store Note'];const rows=(STATE.adminOrders||[]).map(o=>[formatDateTime(o.timestamp),o.customerName||'',o.customerPhone||'',Array.isArray(o.items)?o.items.map(i=>`${i.name} x${i.qty}`).join('; '):'',o.fulfillment||'',o.deliveryDate||'',o.deliverySlot||'',o.recipientName||'',o.recipientPhone||'',o.deliveryAddress||'',o.deliveryZone||'',(Number(o.subtotal)||0).toFixed(2),(Number(o.deliveryFee)||0).toFixed(2),o.discountCode||'',(Number(o.discountAmount)||0).toFixed(2),orderTotal(o).toFixed(2),normalizeStatus(o.status),o.adminComment||'']);const total=(STATE.adminOrders||[]).filter(o=>REVENUE_STATUSES.has(normalizeStatus(o.status))).reduce((s,o)=>s+orderTotal(o),0);rows.push(['','','','Grand Total (Received only)','','','','','','','','','','','',total.toFixed(2),'','']);downloadTextFile(`orders-${new Date().toISOString().slice(0,10)}.csv`,rowsToCsv(headers,rows),'text/csv;charset=utf-8');}
 function exportAdminProductsCsv(){const headers=['Name','Code','Category','Price','Stock','Status','Image URL'];const rows=(STATE.adminProducts||[]).map(p=>[p.name||'',p.barcode||'',p.category||'',(Number(p.price)||0).toFixed(2),parseInt(p.stock)||0,p.isActive?'Active':'Inactive',p.imageUrl||'']);downloadTextFile(`products-${new Date().toISOString().slice(0,10)}.csv`,rowsToCsv(headers,rows),'text/csv;charset=utf-8');}
 
 // ── Print Chooser ───────────────────────────────────────────────
@@ -7743,8 +8328,8 @@ function _doPrintProducts(products, filterLabel) {
 }
 
 function _doPrintOrders(orders, filterLabel) {
-  const rows = orders.map(o=>`<tr><td>${formatDateTime(o.timestamp)}</td><td>${esc(o.customerName)}</td><td>${esc(o.customerPhone)}</td><td>${esc(Array.isArray(o.items)?o.items.map(i=>`${i.name} x${i.qty}`).join('; '):'')}</td><td>${formatMoney(o.subtotal)}</td><td>${esc(normalizeStatus(o.status))}</td></tr>`).join('');
-  const total=orders.filter(o=>REVENUE_STATUSES.has(normalizeStatus(o.status))).reduce((s,o)=>s+(Number(o.subtotal)||0),0);
+  const rows = orders.map(o=>`<tr><td>${formatDateTime(o.timestamp)}</td><td>${esc(o.customerName)}</td><td>${esc(o.customerPhone)}</td><td>${esc(Array.isArray(o.items)?o.items.map(i=>`${i.name} x${i.qty}`).join('; '):'')}</td><td>${formatMoney(orderTotal(o))}${(Number(o.deliveryFee)||Number(o.discountAmount))?`<br><small>Flowers ${formatMoney(o.subtotal)}${Number(o.deliveryFee)?` + Delivery ${formatMoney(o.deliveryFee)}`:''}${Number(o.discountAmount)?` − ${esc(o.discountCode||'Discount')} ${formatMoney(o.discountAmount)}`:''}</small>`:''}</td><td>${esc(normalizeStatus(o.status))}</td></tr>`).join('');
+  const total=orders.filter(o=>REVENUE_STATUSES.has(normalizeStatus(o.status))).reduce((s,o)=>s+orderTotal(o),0);
   const w=window.open('','_blank');
   if(!w){showToast('Popup blocked. Allow popups to print reports.','error');return;}
   w.document.write(`<!doctype html><html><head><title>Orders Report</title><style>body{font-family:Arial,sans-serif;padding:24px;color:#111}h1{margin:0 0 4px}p{margin:0 0 14px}table{border-collapse:collapse;width:100%;font-size:12px}th,td{border:1px solid #ddd;padding:7px;text-align:left;vertical-align:top}th{background:#f7f7f7}.meta{color:#555;font-size:12px;margin-bottom:12px}.filter{font-size:12px;background:#FCE4EA;padding:4px 10px;border-radius:4px;display:inline-block;margin-bottom:10px}</style></head><body><h1>Orders Report</h1><div class="meta">Generated ${formatDateTime(new Date().toISOString())}</div><div class="filter">Filter: ${esc(filterLabel)}</div><p><strong>Grand Total (Received only):</strong> ${formatMoney(total)} &nbsp;·&nbsp; <strong>Showing:</strong> ${orders.length} order(s)</p><table><thead><tr><th>Date & Time</th><th>Customer</th><th>Phone</th><th>Items</th><th>Total</th><th>Status</th></tr></thead><tbody>${rows||'<tr><td colspan="6">No data</td></tr>'}</tbody></table></body></html>`);
@@ -8236,14 +8821,14 @@ function collectFlowerDetails() {
   const mode = document.querySelector('input[name="fl-mode"]:checked').value;
   const v = id => document.getElementById(id).value.trim();
   const date = v('fl-date'), slot = v('fl-slot');
-  if (!date) return { error: 'Please choose a ' + (mode === 'pickup' ? 'pickup' : 'delivery') + ' date.' };
-  if (date < _iso(_flMinDate())) return { error: 'That date is too soon. Please pick ' + _iso(_flMinDate()) + ' or later.' };
+  if (!date) return { error: 'Please choose a ' + (mode === 'pickup' ? 'pickup' : 'delivery') + ' date.', field: 'fl-date' };
+  if (date < _iso(_flMinDate())) return { error: 'That date is too soon. Please pick ' + _iso(_flMinDate()) + ' or later.', field: 'fl-date' };
   const data = { fulfillment: mode, deliveryDate: date, deliverySlot: slot,
                  cardMessage: v('fl-card'), anonymous: document.getElementById('fl-anon').checked };
   if (mode === 'delivery') {
     const rn = v('fl-rname'), rp = normalizePhone(v('fl-rphone')), ad = v('fl-address');
-    if (!rn || !ad) return { error: "Please add the recipient's name and delivery address." };
-    if (!/^0\d{10}$/.test(rp)) return { error: "Please enter a valid 11-digit mobile number for the recipient." };
+    if (!rn || !ad) return { error: "Please add the recipient's name and delivery address.", field: !rn ? 'fl-rname' : 'fl-address' };
+    if (!/^0\d{10}$/.test(rp)) return { error: "Please enter a valid 11-digit mobile number for the recipient.", field: 'fl-rphone' };
     Object.assign(data, { recipientName: rn, recipientPhone: rp, deliveryAddress: ad });
   }
   data.notes = [mode.toUpperCase(), date, slot,
@@ -8543,6 +9128,167 @@ function _fvStep(d) { if (FV.isOpen && FV.imgs.length > 1) _fvShow(FV.i + d); }
     openFlowerViewer(card.dataset.id);
   });
 })();
+</script>
+<script>
+/* ── Cart: delivery fee + promo code wiring ─────────────────────────────── */
+(function initCartPricing() {
+  document.querySelectorAll('input[name="fl-mode"]').forEach(r =>
+    r.addEventListener('change', () => { _fillZoneSelect(); _updateCartTotals(); }));
+  document.getElementById('fl-zone')?.addEventListener('change', _updateCartTotals);
+  document.getElementById('btn-promo-apply')?.addEventListener('click', applyPromo);
+  document.getElementById('promo-input')?.addEventListener('keydown', e => {
+    if (e.key === 'Enter') { e.preventDefault(); applyPromo(); }
+  });
+  _fillZoneSelect();
+  _updateCartTotals();
+})();
+</script>
+<script>
+/* ── Admin: delivery-area preview + Discounts & promo codes ─────────────── */
+document.getElementById('set-delivery-zones')?.addEventListener('input', refreshDeliveryPreview);
+
+STATE.adminDiscounts = [];
+let _dcEditing = null;                       // code being edited (null = adding a new one)
+const _dcEl = id => document.getElementById(id);
+
+function _dcSyncTypeUI() {
+  const t = _dcEl('dc-type').value;
+  _dcEl('dc-value-wrap').style.display = t === 'freeship' ? 'none' : '';
+  _dcEl('dc-cap-wrap').style.display   = t === 'percent'  ? '' : 'none';
+  _dcEl('dc-value-lbl').textContent    = t === 'fixed' ? 'Pesos off (₱) *' : 'Percent off *';
+  _dcEl('dc-value').placeholder        = t === 'fixed' ? 'e.g. 100' : 'e.g. 10';
+}
+function _dcMsg(text, bad) {
+  const el = _dcEl('dc-msg'); if (!el) return;
+  el.textContent = text || ''; el.style.color = bad ? 'var(--red)' : 'var(--green)';
+}
+function _dcReset() {
+  _dcEditing = null;
+  ['dc-code','dc-value','dc-desc','dc-min','dc-cap','dc-uses','dc-starts','dc-expires'].forEach(id => { _dcEl(id).value = ''; });
+  _dcEl('dc-type').value = 'percent';
+  _dcEl('dc-auto').checked = false; _dcEl('dc-once').checked = false; _dcEl('dc-active').checked = true;
+  _dcEl('btn-dc-save').textContent = 'Save discount';
+  _dcEl('btn-dc-cancel').style.display = 'none';
+  _dcSyncTypeUI();
+}
+function _dcFill(d) {
+  _dcEditing = d.code;
+  _dcEl('dc-code').value = d.code; _dcEl('dc-type').value = d.type;
+  _dcEl('dc-value').value   = d.type === 'freeship' ? '' : d.value;
+  _dcEl('dc-desc').value    = d.description || '';
+  _dcEl('dc-min').value     = d.minSubtotal || '';
+  _dcEl('dc-cap').value     = d.maxDiscount || '';
+  _dcEl('dc-uses').value    = d.maxUses || '';
+  _dcEl('dc-starts').value  = d.startsOn || '';
+  _dcEl('dc-expires').value = d.expiresOn || '';
+  _dcEl('dc-auto').checked = !!d.auto; _dcEl('dc-once').checked = !!d.onePerCustomer; _dcEl('dc-active').checked = d.isActive !== false;
+  _dcEl('btn-dc-save').textContent = 'Update discount';
+  _dcEl('btn-dc-cancel').style.display = '';
+  _dcSyncTypeUI();
+  _dcEl('dc-code').scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+function _dcRead(overrides) {
+  return Object.assign({
+    code:  _dcEl('dc-code').value.trim().toUpperCase().replace(/\s+/g, ''),
+    type:  _dcEl('dc-type').value,
+    value: _dcEl('dc-value').value.trim(),
+    description: _dcEl('dc-desc').value.trim(),
+    minSubtotal: _dcEl('dc-min').value.trim(),
+    maxDiscount: _dcEl('dc-cap').value.trim(),
+    maxUses:     _dcEl('dc-uses').value.trim(),
+    startsOn:    _dcEl('dc-starts').value,
+    expiresOn:   _dcEl('dc-expires').value,
+    auto:           _dcEl('dc-auto').checked,
+    onePerCustomer: _dcEl('dc-once').checked,
+    isActive:       _dcEl('dc-active').checked,
+  }, overrides || {});
+}
+function _dcStatus(d) {
+  const t = _localYmd(new Date());
+  if (!d.isActive) return { cls: 'bad', text: 'Paused' };
+  if (d.expiresOn && d.expiresOn < t) return { cls: 'bad', text: 'Expired' };
+  if (d.startsOn && d.startsOn > t)   return { cls: '',    text: 'Starts ' + _fmtYmd(d.startsOn) };
+  if (d.maxUses > 0 && d.used >= d.maxUses) return { cls: 'bad', text: 'Fully used' };
+  return { cls: 'auto', text: 'Running' };
+}
+function renderDiscountList() {
+  const box = _dcEl('disc-list'); if (!box) return;
+  const list = STATE.adminDiscounts || [];
+  if (!list.length) { box.innerHTML = '<div class="disc-empty">No discounts yet. Fill in the form above and press <strong>Save discount</strong>.</div>'; return; }
+  box.innerHTML = list.map(d => {
+    const st = _dcStatus(d);
+    const meta = [
+      d.startsOn || d.expiresOn ? ((d.startsOn ? _fmtYmd(d.startsOn) : 'now') + ' → ' + (d.expiresOn ? _fmtYmd(d.expiresOn) : 'no end date')) : '',
+      d.maxUses > 0 ? `Used ${d.used} of ${d.maxUses}` : `Used ${d.used} time${d.used === 1 ? '' : 's'}`,
+      d.onePerCustomer ? 'once per phone number' : '',
+    ].filter(Boolean).join(' · ');
+    return `<div class="disc-item${d.isActive ? '' : ' off'}">
+      <div class="disc-main">
+        <div><span class="disc-code">${esc(d.code)}</span>
+          ${d.auto ? '<span class="disc-tag auto">AUTOMATIC</span>' : '<span class="disc-tag">PROMO CODE</span>'}
+          <span class="disc-tag ${st.cls}">${esc(st.text)}</span></div>
+        <div class="disc-desc">${esc(discountText(d))}${d.description ? ' — ' + esc(d.description) : ''}</div>
+        <div class="disc-meta">${esc(meta)}</div>
+      </div>
+      <div class="disc-actions">
+        <button type="button" class="btn-admin-util" data-act="edit" data-code="${esc(d.code)}">Edit</button>
+        <button type="button" class="btn-admin-util" data-act="toggle" data-code="${esc(d.code)}">${d.isActive ? 'Pause' : 'Activate'}</button>
+        <button type="button" class="btn-admin-util" data-act="delete" data-code="${esc(d.code)}" style="color:var(--red)">Delete</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+async function loadDiscounts() {
+  try {
+    const res = await api('adminGetDiscounts', { token: STATE.adminToken });
+    STATE.adminDiscounts = res.data || [];
+    renderDiscountList();
+  } catch (err) {
+    const box = _dcEl('disc-list');
+    if (box) box.innerHTML = `<div class="disc-empty">Could not load discounts: ${esc(err.message)}<br>Make sure the new Code.gs is deployed.</div>`;
+  }
+}
+async function saveDiscount() {
+  const btn = _dcEl('btn-dc-save');
+  const d = _dcRead();
+  if (!d.code) { _dcMsg('Please type a code or name first.', true); _dcEl('dc-code').focus(); return; }
+  if (d.type !== 'freeship' && !(_num(d.value) > 0)) { _dcMsg('Please enter how much the discount is.', true); _dcEl('dc-value').focus(); return; }
+  if (d.type === 'percent' && _num(d.value) > 100) { _dcMsg('Percent off cannot be more than 100.', true); return; }
+  if (d.startsOn && d.expiresOn && d.startsOn > d.expiresOn) { _dcMsg('The last day is before the start date.', true); return; }
+  btn.disabled = true; _dcMsg('Saving…');
+  try {
+    const res = await api('adminSaveDiscount', { token: STATE.adminToken, discount: d, originalCode: _dcEditing || '' });
+    STATE.adminDiscounts = res.data || [];
+    renderDiscountList();
+    DataCache.del('store_snapshot');          // customers pick up automatic discounts on their next refresh
+    _dcReset(); _dcMsg('✓ Saved');
+    setTimeout(() => _dcMsg(''), 2500);
+  } catch (err) { _dcMsg(err.message, true); }
+  finally { btn.disabled = false; }
+}
+_dcEl('dc-type')?.addEventListener('change', _dcSyncTypeUI);
+_dcEl('btn-dc-save')?.addEventListener('click', saveDiscount);
+_dcEl('btn-dc-cancel')?.addEventListener('click', () => { _dcReset(); _dcMsg(''); });
+_dcEl('disc-list')?.addEventListener('click', async e => {
+  const b = e.target.closest('button[data-act]'); if (!b) return;
+  const d = (STATE.adminDiscounts || []).find(x => x.code === b.dataset.code); if (!d) return;
+  if (b.dataset.act === 'edit') { _dcFill(d); return; }
+  b.disabled = true;
+  try {
+    let res;
+    if (b.dataset.act === 'toggle') {
+      res = await api('adminSaveDiscount', { token: STATE.adminToken, originalCode: d.code, discount: Object.assign({}, d, { isActive: !d.isActive }) });
+    } else {
+      if (!confirm(`Delete the discount "${d.code}"?\n\nOrders that already used it keep their discount. This cannot be undone.\n(Tip: use "Pause" to stop it without deleting.)`)) { b.disabled = false; return; }
+      res = await api('adminDeleteDiscount', { token: STATE.adminToken, code: d.code });
+      if (_dcEditing === d.code) _dcReset();
+    }
+    STATE.adminDiscounts = res.data || [];
+    renderDiscountList();
+    DataCache.del('store_snapshot');
+  } catch (err) { showToast(err.message, 'error', 5000); b.disabled = false; }
+});
+_dcSyncTypeUI();
 </script>
 </body>
 </html>
