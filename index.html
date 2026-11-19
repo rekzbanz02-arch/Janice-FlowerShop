@@ -2,6 +2,12 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <style id="peso-font">
+/* Peso sign (U+20B1) built into the page: many phones/PCs have no peso glyph and show a box.
+   This tiny font contains ONLY that one character (unicode-range), so nothing else changes. */
+@font-face{font-family:'PesoSign';font-style:normal;font-weight:100 500;font-display:block;unicode-range:U+20B1;src:url(data:font/woff;base64,d09GRk9UVE8AAASIAAsAAAAABUQABAAAAAAAAAAAAAAAAAAAAAAAAAAAAABDRkYgAAABEAAAAXMAAAGh5Udye0dQT1MAAAQ8AAAAIAAAACBEdkx1R1NVQgAABFwAAAAqAAAAKrj6uPRPUy8yAAAC5AAAAFUAAABgkOCTGWNtYXAAAAP4AAAALQAAADQADCEEaGVhZAAAAoQAAAA2AAAANjDb8nZoaGVhAAACxAAAACAAAAAkFoUK8WhtdHgAAAK8AAAACAAAAAgKkQGObWF4cAAAAQgAAAAGAAAABgACUABuYW1lAAADPAAAALkAAAF4HBs1NXBvc3QAAAQoAAAAEwAAACD+pwCMAABQAAACAAB4nFWOPU8bQRCGd20PrITlCMSJ5iBL4wQh/IHB0CFIEzo+S4oLPvyR+M7cnQtaGiTPSVDQ0VouKCjShIYm+QORewokJEQBokGzYR0J2bihevS8M69mOItFGOc8seoEtjezYRfrPyyvmywpk6lxribiTH2MKBnVT/EoyXhs4utheIzYR3zQfBn7/9kcPTfFNVDxw7HKjlBlmA1wLobmdypu3SnPZlayc6lM74bcXpWWU5BvUvalJQPPKthVy/su3T3p+VU/9cWtHXjlYimQs5lsXm6V7P7+mudW7N1ALteDkuv5b2H/654wxvgRi3Ae/X2beKYqGrSBgCoNdIpALaT04x9yBC0gICVBTyKEzbCJLYGtRrPRFDTZnywibJKj0w+6haKzjoD6L+hPXSaBeky9838nlDQ67W49BaqNEPrhPtYE1hr7DV902vrKQJoGdYlQ0Dxv6RwKulD3RudXtzQFdIZAObz59lMzkTBjd8YrDfanlwAAAQAAAAQAAJd+wj1fDzz1AAMIAAAAAADhgFONAAAAAOGAU6j6F/1sFKoI3QAAAAMAAgAAAAAAAAVAAUgFUQBGeJxjYGRgYD/wT4iBQbTkl8T3DJFVDIwMqIAJAItGBZR4nC3JsRGAIBAAweP9H4ytAGuwDhPJqcjA2MQa6IAGSCzEEhyHwUs2ONRmd2Bgi1bg7EpllwsEG2goPflli2ukhByyL+8EvrgHcO1pshsIjB97Ug4RAAAAeJyNzkFKw2AUReEvNio6cAEd/RuoNNUUJCNxJCiEVhw4KxKSiDSSpgP35TpckxCCREGQNzm8d7j34diTiSg+Qc7AkVP5wAfOvp2JO9XAsamPgQ8tfQ58ZBrFbjTevGvVSpVOsDCXWAoeVArBra1OoRXkWo0XhefevrbXqTRau5G5UijtvdpoXTo37ydTqnVmNlILiQuJ1JVUZmXt3lo2Spr9yhp/8/Py2G93ao2t8M/WP5u+ANuONG4AAAB4nCXJ0Q0AEBDA0MfdCAYwklVNZBSCnzZNURFoQnlOHSlv97n35xrvO16HBy0AAAB4nGNgZgCDf0sYehiwAAAyhQIyAAABAAAACgAcAB4AAURGTFQACAAEAAAAAP//AAAAAAAAAAEAAAAKACYAKAACREZMVAAObGF0bgAYAAQAAAAA//8AAAAAAAAAAAAAAAA=) format('woff');}
+@font-face{font-family:'PesoSign';font-style:normal;font-weight:600 900;font-display:block;unicode-range:U+20B1;src:url(data:font/woff;base64,d09GRk9UVE8AAAR4AAsAAAAABSgABAAAAAAAAAAAAAAAAAAAAAAAAAAAAABDRkYgAAABEAAAAWwAAAGf7OydF0dQT1MAAAQsAAAAIAAAACBEdkx1R1NVQgAABEwAAAAqAAAAKrj6uPRPUy8yAAAC3AAAAFQAAABgkgyWV2NtYXAAAAPoAAAALQAAADQADCEEaGVhZAAAAnwAAAA2AAAANjB48pZoaGVhAAACvAAAACAAAAAkFiEJgmhtdHgAAAK0AAAACAAAAAgK+QGebWF4cAAAAQgAAAAGAAAABgACUABuYW1lAAADMAAAALcAAAFgGQQyunBvc3QAAAQYAAAAEwAAACD+wAC+AABQAAACAAB4nFWOvy9DURTH723fqYsXQrylebhTJ6UVhEGktbSDRISNodHqK22fvPf8WgwWSU+TJmYpk0Fs/gMmIlaJf8DMcq68J5FXXUzf8/me8833cKZFGOe8P1/3Sk4ya1eLIWaVydQoV2M6U+MRJaNqRPPf9Cit6dpY7qzZQuyK3mN+3/9kzJFbU3wAFQdbamqYykMsxrnon90qVw/qlelUNj0zmep0yI28LNSL8g8qrixIzykUS7WCsyftHem4NXdy2d4/cSply5PTqfScXLdK3ftVx94tbXsyc+BZtuP+meHXnYkxxs9ZhPPo4/sAbZKLBj0jIH0BrSDQC9ISaQ/UFJQM7QT4cYRmG6/wWuA1XjXaguLdzQTCBl34ixTzn1AEDQQMNPBHEdBPAHVU/8ffp5QwglyY10HlEJrHeISHAg/xqHEsgpx/aSD1gUoiVObzlq+jIFvdGMFEmOkFWkUgHV+tuwUxYGqfxi+u2KIOAAEAAAAEAACMlm43Xw889QADCAAAAAAA4YBTjQAAAADhgFPX+bP9UxSqCOcAAQADAAIAAAAAAAAFQAFIBbkAVnicY2BkYGA/8E+IgUG05OeWrz9FVjEwMqACJgCk6wa+eJwtybENgCAQQNHPeRepnYAdnINGegez0RXojWEBGgdxBGMI/uYVH7UoJwY2awW2rlQu2UHwAw2lJ78sKSaOkEMeyzvBWNwDuPZ0tRsI+A+lYg5/eJyNzk1Kw2AUheGntv6Ou4BvA5WmmoJkpILgQAhWHDjzJzQRaSSNA3fkIlyVKxDCZ8nAQbmT915ezj3Y92BoMDpETuSBI3nkHQcbZ+jKU+SRsa/Iu+a+I+8Z+3Gp9u5To7JUagUzU4m54E6pEFxbaRUaQa5Re1V47uxzH1qlWmPdMy/U3rw4dWzaTWap0pp4lJpJnEikzqQytxZuLGS9jMkmpd/g73bf7WuV2krY8tM/6b9dji/bAHicJcnRDQAQEMDQx90IBjCSVU1kFIKfNk1REWhCeU4dKW/3uffnGu87XocHLQAAAHicY2BmAIN/exn2MWABADjeAn0AAAEAAAAKABwAHgABREZMVAAIAAQAAAAA//8AAAAAAAAAAQAAAAoAJgAoAAJERkxUAA5sYXRuABgABAAAAAD//wAAAAAAAAAAAAAAAA==) format('woff');}
+</style>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>FlowerShop — Fuzzy Wires</title>
 
@@ -14,7 +20,7 @@
   -->
   <script>
     // Injected by GAS template — DO NOT REMOVE THIS LINE
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxCRynrtDPn_AJcgJm4pIOKrzRyArNq_Kl-LXRrUfxMdHP1tg63TdX34D1wCQVGl1XTNQ/exec';
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxIByJViCWgE2L2vk-nrRWkublGQsmYtCj53zlZmSxD_9WBqz3tueAAh-y-iWyNhl4STw/exec';
   </script>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -44,8 +50,8 @@
       --shadow-h:   0 10px 30px rgba(42,16,33,0.14);
       --radius:     14px;
       --radius-sm:  8px;
-      --fd:         'Sora', sans-serif;
-      --fb:         'DM Sans', sans-serif;
+      --fd:         'PesoSign', 'Sora', sans-serif;
+      --fb:         'PesoSign', 'DM Sans', sans-serif;
     }
 
     html { scroll-behavior: smooth; }
@@ -839,7 +845,7 @@
     .cust-order-id {
       font-size: 10px;
       color: var(--muted);
-      font-family: monospace;
+      font-family: 'PesoSign', monospace;
       letter-spacing: 0.3px;
     }
     .cust-order-date {
@@ -2091,7 +2097,7 @@
       gap: 10px;
     }
     .admin-chat-customer-name { font-weight: 700; font-size: 14px; color: var(--dark); }
-    .admin-chat-order-meta    { font-size: 11px; color: var(--muted); font-family: monospace; margin-top: 1px; }
+    .admin-chat-order-meta    { font-size: 11px; color: var(--muted); font-family: 'PesoSign', monospace; margin-top: 1px; }
     .admin-chat-messages {
       flex: 1;
       overflow-y: auto;
@@ -2451,7 +2457,7 @@
       background: var(--cream);
     }
     .admin-chat-popup-name { font-weight: 700; font-size: 15px; color: var(--dark); }
-    .admin-chat-popup-meta { font-size: 11px; color: var(--muted); font-family: monospace; margin-top: 2px; }
+    .admin-chat-popup-meta { font-size: 11px; color: var(--muted); font-family: 'PesoSign', monospace; margin-top: 2px; }
     .admin-chat-popup-close {
       background: none; border: none; font-size: 20px; cursor: pointer;
       color: var(--muted); padding: 4px 8px; border-radius: 6px;
@@ -2578,7 +2584,7 @@
 
 <style>
 /* ── Flower shop additions ── */
-.logo, .section-title, .hero-title { font-family: 'Fraunces', Georgia, serif; }
+.logo, .section-title, .hero-title { font-family: 'PesoSign', 'Fraunces', Georgia, serif; }
 .hero { background: linear-gradient(115deg, var(--dark) 0%, #4A1D3A 100%); color: #fff; }
 .hero-inner { max-width: 1200px; margin: 0 auto; padding: 38px 20px 34px; }
 .hero-title { font-size: clamp(26px, 5vw, 44px); line-height: 1.12; max-width: 16ch; font-weight: 700; }
@@ -2752,7 +2758,7 @@
 .disc-item { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 12px; border: 1.5px solid var(--border); border-radius: var(--radius-sm); background: var(--cream); flex-wrap: wrap; }
 .disc-item.off { opacity: .6; }
 .disc-main { min-width: 0; flex: 1 1 240px; }
-.disc-code { font-family: monospace; font-weight: 800; font-size: 14px; color: var(--dark); }
+.disc-code { font-family: 'PesoSign', monospace; font-weight: 800; font-size: 14px; color: var(--dark); }
 .disc-tag { display: inline-block; margin-left: 6px; padding: 1px 8px; border-radius: 999px; font-size: 10.5px; font-weight: 700; background: var(--amber-lt); color: var(--amber-dk); }
 .disc-tag.auto { background: #E6F4EA; color: var(--green); }
 .disc-tag.bad { background: #FDE7E7; color: var(--red); }
@@ -2844,7 +2850,7 @@ button.promo-chip:hover { filter: brightness(.96); }
       will-change: transform;
     }
     .ann-text {
-      font-family: 'Barlow Condensed', sans-serif;
+      font-family: 'PesoSign', 'Barlow Condensed', sans-serif;
       font-size: 15px;
       font-weight: 700;
       letter-spacing: 0.06em;
@@ -2963,11 +2969,11 @@ button.promo-chip:hover { filter: brightness(.96); }
     <!-- Footer -->
     <div class="cart-footer" id="cart-footer" style="display:none">
       <div class="cart-summary" id="cart-summary" aria-live="polite">
-        <div class="cs-row"><span>Subtotal (<span id="cart-sel-count">0</span> item<span id="cart-sel-plural">s</span>)</span><span id="cart-subtotal">₱0.00</span></div>
-        <div class="cs-row cs-disc" id="cs-disc-row" style="display:none"><span id="cs-disc-label">Discount</span><span id="cs-disc-val">−₱0.00</span></div>
-        <div class="cs-row" id="cs-fee-row"><span id="cs-fee-label">Delivery fee</span><span id="cs-fee-val">₱0.00</span></div>
+        <div class="cs-row"><span>Subtotal (<span id="cart-sel-count">0</span> item<span id="cart-sel-plural">s</span>)</span><span id="cart-subtotal">&#8369;0.00</span></div>
+        <div class="cs-row cs-disc" id="cs-disc-row" style="display:none"><span id="cs-disc-label">Discount</span><span id="cs-disc-val">−&#8369;0.00</span></div>
+        <div class="cs-row" id="cs-fee-row"><span id="cs-fee-label">Delivery fee</span><span id="cs-fee-val">&#8369;0.00</span></div>
         <div class="cs-hint" id="cs-hint" style="display:none"></div>
-        <div class="cs-row cs-total"><span>Total</span><span class="cart-total-val" id="cart-total">₱0.00</span></div>
+        <div class="cs-row cs-total"><span>Total</span><span class="cart-total-val" id="cart-total">&#8369;0.00</span></div>
       </div>
       <div class="promo-box" id="promo-box">
         <div class="promo-row">
@@ -3004,7 +3010,7 @@ button.promo-chip:hover { filter: brightness(.96); }
         </div>
       </div>
       <div class="checkout-bar">
-        <div class="cb-total"><span>Total to pay</span><strong id="cart-total-mini">₱0.00</strong></div>
+        <div class="cb-total"><span>Total to pay</span><strong id="cart-total-mini">&#8369;0.00</strong></div>
         <button class="btn-checkout" id="btn-checkout">Place Order</button>
       </div>
     </div>
@@ -3285,11 +3291,11 @@ button.promo-chip:hover { filter: brightness(.96); }
             <div class="set-sub">What customers pay to have their flowers delivered. Pickup is always free. Leave everything empty for free delivery. Press <strong>Save Settings</strong> (bottom of the page) to apply.</div>
             <div class="set-row set-2col">
               <div>
-                <label class="set-label" for="set-delivery-fee">Delivery fee (₱)</label>
+                <label class="set-label" for="set-delivery-fee">Delivery fee (&#8369;)</label>
                 <input type="text" inputmode="decimal" class="set-input" id="set-delivery-fee" placeholder="e.g. 100" maxlength="8" autocomplete="off">
               </div>
               <div>
-                <label class="set-label" for="set-free-min">Free delivery from (₱)</label>
+                <label class="set-label" for="set-free-min">Free delivery from (&#8369;)</label>
                 <input type="text" inputmode="decimal" class="set-input" id="set-free-min" placeholder="e.g. 2000 (optional)" maxlength="8" autocomplete="off">
               </div>
             </div>
@@ -3351,7 +3357,7 @@ button.promo-chip:hover { filter: brightness(.96); }
 
           <div class="settings-card set-wide" id="disc-card">
             <div class="settings-card-title">🏷️ Discounts &amp; promo codes</div>
-            <div class="set-sub">Make a <strong>promo code</strong> that customers type in the cart, or a discount that applies <strong>automatically</strong> (for example "10% off orders over ₱1,500"). A customer gets one discount per order — the one that saves them the most. Discounts are saved right away; you do not need to press Save Settings.</div>
+            <div class="set-sub">Make a <strong>promo code</strong> that customers type in the cart, or a discount that applies <strong>automatically</strong> (for example "10% off orders over &#8369;1,500"). A customer gets one discount per order — the one that saves them the most. Discounts are saved right away; you do not need to press Save Settings.</div>
 
             <div class="set-row set-3col">
               <div>
@@ -3362,7 +3368,7 @@ button.promo-chip:hover { filter: brightness(.96); }
                 <label class="set-label" for="dc-type">Type of discount</label>
                 <select class="set-input" id="dc-type">
                   <option value="percent">Percent off (%)</option>
-                  <option value="fixed">Pesos off (₱)</option>
+                  <option value="fixed">Pesos off (&#8369;)</option>
                   <option value="freeship">Free delivery</option>
                 </select>
               </div>
@@ -3394,11 +3400,11 @@ button.promo-chip:hover { filter: brightness(.96); }
             </div>
             <div class="set-row set-3col">
               <div>
-                <label class="set-label" for="dc-min">Smallest order (₱) <span class="set-hint" id="dc-min-hint">optional</span></label>
+                <label class="set-label" for="dc-min">Smallest order (&#8369;) <span class="set-hint" id="dc-min-hint">optional</span></label>
                 <input type="text" inputmode="decimal" class="set-input" id="dc-min" placeholder="e.g. 1500" maxlength="8" autocomplete="off">
               </div>
               <div id="dc-cap-wrap">
-                <label class="set-label" for="dc-cap">Biggest discount (₱) <span class="set-hint">optional</span></label>
+                <label class="set-label" for="dc-cap">Biggest discount (&#8369;) <span class="set-hint">optional</span></label>
                 <input type="text" inputmode="decimal" class="set-input" id="dc-cap" placeholder="e.g. 300" maxlength="8" autocomplete="off">
               </div>
               <div>
@@ -4258,7 +4264,7 @@ function _fmtYmd(ymd) {
 function orderBreakdownHtml(o) {
   const fee = Number(o.deliveryFee) || 0, disc = Number(o.discountAmount) || 0;
   if (!fee && !disc) return '';
-  const pe = n => '₱' + formatMoney(n);
+  const pe = n => '\u20B1' + formatMoney(n);
   return `<div class="ord-break">` +
     `<div><span>Subtotal</span><span>${pe(o.subtotal)}</span></div>` +
     (disc ? `<div class="ob-disc"><span>Discount${o.discountCode ? ' (' + esc(o.discountCode) + ')' : ''}</span><span>−${pe(disc)}</span></div>` : '') +
@@ -4905,7 +4911,7 @@ function _num(v) {
 function _parseZones(text) {
   const out = [], seen = {};
   String(text == null ? '' : text).split(/\r?\n/).forEach(function (line) {
-    const m = line.match(/^\s*(.+?)\s*[=:]\s*(?:₱|PHP|P)?\s*(\d+(?:\.\d+)?)\s*$/i);
+    const m = line.match(/^\s*(.+?)\s*[=:]\s*(?:\u20B1|PHP|P)?\s*(\d+(?:\.\d+)?)\s*$/i);
     if (!m) return;
     const key = m[1].toLowerCase();
     if (seen[key]) return;
@@ -4998,7 +5004,9 @@ function _bestDiscount(cands, subtotal, mode, zoneInput, cfg, typedCode, lines) 
 
 /* ==== END PRICING ==== */
 
-const peso = n => '₱' + formatMoney(n);
+/** The @font-face rules of the built-in peso font (used by the print windows too). */
+function _pesoFontCss() { const el = document.getElementById('peso-font'); return el ? el.textContent : ''; }
+const peso = n => '\u20B1' + formatMoney(n);
 
 /** Settings the cart needs (they arrive with the store snapshot). */
 function _feeCfg() {
@@ -5023,7 +5031,7 @@ function discountText(d) {
 }
 
 /* ── Promo display on the shop page (ads, badges, original prices, tap-to-filter) ─────────── */
-const _pesoShort = n => '₱' + (Number(n) || 0).toLocaleString('en-PH', { maximumFractionDigits: 2 });
+const _pesoShort = n => '\u20B1' + (Number(n) || 0).toLocaleString('en-PH', { maximumFractionDigits: 2 });
 /** An old cached snapshot has no "auto" field: those promos were all automatic. */
 function _isAutoPromo(d) { return d.auto !== false; }
 function _promoIsScoped(d) { return !!(d && d.productIds && d.productIds.length); }
@@ -5050,7 +5058,7 @@ function _promoEnds(d) {
   if (d.expiresOn === _localYmd(new Date())) return 'Ends today';
   return 'Until ' + new Date(+m[1], +m[2] - 1, +m[3]).toLocaleDateString('en-PH', { month: 'short', day: 'numeric' });
 }
-/** Free delivery from the shop's own setting ("Free delivery from ₱X" in Settings), if there is one. */
+/** Free delivery from the shop's own setting ("Free delivery from \u20B1X" in Settings), if there is one. */
 function _storeFreeShipMin() {
   const cfg = _feeCfg();
   return (_feeConfigured(cfg) && _num(cfg.freeDeliveryMin) > 0) ? _num(cfg.freeDeliveryMin) : 0;
@@ -6407,7 +6415,7 @@ function _buildOrderCardHtml(o) {
           <div class="cust-order-id">${esc(o.orderId)}</div>
           <div class="cust-order-date">${esc(date)}</div>
         </div>
-        <div class="cust-order-total">₱${formatMoney(orderTotal(o))}</div>
+        <div class="cust-order-total">\u20B1${formatMoney(orderTotal(o))}</div>
       </div>
       <div class="cust-order-status-row">
         <span class="badge ${esc(sc.cls)}">${sc.label}</span>
@@ -6604,7 +6612,7 @@ function updateAdminStats() {
   const activeCount = o.filter(x => ACTIVE_STATUSES.has(x.status)).length;
 
   document.getElementById('stat-orders').textContent   = o.length;
-  document.getElementById('stat-revenue').textContent  = `₱${formatMoney(revenue)}`;
+  document.getElementById('stat-revenue').textContent  = `\u20B1${formatMoney(revenue)}`;
   document.getElementById('stat-products').textContent = p.filter(x => x.isActive).length;
   document.getElementById('stat-pending').textContent  = activeCount;
 }
@@ -6652,11 +6660,11 @@ function renderAdminOrders() {
         <td>${esc(o.customerName  || '—')}</td>
         <td style="font-size:12px">${esc(o.customerPhone || '—')}</td>
         <td style="min-width:210px;max-width:280px;font-size:12px;color:var(--muted)">${esc(items)}${orderShipHtml(o)}</td>
-        <td style="color:var(--green);font-weight:700;white-space:nowrap">₱${formatMoney(orderTotal(o))}${
+        <td style="color:var(--green);font-weight:700;white-space:nowrap">\u20B1${formatMoney(orderTotal(o))}${
           (Number(o.deliveryFee) || Number(o.discountAmount))
-            ? `<span class="ord-money-sub">Flowers ₱${formatMoney(o.subtotal)}` +
-              (Number(o.deliveryFee) ? `<br>+ Delivery ₱${formatMoney(o.deliveryFee)}` : '') +
-              (Number(o.discountAmount) ? `<br>− ${esc(o.discountCode || 'Discount')} ₱${formatMoney(o.discountAmount)}` : '') +
+            ? `<span class="ord-money-sub">Flowers \u20B1${formatMoney(o.subtotal)}` +
+              (Number(o.deliveryFee) ? `<br>+ Delivery \u20B1${formatMoney(o.deliveryFee)}` : '') +
+              (Number(o.discountAmount) ? `<br>− ${esc(o.discountCode || 'Discount')} \u20B1${formatMoney(o.discountAmount)}` : '') +
               `</span>`
             : ''}</td>
         <td style="white-space:nowrap"><span class="badge ${esc(sc.cls)}">${sc.label}</span></td>
@@ -6713,7 +6721,7 @@ function renderAdminProducts() {
     <tr>
       <td style="font-size:12px;color:var(--muted)">${safeId}</td>
       <td><strong>${esc(p.name)}</strong>${_isLegacyCat(p.category) ? '<div class="legacy-flag">Hidden category · not shown in shop</div>' : ''}</td>
-      <td style="font-family:monospace;font-size:12px;color:var(--muted)">${esc(p.barcode || '—')}</td>
+      <td style="font-family:'PesoSign',monospace;font-size:12px;color:var(--muted)">${esc(p.barcode || '—')}</td>
       <td>${esc(p.category)}</td>
       <td style="color:var(--green);font-weight:700">${parseFloat(p.price||0).toFixed(2)}</td>
       <td class="${stockCls}">
@@ -8647,7 +8655,7 @@ function _doPrintProducts(products, filterLabel) {
   const rows = products.map(p=>`<tr><td>${esc(p.name)}</td><td>${esc(p.category)}</td><td>${formatMoney(p.price)}</td><td>${parseInt(p.stock)||0}</td><td>${p.isActive?'Active':'Inactive'}</td></tr>`).join('');
   const w=window.open('','_blank');
   if(!w){showToast('Popup blocked. Allow popups to print reports.','error');return;}
-  w.document.write(`<!doctype html><html><head><title>Product Inventory</title><style>body{font-family:Arial,sans-serif;padding:24px;color:#111}h1{margin:0 0 4px}p{margin:0 0 14px}table{border-collapse:collapse;width:100%;font-size:12px}th,td{border:1px solid #ddd;padding:7px;text-align:left;vertical-align:top}th{background:#f7f7f7}.meta{color:#555;font-size:12px;margin-bottom:12px}.filter{font-size:12px;background:#FCE4EA;padding:4px 10px;border-radius:4px;display:inline-block;margin-bottom:10px}</style></head><body><h1>Product Inventory</h1><div class="meta">Generated ${formatDateTime(new Date().toISOString())}</div><div class="filter">Filter: ${esc(filterLabel)}</div><p><strong>Total:</strong> ${products.length} product(s)</p><table><thead><tr><th>Name</th><th>Category</th><th>Price</th><th>Stock</th><th>Status</th></tr></thead><tbody>${rows||'<tr><td colspan="5">No data</td></tr>'}</tbody></table></body></html>`);
+  w.document.write(`<!doctype html><html><head><title>Product Inventory</title><style>${_pesoFontCss()}body{font-family:'PesoSign',Arial,sans-serif;padding:24px;color:#111}h1{margin:0 0 4px}p{margin:0 0 14px}table{border-collapse:collapse;width:100%;font-size:12px}th,td{border:1px solid #ddd;padding:7px;text-align:left;vertical-align:top}th{background:#f7f7f7}.meta{color:#555;font-size:12px;margin-bottom:12px}.filter{font-size:12px;background:#FCE4EA;padding:4px 10px;border-radius:4px;display:inline-block;margin-bottom:10px}</style></head><body><h1>Product Inventory</h1><div class="meta">Generated ${formatDateTime(new Date().toISOString())}</div><div class="filter">Filter: ${esc(filterLabel)}</div><p><strong>Total:</strong> ${products.length} product(s)</p><table><thead><tr><th>Name</th><th>Category</th><th>Price</th><th>Stock</th><th>Status</th></tr></thead><tbody>${rows||'<tr><td colspan="5">No data</td></tr>'}</tbody></table></body></html>`);
   w.document.close();w.focus();w.print();
 }
 
@@ -8656,7 +8664,7 @@ function _doPrintOrders(orders, filterLabel) {
   const total=orders.filter(o=>REVENUE_STATUSES.has(normalizeStatus(o.status))).reduce((s,o)=>s+orderTotal(o),0);
   const w=window.open('','_blank');
   if(!w){showToast('Popup blocked. Allow popups to print reports.','error');return;}
-  w.document.write(`<!doctype html><html><head><title>Orders Report</title><style>body{font-family:Arial,sans-serif;padding:24px;color:#111}h1{margin:0 0 4px}p{margin:0 0 14px}table{border-collapse:collapse;width:100%;font-size:12px}th,td{border:1px solid #ddd;padding:7px;text-align:left;vertical-align:top}th{background:#f7f7f7}.meta{color:#555;font-size:12px;margin-bottom:12px}.filter{font-size:12px;background:#FCE4EA;padding:4px 10px;border-radius:4px;display:inline-block;margin-bottom:10px}</style></head><body><h1>Orders Report</h1><div class="meta">Generated ${formatDateTime(new Date().toISOString())}</div><div class="filter">Filter: ${esc(filterLabel)}</div><p><strong>Grand Total (Received only):</strong> ${formatMoney(total)} &nbsp;·&nbsp; <strong>Showing:</strong> ${orders.length} order(s)</p><table><thead><tr><th>Date & Time</th><th>Customer</th><th>Phone</th><th>Items</th><th>Total</th><th>Status</th></tr></thead><tbody>${rows||'<tr><td colspan="6">No data</td></tr>'}</tbody></table></body></html>`);
+  w.document.write(`<!doctype html><html><head><title>Orders Report</title><style>${_pesoFontCss()}body{font-family:'PesoSign',Arial,sans-serif;padding:24px;color:#111}h1{margin:0 0 4px}p{margin:0 0 14px}table{border-collapse:collapse;width:100%;font-size:12px}th,td{border:1px solid #ddd;padding:7px;text-align:left;vertical-align:top}th{background:#f7f7f7}.meta{color:#555;font-size:12px;margin-bottom:12px}.filter{font-size:12px;background:#FCE4EA;padding:4px 10px;border-radius:4px;display:inline-block;margin-bottom:10px}</style></head><body><h1>Orders Report</h1><div class="meta">Generated ${formatDateTime(new Date().toISOString())}</div><div class="filter">Filter: ${esc(filterLabel)}</div><p><strong>Grand Total (Received only):</strong> ${formatMoney(total)} &nbsp;·&nbsp; <strong>Showing:</strong> ${orders.length} order(s)</p><table><thead><tr><th>Date & Time</th><th>Customer</th><th>Phone</th><th>Items</th><th>Total</th><th>Status</th></tr></thead><tbody>${rows||'<tr><td colspan="6">No data</td></tr>'}</tbody></table></body></html>`);
   w.document.close();w.focus();w.print();
 }
 
@@ -9510,7 +9518,7 @@ function _dcSyncTypeUI() {
   const t = _dcEl('dc-type').value;
   _dcEl('dc-value-wrap').style.display = t === 'freeship' ? 'none' : '';
   _dcEl('dc-cap-wrap').style.display   = t === 'percent'  ? '' : 'none';
-  _dcEl('dc-value-lbl').textContent    = t === 'fixed' ? 'Pesos off (₱) *' : 'Percent off *';
+  _dcEl('dc-value-lbl').textContent    = t === 'fixed' ? 'Pesos off (\u20B1) *' : 'Percent off *';
   _dcEl('dc-value').placeholder        = t === 'fixed' ? 'e.g. 100' : 'e.g. 10';
 }
 function _dcMsg(text, bad) {
