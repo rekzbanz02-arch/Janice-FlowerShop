@@ -2822,11 +2822,31 @@ button.promo-chip:hover { filter: brightness(.96); }
 .apf-photo-btns { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-top: 8px; }
 .apf-gal-item .apf-photo-btns { margin-top: 0; }
 .apf-rm { color: var(--red) !important; }
-.music-btn { position: fixed; left: 16px; bottom: calc(18px + env(safe-area-inset-bottom, 0px)); z-index: 150; width: 46px; height: 46px; border-radius: 50%; border: 0; background: var(--dark); color: #fff; font-size: 21px; line-height: 1; cursor: pointer; display: grid; place-items: center; box-shadow: 0 4px 16px rgba(42,16,33,.35); transition: transform .15s, background .15s; }
+.music-btn { position: fixed; left: 12px; bottom: calc(14px + env(safe-area-inset-bottom, 0px)); z-index: 150; width: 34px; height: 34px; border-radius: 50%; border: 0; background: var(--dark); color: #fff; font-size: 16px; line-height: 1; cursor: pointer; display: grid; place-items: center; box-shadow: 0 3px 12px rgba(42,16,33,.35); transition: transform .15s, background .15s; opacity: .92; }
 .music-btn:hover { transform: scale(1.08); }
 .music-btn.playing { background: var(--amber); animation: musicPulse 2.4s ease-in-out infinite; }
-@keyframes musicPulse { 0%,100% { box-shadow: 0 4px 16px rgba(42,16,33,.35), 0 0 0 0 rgba(212,71,111,.45); } 50% { box-shadow: 0 4px 16px rgba(42,16,33,.35), 0 0 0 10px rgba(212,71,111,0); } }
+@keyframes musicPulse { 0%,100% { box-shadow: 0 4px 16px rgba(42,16,33,.35), 0 0 0 0 rgba(212,71,111,.45); } 50% { box-shadow: 0 4px 16px rgba(42,16,33,.35), 0 0 0 7px rgba(212,71,111,0); } }
 @media print { .music-btn { display: none !important; } }
+.music-btn.blocked { animation: musicNudge 1.8s ease-in-out infinite; }
+@keyframes musicNudge { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.18); } }
+.music-current { padding: 9px 12px; border: 1.5px dashed var(--border); border-radius: var(--radius-sm); background: var(--cream); font-size: 13px; font-weight: 600; color: var(--dark); word-break: break-all; }
+details.set-more { margin-top: 10px; }
+details.set-more summary { cursor: pointer; font-size: 12px; font-weight: 700; color: var(--muted); margin-bottom: 6px; }
+.apt-btn { padding: 10px 18px; border: none; background: none; font-family: var(--fb); font-size: 13px; font-weight: 600; color: var(--muted); cursor: pointer; border-bottom: 3px solid transparent; margin-bottom: -1px; transition: color .2s; }
+.apt-btn:hover { color: var(--dark); }
+.apt-btn.active { color: var(--amber); border-bottom-color: var(--amber); }
+.apt-pane { display: none; }
+.apt-pane.active { display: block; }
+.apt-list { display: flex; flex-direction: column; gap: 8px; }
+.apt-row { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border: 2px solid var(--border); border-radius: 10px; cursor: pointer; background: var(--card); transition: border-color .15s, background .15s; }
+.apt-row:hover { border-color: var(--amber); }
+.apt-row.selected { border-color: var(--amber); background: var(--amber-lt); }
+.apt-row.big { opacity: .55; }
+.apt-row-name { flex: 1; min-width: 0; font-weight: 600; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.apt-row-meta { font-size: 11px; color: var(--muted); white-space: nowrap; }
+.apt-play { flex-shrink: 0; width: 30px; height: 30px; border-radius: 50%; border: 1.5px solid var(--border); background: #fff; color: var(--dark); font-size: 12px; cursor: pointer; }
+.apt-play:hover { border-color: var(--amber); }
+.fv-retry { margin-top: 10px; border: 0; border-radius: 999px; padding: 8px 16px; background: var(--amber); color: #fff; font: 700 13px var(--fb); cursor: pointer; }
 </style>
 </head>
 <body>
@@ -3380,7 +3400,7 @@ button.promo-chip:hover { filter: brightness(.96); }
 
           <div class="settings-card" id="music-card">
             <div class="settings-card-title">🎵 Background music</div>
-            <div class="set-sub">Soft music that plays while customers browse the shop. Phones and browsers only allow sound after the first tap, so music starts on the customer's first tap, and a small 🎵 button lets them pause it. Press <strong>Save Settings</strong> to apply.</div>
+            <div class="set-sub">Music that plays while customers browse the shop. It starts as soon as the shop opens. Some browsers (especially phones) wait for the customer's first tap, and a small 🎵 button lets them pause it. Press <strong>Save Settings</strong> to apply.</div>
             <div class="set-row set-toggle-row">
               <div>
                 <div class="set-toggle-label">Play background music</div>
@@ -3392,21 +3412,28 @@ button.promo-chip:hover { filter: brightness(.96); }
               </label>
             </div>
             <div class="set-row">
-              <label class="set-label" for="set-music-url">Music link <span class="set-hint">(Google Drive file link, or a direct https .mp3 link)</span></label>
-              <input type="url" class="set-input" id="set-music-url" placeholder="https://drive.google.com/file/d/…/view" autocomplete="off" spellcheck="false">
+              <label class="set-label">Music file</label>
+              <div class="music-current" id="music-current"><span id="music-current-name">No music selected</span></div>
+              <input type="hidden" id="set-music-name">
+              <div class="set-hero-actions" style="margin-top:8px">
+                <button type="button" class="btn-admin-util btn-add-product" id="btn-music-choose">🎵 Choose or upload music</button>
+                <button type="button" class="btn-admin-util" id="btn-music-test" disabled>▶ Test music</button>
+                <button type="button" class="btn-admin-util" id="btn-music-clear" disabled>Remove music</button>
+              </div>
             </div>
             <div class="set-row">
               <label class="set-label" for="set-music-volume">Volume: <span id="set-music-vol-val">40</span>%</label>
               <input type="range" id="set-music-volume" min="0" max="100" step="5" value="40" style="width:100%;accent-color:var(--amber)">
             </div>
-            <div class="set-hero-actions">
-              <button type="button" class="btn-admin-util" id="btn-music-test" disabled>▶ Test music</button>
-              <button type="button" class="btn-admin-util" id="btn-music-clear" disabled>Remove music</button>
-            </div>
             <div class="set-hero-err" id="set-music-msg" style="display:none"></div>
             <div class="set-hint" style="margin-top:8px;line-height:1.55">
-              How to get the link: upload your MP3 to Google Drive (use the <strong>same Google account that runs this app</strong>) → right-click it → <strong>Share</strong> → <strong>Copy link</strong> → paste it above. The file does not need to be public. Tip: use a small MP3 (1–3 MB, under 8 MB) and royalty-free music. Press <strong>Test music</strong> to check that it plays.
+              Press <strong>Choose or upload music</strong>: pick an MP3 already in the shop's Drive folder, or upload one from your device (it is saved in the Drive folder <strong>Shop Music</strong>). Use a small MP3 (1–3 MB, up to 8 MB) and royalty-free music.
             </div>
+            <details class="set-more">
+              <summary>Advanced: use a link instead</summary>
+              <input type="url" class="set-input" id="set-music-url" placeholder="https://drive.google.com/file/d/…/view  or  https://…/song.mp3" autocomplete="off" spellcheck="false">
+              <div class="set-hint" style="margin-top:4px">A Google Drive file link (in the account that runs this app) or an https link to an MP3 on another site.</div>
+            </details>
           </div>
 
           <div class="settings-card set-wide" id="disc-card">
@@ -3788,6 +3815,53 @@ button.promo-chip:hover { filter: brightness(.96); }
   </div>
 </div>
 
+<div class="img-picker-overlay" id="aud-picker-overlay" role="dialog" aria-modal="true" aria-labelledby="aud-picker-title">
+  <div class="img-picker-modal">
+    <div class="img-picker-header">
+      <div>
+        <div class="img-picker-title" id="aud-picker-title">🎵 Background Music</div>
+        <div class="img-picker-subtitle">Choose an MP3 from the Drive folder, or upload one from your device</div>
+      </div>
+      <button class="img-picker-close" id="aud-picker-close" aria-label="Close music picker">✕</button>
+    </div>
+    <div class="img-picker-tabs">
+      <button type="button" class="apt-btn active" data-apt="drive">📁 Choose from Drive folder</button>
+      <button type="button" class="apt-btn" data-apt="upload">📤 Upload from device</button>
+    </div>
+    <div class="img-picker-body">
+      <div class="apt-pane active" id="apt-drive">
+        <div class="img-picker-loading" id="apt-loading"><div class="spin">⚙️</div><br>Loading music from Drive…</div>
+        <div class="img-picker-err" id="apt-err" style="display:none"></div>
+        <div class="img-empty-folder" id="apt-empty" style="display:none">
+          <div style="font-size:36px;margin-bottom:10px">🎵</div>
+          <strong>No music found in the folder</strong><br>
+          <span style="font-size:12px">Upload an MP3 from your device, or add one to the Drive folder.</span>
+        </div>
+        <div class="apt-list" id="apt-list"></div>
+      </div>
+      <div class="apt-pane" id="apt-upload">
+        <div class="img-upload-section">
+          <div class="img-upload-hint">Select an MP3 from your device. It is saved in the shop's Google Drive folder (<strong>Shop Music</strong>) and used right away. Max 8 MB.</div>
+          <label class="img-upload-label" id="apt-upload-label" for="apt-upload-input">
+            <span class="img-upload-icon">🎵</span>
+            <span class="img-upload-text">Choose music file…</span>
+            <span class="img-upload-sub">MP3, M4A, WAV, OGG, AAC · max 8 MB</span>
+          </label>
+          <input type="file" id="apt-upload-input" accept="audio/*,.mp3,.m4a,.wav,.ogg,.aac" style="display:none">
+          <div class="img-upload-filename" id="apt-upload-name"></div>
+          <div class="img-upload-err" id="apt-upload-err" style="display:none"></div>
+          <div class="img-upload-progress" id="apt-upload-progress" style="display:none"><div class="img-upload-spinner">⏳</div> Uploading to Drive… this can take a few seconds.</div>
+        </div>
+      </div>
+    </div>
+    <div class="img-picker-footer">
+      <div class="img-picker-sel-info" id="apt-sel-info">No music selected</div>
+      <button class="btn-picker-cancel" id="btn-apt-cancel">Cancel</button>
+      <button class="btn-picker-save" id="btn-apt-save" disabled>Use this music</button>
+    </div>
+  </div>
+</div>
+
 <button type="button" class="music-btn" id="music-btn" style="display:none" aria-pressed="false" aria-label="Play background music">🔇</button>
 <div class="toast" id="toast" role="alert" aria-live="polite"></div>
 
@@ -3842,12 +3916,12 @@ const DataCache = (() => {
 // ─────────────────────────────────────────────────────────────────────────────
 const _inflight = new Map(); // deduplicate concurrent identical calls
 
-async function api(action, data = {}) {
+async function api(action, data = {}, opts = {}) {
   const key = action + '|' + JSON.stringify(data);
   if (_inflight.has(key)) return _inflight.get(key);
   const promise = (async () => {
     const ctrl = new AbortController();
-    const timer = setTimeout(() => ctrl.abort(), 25000);
+    const timer = setTimeout(() => ctrl.abort(), opts.timeout || 25000);
     try {
       const res = await fetch(SCRIPT_URL, { method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'}, body:JSON.stringify({action,...data}), redirect:'follow', signal:ctrl.signal, cache:'no-store' });
       if (!res.ok) throw new Error(`Network error ${res.status}`);
@@ -7190,7 +7264,7 @@ window.addEventListener('resize', () => {
 const DEFAULT_SETTINGS = {
   storeName: 'Janice FlowerShop', storePhone: '', storeEmail: '', storeAddress: '',
   storeOpen: '', storeClose: '', announcement: '', announcementSpeed: 'normal', heroImage: '', storeLat: '', storeLng: '',
-  musicEnabled: false, musicUrl: '', musicVolume: 40,
+  musicEnabled: false, musicUrl: '', musicName: '', musicVolume: 40,
   deliveryEnabled: true, deliveryFee: '', deliveryZones: '', freeDeliveryMin: '',
   liveSync: true, syncSpeed: 'normal', soundOrder: false, soundMsg: false,
 };
@@ -7465,6 +7539,7 @@ async function loadSettingsIntoForm() {
   refreshDeliveryPreview();
   document.getElementById('set-music-enabled').checked = settings.musicEnabled === true || String(settings.musicEnabled).toLowerCase() === 'true';
   document.getElementById('set-music-url').value = settings.musicUrl || '';
+  document.getElementById('set-music-name').value = settings.musicName || '';
   { const mv = parseInt(settings.musicVolume, 10); document.getElementById('set-music-volume').value = isNaN(mv) ? 40 : mv; }
   if (typeof refreshMusicLinkUI === 'function') refreshMusicLinkUI();
   if (typeof loadDiscounts === 'function') loadDiscounts();
@@ -7493,6 +7568,7 @@ function _readSettingsFromForm() {
     deliveryEnabled: document.getElementById('set-delivery-enabled').checked,
     musicEnabled: document.getElementById('set-music-enabled').checked,
     musicUrl:     (document.getElementById('set-music-url').value || '').trim(),
+    musicName:    (document.getElementById('set-music-name').value || '').trim(),
     musicVolume:  (() => { const v = parseInt(document.getElementById('set-music-volume').value, 10); return isNaN(v) ? 40 : Math.min(100, Math.max(0, v)); })(),
     liveSync:     document.getElementById('set-live-sync').checked,
     syncSpeed:    document.getElementById('set-sync-speed').value,
@@ -9506,21 +9582,39 @@ function closeFlowerViewer() {
   const ov = document.getElementById('fv-overlay');
   ov.classList.remove('open'); ov.setAttribute('aria-hidden', 'true');
   document.body.style.overflow = FV.prevOverflow || '';
+  clearTimeout(FV.preT);
   document.getElementById('fv-track').innerHTML = '';      // stop any in-flight image loads
   try { if (FV.lastFocus && FV.lastFocus.focus) FV.lastFocus.focus({ preventScroll: true }); } catch (e) {}
 }
 
+/** Drive pictures are asked for at a web size (fast); other links are used as they are. */
+function _fvSizedUrl(src) { return /^https:\/\/lh3\.googleusercontent\.com\/d\/[^=?]+$/.test(src) ? src + '=w1400' : src; }
+function _fvPlaceholder(slide, k) {
+  slide.classList.remove('loading');
+  slide.innerHTML = '<div class="fv-ph"><b>🌸</b>This photo can\u2019t be loaded<br><button type="button" class="fv-retry" data-k="' + k + '">Try again</button></div>';
+}
 function _fvLoad(k) {
   const slide = document.getElementById('fv-track').children[k];
   if (!slide || slide.dataset.started) return;
   slide.dataset.started = '1';
   const img = slide.querySelector('img');
+  if (!img) return;
+  const plain = slide.dataset.src, sized = _fvSizedUrl(plain);
+  let triedPlain = sized === plain;
   img.onload  = () => { slide.classList.remove('loading'); slide.classList.add('loaded'); };
   img.onerror = () => {
-    slide.classList.remove('loading');
-    slide.innerHTML = '<div class="fv-ph"><b>🌸</b>This photo can\u2019t be loaded</div>';
+    if (!triedPlain) { triedPlain = true; img.src = plain; return; }     // the resized picture failed: try the original link
+    _fvPlaceholder(slide, k);
   };
-  img.src = slide.dataset.src;
+  img.src = sized;
+}
+function _fvRetry(k) {
+  const slide = document.getElementById('fv-track').children[k];
+  if (!slide) return;
+  delete slide.dataset.started;
+  slide.classList.remove('loaded'); slide.classList.add('loading');
+  slide.innerHTML = '<img alt="' + esc(document.getElementById('fv-title').textContent) + '" draggable="false">';
+  _fvLoad(k);
 }
 
 function _fvShow(k, instant) {
@@ -9530,7 +9624,9 @@ function _fvShow(k, instant) {
   if (instant) track.style.transition = 'none';
   track.style.transform = `translateX(${-FV.i * 100}%)`;
   if (instant) { void track.offsetWidth; track.style.transition = ''; }
-  [FV.i - 1, FV.i, FV.i + 1].forEach(j => { if (j >= 0 && j < n) _fvLoad(j); });   // current + neighbours
+  _fvLoad(FV.i);                                                                      // the photo on screen first
+  clearTimeout(FV.preT);
+  FV.preT = setTimeout(() => { if (FV.isOpen) FV.imgs.forEach((_, j) => _fvLoad(j)); }, 60);   // then ALL the others, so swiping never shows an empty slide
   document.getElementById('fv-counter').textContent = n > 1 ? `${FV.i + 1} / ${n}` : '1 photo';
   document.getElementById('fv-prev').disabled = FV.i === 0;
   document.getElementById('fv-next').disabled = FV.i === n - 1;
@@ -9543,6 +9639,7 @@ function _fvStep(d) { if (FV.isOpen && FV.imgs.length > 1) _fvShow(FV.i + d); }
   if (!ov || !stage) return;
 
   document.getElementById('fv-close').addEventListener('click', closeFlowerViewer);
+  track.addEventListener('click', e => { const b = e.target.closest('.fv-retry'); if (b) _fvRetry(parseInt(b.dataset.k, 10)); });   // keyboard users
   document.getElementById('fv-prev').addEventListener('click', e => { e.stopPropagation(); _fvStep(-1); });
   document.getElementById('fv-next').addEventListener('click', e => { e.stopPropagation(); _fvStep(1); });
   document.getElementById('fv-dots').addEventListener('click', e => {
@@ -9580,8 +9677,15 @@ function _fvStep(d) { if (FV.isOpen && FV.imgs.length > 1) _fvShow(FV.i + d); }
       const fast = Math.abs(d.dx) / Math.max(1, Date.now() - d.t) > 0.45;
       if (Math.abs(d.dx) > Math.max(50, d.w * 0.15) || (fast && Math.abs(d.dx) > 20)) _fvShow(FV.i + (d.dx < 0 ? 1 : -1));
       else _fvShow(FV.i);                                                                 // snap back
-    } else if (e.type === 'pointerup' && !e.target.closest('img')) {
-      closeFlowerViewer();                                                                // tap on the dark area closes
+    } else if (e.type === 'pointerup') {
+      // (the pointer is captured by the stage, so find what was really tapped)
+      const hit = document.elementFromPoint(e.clientX, e.clientY);
+      const retry = hit && hit.closest ? hit.closest('.fv-retry') : null;
+      if (retry) { _fvRetry(parseInt(retry.dataset.k, 10)); return; }
+      const slide = track.children[FV.i], im = slide && slide.querySelector('img');
+      const r = im ? im.getBoundingClientRect() : null;
+      const onPhoto = !!r && e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom;
+      if (!onPhoto) closeFlowerViewer();                                                  // tap on the dark area closes; tapping the photo does not
     }
   };
   stage.addEventListener('pointerup', endDrag);
@@ -9822,9 +9926,17 @@ _dcSyncTypeUI();
 </script>
 <script>
 /* ── Background music ───────────────────────────────────────────────────── */
-const LS_MUSIC_OFF = 'mystore_music_off';      // true = the customer paused the music (we respect that)
-const MUSIC = { audio: null, src: '', ready: false, loading: false, wantPlay: false, failed: false, blob: null, dataTried: false,
-                userPaused: lsGet(LS_MUSIC_OFF) === true, resume: false, resumeStore: false };
+const LS_MUSIC_OFF = 'mystore_music_off';      // "paused by the customer" lasts for this visit only, so music plays by default next time
+let _musicPausedMem = false;
+function _musicPausedGet() { try { return sessionStorage.getItem(LS_MUSIC_OFF) === '1'; } catch (_) { return _musicPausedMem; } }
+function _musicPausedSet(v) {
+  _musicPausedMem = !!v;
+  try { if (v) sessionStorage.setItem(LS_MUSIC_OFF, '1'); else sessionStorage.removeItem(LS_MUSIC_OFF); } catch (_) {}
+}
+lsDel(LS_MUSIC_OFF);                           // older versions remembered a pause for ever: forget it
+
+const MUSIC = { audio: null, src: '', ready: false, loading: false, wantPlay: false, failed: false, blocked: false, tries: 0,
+                blob: null, dataTried: false, userPaused: _musicPausedGet(), resume: false, resumeStore: false };
 const _musicBlobs = {};                        // Drive file id -> { url, blob } (kept for this visit)
 let _musicTestWarm = '';
 
@@ -9865,7 +9977,7 @@ function _blobToDataUrl(blob) {
 /**
  * Gets a Google Drive MP3 through the script (Drive blocks playing its files directly in a page).
  * Customers keep a copy in the browser, so the file is downloaded only once.
- * opts: { token, fresh } — the admin test sends the admin token and skips the saved copies.
+ * opts: { token, fresh } — the admin sends the admin token; fresh = skip the saved copies.
  */
 async function _musicLoadDrive(id, opts) {
   opts = opts || {};
@@ -9876,7 +9988,7 @@ async function _musicLoadDrive(id, opts) {
     try { if (window.caches) { const c = await caches.open('shop-music-v1'); const hit = await c.match(key); if (hit) blob = await hit.blob(); } } catch (_) {}
   }
   if (!blob) {
-    const res = await api('getMusic', opts.token ? { id, token: opts.token } : { id });
+    const res = await api('getMusic', opts.token ? { id, token: opts.token } : { id }, { timeout: 60000 });   // a few MB can be slow on mobile data
     const bin = atob(res.base64), bytes = new Uint8Array(bin.length);
     for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
     blob = new Blob([bytes], { type: res.mimeType || 'audio/mpeg' });
@@ -9895,7 +10007,7 @@ function _musicEnsureAudio() {
   const a = new Audio();
   a.loop = true;
   a.preload = 'auto';
-  a.addEventListener('play',  _musicRefreshBtn);
+  a.addEventListener('play',  () => { MUSIC.blocked = false; _musicRefreshBtn(); });
   a.addEventListener('pause', _musicRefreshBtn);
   a.addEventListener('error', () => {
     if (!MUSIC.src || !a.getAttribute('src')) return;
@@ -9912,9 +10024,10 @@ function _musicEnsureAudio() {
   MUSIC.audio = a;
   return a;
 }
-/** Downloads / prepares the song (once). Called a few seconds after the shop opens, so the first tap can play at once. */
+/** Downloads / prepares the song (once). Runs as soon as the shop opens, so the first tap can play at once. */
 async function _musicPrepare() {
   if (MUSIC.ready || MUSIC.loading || MUSIC.failed || !MUSIC.src || !MUSIC.audio) return;
+  if (_musicAdminOpen()) return;                         // loaded when the admin goes back to the shop
   const src = MUSIC.src, info = _musicInfo(src);
   if (info.direct) { MUSIC.audio.src = info.direct; MUSIC.ready = true; if (MUSIC.wantPlay) _musicTryPlay(); return; }
   if (!info.driveId) return;
@@ -9923,12 +10036,20 @@ async function _musicPrepare() {
     const item = await _musicLoadDrive(info.driveId);
     MUSIC.loading = false;
     if (MUSIC.src !== src) { _musicPrepare(); return; }  // another song was chosen meanwhile
-    MUSIC.blob = item.blob; MUSIC.dataTried = false;
+    MUSIC.blob = item.blob; MUSIC.dataTried = false; MUSIC.tries = 0;
     MUSIC.audio.src = item.url;
     MUSIC.ready = true;
   } catch (err) {
-    console.warn('Music:', err && err.message);
     MUSIC.loading = false;
+    const m = String((err && err.message) || '');
+    MUSIC.tries++;
+    // A slow or dropped connection: try again (up to 3 times). A real problem with the file: give up.
+    if (MUSIC.tries < 3 && !/not available|too large|not an audio|Invalid|Cannot open|Unknown action/i.test(m)) {
+      setTimeout(_musicPrepare, 3000 * MUSIC.tries);
+      _musicRefreshBtn();
+      return;
+    }
+    console.warn('Music:', m);
     _musicFail();
     return;
   }
@@ -9939,11 +10060,13 @@ function _musicTryPlay() {
   const a = MUSIC.audio;
   if (!a || !MUSIC.src || MUSIC.failed) return;
   MUSIC.wantPlay = true;
-  if (_musicAdminOpen()) return;                 // no music while the admin works
+  if (_musicAdminOpen()) return;                         // no music while the admin works
   if (!MUSIC.ready) { _musicPrepare(); _musicRefreshBtn(); return; }
   if (!a.paused) return;
   const p = a.play();
-  if (p && p.catch) p.catch(() => {});    // blocked until the customer taps: the next tap tries again
+  if (p && p.catch) p.catch(err => {                     // blocked until the customer taps: the next tap tries again
+    if (err && err.name === 'NotAllowedError') { MUSIC.blocked = true; _musicRefreshBtn(); }
+  });
 }
 function _musicRefreshBtn() {
   const btn = document.getElementById('music-btn');
@@ -9953,6 +10076,7 @@ function _musicRefreshBtn() {
   const playing = !!MUSIC.audio && !MUSIC.audio.paused;
   const waiting = !playing && MUSIC.wantPlay && !MUSIC.ready && !MUSIC.failed;
   btn.classList.toggle('playing', playing);
+  btn.classList.toggle('blocked', !playing && MUSIC.blocked && !MUSIC.userPaused);
   btn.textContent = playing ? '🎵' : (waiting ? '⏳' : '🔇');
   btn.setAttribute('aria-pressed', String(playing));
   btn.setAttribute('aria-label', playing ? 'Pause background music' : 'Play background music');
@@ -9964,7 +10088,7 @@ function applyBackgroundMusic() {
   const c = _musicCfg();
   if (!c.on || !c.url || musicLinkProblem(c.url)) {      // music off, or no usable link
     if (MUSIC.audio) { MUSIC.audio.pause(); MUSIC.audio.removeAttribute('src'); MUSIC.audio.load(); }
-    MUSIC.src = ''; MUSIC.ready = false; MUSIC.failed = false; MUSIC.wantPlay = false; MUSIC.blob = null;
+    MUSIC.src = ''; MUSIC.ready = false; MUSIC.failed = false; MUSIC.wantPlay = false; MUSIC.blob = null; MUSIC.tries = 0;
     _musicRefreshBtn();
     return;
   }
@@ -9972,9 +10096,9 @@ function applyBackgroundMusic() {
   a.volume = c.vol;
   if (MUSIC.src !== c.url) {                            // first time, or a new song chosen in Admin → Settings
     a.pause(); a.removeAttribute('src');
-    MUSIC.src = c.url; MUSIC.ready = false; MUSIC.failed = false; MUSIC.blob = null; MUSIC.dataTried = false;
-    MUSIC.wantPlay = !MUSIC.userPaused;          // PLAY BY DEFAULT (unless this customer paused it before)
-    _musicPrepare();                              // load now, then try to play at once
+    MUSIC.src = c.url; MUSIC.ready = false; MUSIC.failed = false; MUSIC.blob = null; MUSIC.dataTried = false; MUSIC.tries = 0;
+    MUSIC.wantPlay = !MUSIC.userPaused;                 // PLAY BY DEFAULT (unless this customer paused it during this visit)
+    _musicPrepare();                                    // load now, then try to play at once
   }
   _musicRefreshBtn();
 }
@@ -9983,8 +10107,8 @@ function toggleMusic() {
   const a = MUSIC.audio;
   if (!a || !MUSIC.src) return;
   const playing = !a.paused, waiting = MUSIC.wantPlay && !MUSIC.ready;
-  if (!playing && !waiting) { MUSIC.userPaused = false; lsDel(LS_MUSIC_OFF); _musicTryPlay(); }
-  else { MUSIC.userPaused = true; MUSIC.wantPlay = false; lsSet(LS_MUSIC_OFF, true); a.pause(); _musicRefreshBtn(); }
+  if (!playing && !waiting) { MUSIC.userPaused = false; _musicPausedSet(false); _musicTryPlay(); }
+  else { MUSIC.userPaused = true; MUSIC.wantPlay = false; _musicPausedSet(true); a.pause(); _musicRefreshBtn(); }
 }
 
 /** The shop page and the admin page switch: no music while the admin works. */
@@ -10007,7 +10131,7 @@ function _musicViewChanged() {
     if (!MUSIC.audio.paused) return;
     _musicTryPlay();
   };
-  ['pointerdown', 'touchend', 'click', 'keydown'].forEach(ev =>
+  ['pointerdown', 'pointerup', 'mouseup', 'touchend', 'click', 'keydown'].forEach(ev =>
     document.addEventListener(ev, firstGesture, { capture: true, passive: true }));
 
   // Quiet while the tab is hidden
@@ -10032,7 +10156,15 @@ function musicTestStop() {
 }
 function refreshMusicLinkUI() {
   const input = document.getElementById('set-music-url'); if (!input) return true;
+  const nameEl = document.getElementById('set-music-name');
   const url = input.value.trim(), problem = url ? musicLinkProblem(url) : '';
+  const cur = document.getElementById('music-current-name');
+  if (cur) {
+    const nm = nameEl ? nameEl.value.trim() : '';
+    cur.textContent = !url ? 'No music selected'
+      : nm ? '🎵 ' + nm
+      : (problem ? url : (_musicInfo(url).driveId ? '🎵 Google Drive file' : '🎵 ' + url));
+  }
   document.getElementById('set-music-vol-val').textContent = document.getElementById('set-music-volume').value;
   document.getElementById('btn-music-test').disabled  = !url || !!problem;
   document.getElementById('btn-music-clear').disabled = !url;
@@ -10092,21 +10224,200 @@ async function _verifyMusicOnServer(s) {
     }
   } catch (_) { /* silent */ }
 }
-(function wireMusicSettings() {
-  const url = document.getElementById('set-music-url'), vol = document.getElementById('set-music-volume');
-  url?.addEventListener('input', () => { musicTestStop(); _musicTestWarm = ''; refreshMusicLinkUI(); });
-  vol?.addEventListener('input', () => {
-    document.getElementById('set-music-vol-val').textContent = vol.value;
-    if (_musicTest) _musicTest.volume = (parseInt(vol.value, 10) || 0) / 100;
+
+/* ── Music picker: choose from the Drive folder OR upload from the device ── */
+const APICK = { selected: null, tab: 'drive', cache: null, maxBytes: 8 * 1024 * 1024, preview: null, previewId: '' };
+const _aptEl = id => document.getElementById(id);
+function _aptSize(b) { b = Number(b) || 0; return b >= 1048576 ? (b / 1048576).toFixed(1) + ' MB' : Math.max(1, Math.round(b / 1024)) + ' KB'; }
+
+function _aptSwitch(tab) {
+  APICK.tab = tab;
+  document.querySelectorAll('.apt-btn').forEach(b => b.classList.toggle('active', b.dataset.apt === tab));
+  document.querySelectorAll('.apt-pane').forEach(p => p.classList.toggle('active', p.id === 'apt-' + tab));
+}
+function _aptStopPreview() {
+  if (APICK.preview) { try { APICK.preview.pause(); APICK.preview.removeAttribute('src'); } catch (_) {} }
+  APICK.preview = null; APICK.previewId = '';
+  document.querySelectorAll('.apt-play').forEach(b => { b.textContent = '▶'; });
+}
+function openAudioPicker() {
+  if (!STATE.adminToken) { showToast('Please log in as admin first.', 'error'); return; }
+  musicTestStop();
+  APICK.selected = null;
+  _aptStopPreview();
+  _aptSwitch('drive');
+  _aptEl('apt-sel-info').textContent = 'No music selected';
+  _aptEl('btn-apt-save').disabled = true;
+  if (typeof window._aptResetUpload === 'function') window._aptResetUpload();
+  _aptEl('aud-picker-overlay').classList.add('open');
+  _aptLoadList();
+}
+function closeAudioPicker() {
+  _aptStopPreview();
+  _aptEl('aud-picker-overlay').classList.remove('open');
+  APICK.selected = null;
+}
+async function _aptLoadList() {
+  const loading = _aptEl('apt-loading'), err = _aptEl('apt-err'), empty = _aptEl('apt-empty'), list = _aptEl('apt-list');
+  err.style.display = 'none'; empty.style.display = 'none';
+  if (APICK.cache) _aptRender(APICK.cache);
+  else { loading.style.display = ''; list.innerHTML = ''; }
+  try {
+    const res = await api('adminListDriveAudio', { token: STATE.adminToken });
+    if (res.maxBytes) APICK.maxBytes = res.maxBytes;
+    APICK.cache = res.files || [];
+    _aptRender(APICK.cache);
+  } catch (e) {
+    loading.style.display = 'none';
+    if (!APICK.cache) {
+      err.style.display = '';
+      err.innerHTML = 'Failed to load music: ' + esc(/Unknown action/i.test(e.message) ? 'the server does not know this action yet — update Code.gs and deploy a new version.' : e.message);
+    }
+  }
+}
+function _aptRender(files) {
+  _aptEl('apt-loading').style.display = 'none';
+  const list = _aptEl('apt-list'), empty = _aptEl('apt-empty');
+  if (!files.length) { empty.style.display = ''; list.innerHTML = ''; return; }
+  empty.style.display = 'none';
+  const sel = APICK.selected ? APICK.selected.id : '';
+  list.innerHTML = files.map(f => {
+    const big = f.size > APICK.maxBytes;
+    return `<div class="apt-row${f.id === sel ? ' selected' : ''}${big ? ' big' : ''}" data-id="${esc(f.id)}">
+      <button type="button" class="apt-play" data-play="${esc(f.id)}" title="Listen">▶</button>
+      <div class="apt-row-name" title="${esc(f.name)}">${esc(f.name)}</div>
+      <div class="apt-row-meta">${big ? 'too large · ' : ''}${esc(_aptSize(f.size))}</div></div>`;
+  }).join('');
+}
+function _aptSelect(id) {
+  const f = (APICK.cache || []).find(x => x.id === id);
+  if (!f) return;
+  if (f.size > APICK.maxBytes) { showToast('That file is too large (max ' + _aptSize(APICK.maxBytes) + '). Choose a smaller MP3.', 'error', 5000); return; }
+  APICK.selected = f;
+  document.querySelectorAll('.apt-row').forEach(r => r.classList.toggle('selected', r.dataset.id === id));
+  _aptEl('apt-sel-info').innerHTML = 'Selected: <strong>' + esc(f.name) + '</strong>';
+  _aptEl('btn-apt-save').disabled = false;
+}
+async function _aptPreview(id, btn) {
+  if (APICK.preview && APICK.previewId === id) { _aptStopPreview(); return; }
+  _aptStopPreview();
+  const a = new Audio();
+  APICK.preview = a; APICK.previewId = id;
+  a.volume = (parseInt(_aptEl('set-music-volume').value, 10) || 40) / 100;
+  btn.textContent = '⏳';
+  let blob = null, dataTried = false;
+  a.addEventListener('playing', () => { if (APICK.preview === a) btn.textContent = '■'; });
+  a.addEventListener('error', () => {
+    if (APICK.preview !== a || !a.getAttribute('src')) return;
+    if (blob && !dataTried) { dataTried = true; _blobToDataUrl(blob).then(u => { if (APICK.preview === a) { a.src = u; a.play().catch(() => {}); } }); return; }
+    _aptStopPreview();
+    showToast('This file cannot be played. Is it a real MP3?', 'error', 4500);
   });
-  document.getElementById('btn-music-test')?.addEventListener('click', musicTestToggle);
-  document.getElementById('btn-music-clear')?.addEventListener('click', () => {
-    musicTestStop(); _musicTestWarm = ''; url.value = ''; refreshMusicLinkUI();
-    showToast('Music link removed — press Save Settings to apply.', 'info', 3500);
+  try {
+    const item = await _musicLoadDrive(id, { token: STATE.adminToken });
+    if (APICK.preview !== a) return;
+    blob = item.blob; a.src = item.url;
+    await a.play();
+  } catch (err) {
+    if (APICK.preview !== a) return;
+    _aptStopPreview();
+    if (err && err.name === 'AbortError') return;
+    if (err && err.name === 'NotAllowedError') { showToast('The browser blocked the sound. Press ▶ again.', 'info', 3500); return; }
+    showToast(String((err && err.message) || 'Could not play this file.'), 'error', 5000);
+  }
+}
+/** The admin chose a file: put it in the Settings form (it is saved with Save Settings). */
+function confirmAudioSelection() {
+  const f = APICK.selected;
+  if (!f) return;
+  closeAudioPicker();
+  _aptEl('set-music-url').value = f.url;
+  _aptEl('set-music-name').value = f.name;
+  _aptEl('set-music-enabled').checked = true;
+  musicTestStop(); _musicTestWarm = '';
+  refreshMusicLinkUI();
+  showToast('Music selected: ' + f.name + ' — press Save Settings to apply.', 'success', 5000);
+}
+
+(function initAudioUpload() {
+  const input = _aptEl('apt-upload-input'), label = _aptEl('apt-upload-label');
+  const prog = _aptEl('apt-upload-progress'), errEl = _aptEl('apt-upload-err'), nameEl = _aptEl('apt-upload-name');
+  if (!input || !label) return;
+  const showErr = m => { errEl.textContent = m || ''; errEl.style.display = m ? '' : 'none'; };
+  window._aptResetUpload = function () {
+    input.value = ''; prog.style.display = 'none'; showErr(''); nameEl.textContent = '';
+    label.querySelector('.img-upload-text').textContent = 'Choose music file…';
+  };
+  async function handle(file) {
+    if (!file) return;
+    showErr('');
+    if (!/^audio\//i.test(file.type) && !/\.(mp3|m4a|wav|ogg|aac)$/i.test(file.name)) { showErr('Only audio files are allowed (MP3, M4A, WAV, OGG, AAC).'); return; }
+    if (file.size > APICK.maxBytes) { showErr('File too large (' + _aptSize(file.size) + '). Max is ' + _aptSize(APICK.maxBytes) + '. Please use a smaller MP3.'); return; }
+    nameEl.textContent = file.name + ' · ' + _aptSize(file.size);
+    label.querySelector('.img-upload-text').textContent = file.name;
+    prog.style.display = '';
+    APICK.selected = null; _aptEl('btn-apt-save').disabled = true;
+    try {
+      const base64 = await new Promise((res, rej) => {
+        const r = new FileReader();
+        r.onload = () => res(String(r.result).split(',')[1]);
+        r.onerror = () => rej(new Error('Failed to read file'));
+        r.readAsDataURL(file);
+      });
+      const result = await api('adminUploadAudioToDrive', { token: STATE.adminToken, filename: file.name, base64, mimeType: file.type || '' }, { timeout: 180000 });
+      prog.style.display = 'none';
+      if (APICK.cache) APICK.cache.unshift(Object.assign({}, result.audio));
+      APICK.selected = result.audio;
+      showToast('Music saved to the Drive folder ✓');
+      confirmAudioSelection();                          // use the uploaded music right away
+    } catch (err) {
+      prog.style.display = 'none';
+      showErr('Upload failed: ' + (/Unknown action/i.test(err.message) ? 'the server does not know this action yet — update Code.gs and deploy a new version.' : err.message));
+    }
+  }
+  input.addEventListener('change', () => { if (input.files && input.files[0]) handle(input.files[0]); });
+  label.addEventListener('dragover', e => { e.preventDefault(); label.classList.add('drag-over'); });
+  label.addEventListener('dragleave', () => label.classList.remove('drag-over'));
+  label.addEventListener('drop', e => {
+    e.preventDefault(); label.classList.remove('drag-over');
+    const f = e.dataTransfer.files && e.dataTransfer.files[0];
+    if (f) handle(f);
+  });
+})();
+
+(function wireMusicSettings() {
+  const url = _aptEl('set-music-url'), name = _aptEl('set-music-name'), vol = _aptEl('set-music-volume');
+  url?.addEventListener('input', () => { if (name) name.value = ''; musicTestStop(); _musicTestWarm = ''; refreshMusicLinkUI(); });
+  vol?.addEventListener('input', () => {
+    _aptEl('set-music-vol-val').textContent = vol.value;
+    if (_musicTest) _musicTest.volume = (parseInt(vol.value, 10) || 0) / 100;
+    if (APICK.preview) APICK.preview.volume = (parseInt(vol.value, 10) || 0) / 100;
+  });
+  _aptEl('btn-music-test')?.addEventListener('click', musicTestToggle);
+  _aptEl('btn-music-choose')?.addEventListener('click', openAudioPicker);
+  _aptEl('btn-music-clear')?.addEventListener('click', () => {
+    musicTestStop(); _musicTestWarm = ''; url.value = ''; if (name) name.value = ''; refreshMusicLinkUI();
+    showToast('Music removed — press Save Settings to apply.', 'info', 3500);
   });
   document.querySelectorAll('.admin-tab').forEach(b => b.addEventListener('click', musicTestStop));
-  document.getElementById('btn-back-store')?.addEventListener('click', musicTestStop);
-  document.getElementById('admin-back-link')?.addEventListener('click', musicTestStop);
+  _aptEl('btn-back-store')?.addEventListener('click', musicTestStop);
+  _aptEl('admin-back-link')?.addEventListener('click', musicTestStop);
+
+  // picker window
+  _aptEl('aud-picker-close')?.addEventListener('click', closeAudioPicker);
+  _aptEl('btn-apt-cancel')?.addEventListener('click', closeAudioPicker);
+  _aptEl('btn-apt-save')?.addEventListener('click', confirmAudioSelection);
+  _aptEl('aud-picker-overlay')?.addEventListener('click', e => { if (e.target === e.currentTarget) closeAudioPicker(); });
+  document.querySelectorAll('.apt-btn').forEach(b => b.addEventListener('click', () => _aptSwitch(b.dataset.apt)));
+  _aptEl('apt-list')?.addEventListener('click', e => {
+    const play = e.target.closest('[data-play]');
+    if (play) { _aptPreview(play.dataset.play, play); return; }
+    const row = e.target.closest('.apt-row');
+    if (row) _aptSelect(row.dataset.id);
+  });
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && _aptEl('aud-picker-overlay')?.classList.contains('open')) closeAudioPicker();
+  });
 })();
 </script>
 </body>
