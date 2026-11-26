@@ -2624,6 +2624,7 @@
 .fl-box input:focus, .fl-box textarea:focus, .fl-box select:focus { border-color: var(--amber); }
 #fl-delivery-only { display: flex; flex-direction: column; gap: 8px; }
 .fl-seg { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.fl-seg.single { grid-template-columns: 1fr; }
 .fl-seg label { cursor: pointer; }
 .fl-seg input { position: absolute; opacity: 0; pointer-events: none; }
 .fl-seg span { display: block; text-align: center; padding: 9px; border: 1.5px solid var(--border); border-radius: var(--radius-sm); font-weight: 600; font-size: 14px; }
@@ -2815,6 +2816,17 @@ button.promo-chip:hover { filter: brightness(.96); }
 .dc-pick-row:hover { background: var(--cream); }
 .dc-pick-name { font-weight: 600; flex: 1; min-width: 0; }
 .dc-pick-meta { font-size: 11.5px; color: var(--muted); white-space: nowrap; }
+</style>
+<style>
+.img-picker-overlay { z-index: 660; }
+.apf-photo-btns { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-top: 8px; }
+.apf-gal-item .apf-photo-btns { margin-top: 0; }
+.apf-rm { color: var(--red) !important; }
+.music-btn { position: fixed; left: 16px; bottom: calc(18px + env(safe-area-inset-bottom, 0px)); z-index: 150; width: 46px; height: 46px; border-radius: 50%; border: 0; background: var(--dark); color: #fff; font-size: 21px; line-height: 1; cursor: pointer; display: grid; place-items: center; box-shadow: 0 4px 16px rgba(42,16,33,.35); transition: transform .15s, background .15s; }
+.music-btn:hover { transform: scale(1.08); }
+.music-btn.playing { background: var(--amber); animation: musicPulse 2.4s ease-in-out infinite; }
+@keyframes musicPulse { 0%,100% { box-shadow: 0 4px 16px rgba(42,16,33,.35), 0 0 0 0 rgba(212,71,111,.45); } 50% { box-shadow: 0 4px 16px rgba(42,16,33,.35), 0 0 0 10px rgba(212,71,111,0); } }
+@media print { .music-btn { display: none !important; } }
 </style>
 </head>
 <body>
@@ -3060,6 +3072,7 @@ button.promo-chip:hover { filter: brightness(.96); }
           <path d="M3 3v5h5"/>
         </svg>
       </button>
+      <button class="btn-back" id="btn-admin-logout" style="display:none">Log out</button>
       <button class="btn-back" id="btn-back-store">← Back to Store</button>
     </div>
   </div>
@@ -3289,6 +3302,16 @@ button.promo-chip:hover { filter: brightness(.96); }
           <div class="settings-card">
             <div class="settings-card-title">🚚 Delivery (transport) fee</div>
             <div class="set-sub">What customers pay to have their flowers delivered. Pickup is always free. Leave everything empty for free delivery. Press <strong>Save Settings</strong> (bottom of the page) to apply.</div>
+            <div class="set-row set-toggle-row">
+              <div>
+                <div class="set-toggle-label">Delivery service</div>
+                <div class="set-hint">Turn OFF to accept pickup orders only. Customers will not see the Delivery choice.</div>
+              </div>
+              <label class="set-switch">
+                <input type="checkbox" id="set-delivery-enabled" checked>
+                <span class="set-switch-slider"></span>
+              </label>
+            </div>
             <div class="set-row set-2col">
               <div>
                 <label class="set-label" for="set-delivery-fee">Delivery fee (&#8369;)</label>
@@ -3352,6 +3375,37 @@ button.promo-chip:hover { filter: brightness(.96); }
             <div class="set-row">
               <button class="btn-set-save" id="btn-save-settings">Save Settings</button>
               <span class="set-saved-msg" id="set-saved-msg" style="display:none">✓ Saved</span>
+            </div>
+          </div>
+
+          <div class="settings-card" id="music-card">
+            <div class="settings-card-title">🎵 Background music</div>
+            <div class="set-sub">Soft music that plays while customers browse the shop. Phones and browsers only allow sound after the first tap, so music starts on the customer's first tap, and a small 🎵 button lets them pause it. Press <strong>Save Settings</strong> to apply.</div>
+            <div class="set-row set-toggle-row">
+              <div>
+                <div class="set-toggle-label">Play background music</div>
+                <div class="set-hint">Turn OFF to remove the music and the 🎵 button.</div>
+              </div>
+              <label class="set-switch">
+                <input type="checkbox" id="set-music-enabled">
+                <span class="set-switch-slider"></span>
+              </label>
+            </div>
+            <div class="set-row">
+              <label class="set-label" for="set-music-url">Music link <span class="set-hint">(Google Drive file link, or a direct https .mp3 link)</span></label>
+              <input type="url" class="set-input" id="set-music-url" placeholder="https://drive.google.com/file/d/…/view" autocomplete="off" spellcheck="false">
+            </div>
+            <div class="set-row">
+              <label class="set-label" for="set-music-volume">Volume: <span id="set-music-vol-val">40</span>%</label>
+              <input type="range" id="set-music-volume" min="0" max="100" step="5" value="40" style="width:100%;accent-color:var(--amber)">
+            </div>
+            <div class="set-hero-actions">
+              <button type="button" class="btn-admin-util" id="btn-music-test" disabled>▶ Test music</button>
+              <button type="button" class="btn-admin-util" id="btn-music-clear" disabled>Remove music</button>
+            </div>
+            <div class="set-hero-err" id="set-music-msg" style="display:none"></div>
+            <div class="set-hint" style="margin-top:8px;line-height:1.55">
+              How to get the link: upload your MP3 to Google Drive (use the <strong>same Google account that runs this app</strong>) → right-click it → <strong>Share</strong> → <strong>Copy link</strong> → paste it above. The file does not need to be public. Tip: use a small MP3 (1–3 MB, under 8 MB) and royalty-free music. Press <strong>Test music</strong> to check that it plays.
             </div>
           </div>
 
@@ -3460,9 +3514,8 @@ button.promo-chip:hover { filter: brightness(.96); }
     </div>
 
     <div class="img-picker-tabs">
-      <button class="ipt-btn active" data-ipt="drive">📁 Drive Folder</button>
-      <button class="ipt-btn"        data-ipt="upload">📤 Upload File</button>
-      <button class="ipt-btn"        data-ipt="url">🔗 Manual URL</button>
+      <button class="ipt-btn active" data-ipt="drive">📁 Choose from Drive folder</button>
+      <button class="ipt-btn"        data-ipt="upload">📤 Upload from device</button>
     </div>
 
     <div class="img-picker-body">
@@ -3484,12 +3537,12 @@ button.promo-chip:hover { filter: brightness(.96); }
       <div class="ipt-pane" id="ipt-upload">
         <div class="img-upload-section">
           <div class="img-upload-hint">
-            Select an image from your device. It will be uploaded directly to the Drive folder.
+            Select a photo from your device. It is saved in the shop's Google Drive folder and used right away. Big photos are made smaller automatically.
           </div>
           <label class="img-upload-label" id="img-upload-label" for="img-upload-input">
             <span class="img-upload-icon">📁</span>
             <span class="img-upload-text">Choose image file…</span>
-            <span class="img-upload-sub">JPG, PNG, GIF, WEBP · max 5 MB</span>
+            <span class="img-upload-sub">JPG, PNG, GIF, WEBP</span>
           </label>
           <input type="file" id="img-upload-input" accept="image/*" style="display:none">
           <div class="img-upload-preview-wrap" id="img-upload-preview-wrap" style="display:none">
@@ -3503,34 +3556,12 @@ button.promo-chip:hover { filter: brightness(.96); }
         </div>
       </div>
 
-      <!-- Manual URL Tab -->
-      <div class="ipt-pane" id="ipt-url">
-        <div class="img-url-section">
-          <div>
-            <div class="img-url-label">Google Drive Share URL</div>
-            <div class="img-url-hint">
-              Paste a Google Drive file link (e.g. <em>https://drive.google.com/file/d/…/view</em>)<br>
-              or any direct image URL (ending in .jpg, .png, etc.)
-            </div>
-          </div>
-          <div class="img-url-row">
-            <div class="img-url-fields">
-              <input type="url" class="img-url-input" id="img-manual-url"
-                placeholder="https://drive.google.com/file/d/…/view" autocomplete="off">
-              <div class="img-url-err" id="img-url-err"></div>
-            </div>
-            <div class="img-url-preview-wrap" id="img-url-preview-wrap">
-              <img id="img-url-preview-img" src="" alt="Preview">
-            </div>
-          </div>
-        </div>
-      </div>
     </div><!-- /.img-picker-body -->
 
     <div class="img-picker-footer">
       <div class="img-picker-sel-info" id="img-picker-sel-info">No image selected</div>
       <button class="btn-picker-cancel" id="btn-picker-cancel">Cancel</button>
-      <button class="btn-picker-save"   id="btn-picker-save" disabled>Save Image</button>
+      <button class="btn-picker-save"   id="btn-picker-save" disabled>Use this photo</button>
     </div>
 
   </div><!-- /.img-picker-modal -->
@@ -3591,30 +3622,50 @@ button.promo-chip:hover { filter: brightness(.96); }
         <textarea class="apf-input apf-textarea" id="apf-desc" placeholder="Short product description (optional)…" maxlength="300" rows="2"></textarea>
       </div>
       <div class="apf-row">
-        <label class="apf-label">Image URL <span style="font-size:11px;color:var(--muted)">(optional — paste Google Drive or direct URL)</span></label>
-        <input type="url" class="apf-input" id="apf-image" placeholder="https://drive.google.com/file/d/…/view">
+        <label class="apf-label">Main photo <span style="font-size:11px;color:var(--muted)">(optional — upload from your device, or pick one from the Drive folder)</span></label>
+        <input type="hidden" id="apf-image">
         <div class="apf-img-preview-wrap" id="apf-img-preview-wrap" style="display:none">
           <img id="apf-img-preview" src="" alt="Preview">
         </div>
+        <div class="apf-photo-btns">
+          <button type="button" class="btn-admin-util" id="apf-choose-0" data-slot-choose="0">🖼️ Add photo</button>
+          <button type="button" class="btn-admin-util apf-rm" id="apf-rm-0" data-slot-remove="0" style="display:none">✕ Remove</button>
+        </div>
       </div>
       <div class="apf-row">
-        <label class="apf-label">More photos <span style="font-size:11px;color:var(--muted)">(optional — up to 4 more image links; shoppers swipe through them when they open the flower)</span></label>
+        <label class="apf-label">More photos <span style="font-size:11px;color:var(--muted)">(optional — up to 4 more; shoppers swipe through them when they open the flower)</span></label>
         <div class="apf-gal-grid">
           <div class="apf-gal-item" id="apf-gal-item-1">
-            <input type="url" class="apf-input apf-gal-input" id="apf-gal-1" data-gal="1" placeholder="Extra photo 1 — image link" autocomplete="off">
-            <div class="apf-gal-thumb" id="apf-gal-thumb-1">No preview</div>
+            <div class="apf-gal-thumb" id="apf-gal-thumb-1">No photo</div>
+            <input type="hidden" class="apf-gal-input" id="apf-gal-1" data-gal="1">
+            <div class="apf-photo-btns">
+              <button type="button" class="btn-admin-util" id="apf-choose-1" data-slot-choose="1">🖼️ Add photo</button>
+              <button type="button" class="btn-admin-util apf-rm" id="apf-rm-1" data-slot-remove="1" style="display:none">✕ Remove</button>
+            </div>
           </div>
           <div class="apf-gal-item" id="apf-gal-item-2">
-            <input type="url" class="apf-input apf-gal-input" id="apf-gal-2" data-gal="2" placeholder="Extra photo 2 — image link" autocomplete="off">
-            <div class="apf-gal-thumb" id="apf-gal-thumb-2">No preview</div>
+            <div class="apf-gal-thumb" id="apf-gal-thumb-2">No photo</div>
+            <input type="hidden" class="apf-gal-input" id="apf-gal-2" data-gal="2">
+            <div class="apf-photo-btns">
+              <button type="button" class="btn-admin-util" id="apf-choose-2" data-slot-choose="2">🖼️ Add photo</button>
+              <button type="button" class="btn-admin-util apf-rm" id="apf-rm-2" data-slot-remove="2" style="display:none">✕ Remove</button>
+            </div>
           </div>
           <div class="apf-gal-item" id="apf-gal-item-3">
-            <input type="url" class="apf-input apf-gal-input" id="apf-gal-3" data-gal="3" placeholder="Extra photo 3 — image link" autocomplete="off">
-            <div class="apf-gal-thumb" id="apf-gal-thumb-3">No preview</div>
+            <div class="apf-gal-thumb" id="apf-gal-thumb-3">No photo</div>
+            <input type="hidden" class="apf-gal-input" id="apf-gal-3" data-gal="3">
+            <div class="apf-photo-btns">
+              <button type="button" class="btn-admin-util" id="apf-choose-3" data-slot-choose="3">🖼️ Add photo</button>
+              <button type="button" class="btn-admin-util apf-rm" id="apf-rm-3" data-slot-remove="3" style="display:none">✕ Remove</button>
+            </div>
           </div>
           <div class="apf-gal-item" id="apf-gal-item-4">
-            <input type="url" class="apf-input apf-gal-input" id="apf-gal-4" data-gal="4" placeholder="Extra photo 4 — image link" autocomplete="off">
-            <div class="apf-gal-thumb" id="apf-gal-thumb-4">No preview</div>
+            <div class="apf-gal-thumb" id="apf-gal-thumb-4">No photo</div>
+            <input type="hidden" class="apf-gal-input" id="apf-gal-4" data-gal="4">
+            <div class="apf-photo-btns">
+              <button type="button" class="btn-admin-util" id="apf-choose-4" data-slot-choose="4">🖼️ Add photo</button>
+              <button type="button" class="btn-admin-util apf-rm" id="apf-rm-4" data-slot-remove="4" style="display:none">✕ Remove</button>
+            </div>
           </div>
         </div>
       </div>
@@ -3737,6 +3788,7 @@ button.promo-chip:hover { filter: brightness(.96); }
   </div>
 </div>
 
+<button type="button" class="music-btn" id="music-btn" style="display:none" aria-pressed="false" aria-label="Play background music">🔇</button>
 <div class="toast" id="toast" role="alert" aria-live="polite"></div>
 
 
@@ -3804,6 +3856,10 @@ async function api(action, data = {}) {
       if (!json || json.success !== true) {
         const e = new Error((json && json.error) || 'Server error');
         e.data = json || null;          // lets callers read extra fields (e.g. the new total)
+        // The saved admin login key stopped working (password changed / logged out elsewhere)
+        if (json && json.error === 'Unauthorized' && data && data.token && data.token === STATE.adminToken) {
+          try { adminSessionExpired(); } catch (_) {}
+        }
         throw e;
       }
       return json;
@@ -4074,6 +4130,7 @@ const STATE = {
 const LS_CUSTOMER   = 'mystore_customer';
 const LS_CART_DRAFT = 'mystore_cart_draft';
 const LS_VIEW       = 'mystore_view_mode';
+const LS_ADMIN_TOKEN = 'mystore_admin_token';   // admin login key (the password itself is never saved)
 const LS_VERSION    = 2; // bumped to v2 for selected-flag schema
 
 /** Safely read + parse a localStorage key; returns null on any error. */
@@ -4424,8 +4481,8 @@ function _hydrateFromSnapshot(snap, isFirstLoad) {
   // ── Announcement Banner ───────────────────────────────────────
   // (public store settings were saved above, so every visitor sees the banner)
   // Delivery fee settings + automatic discounts → cart prices + promo ads
-  _fillZoneSelect();
-  _updateCartTotals();
+  _applyDeliveryAvailability();
+  if (typeof applyBackgroundMusic === 'function') applyBackgroundMusic();
   renderPromoStrip();
   renderAnnouncementBanner();
   applyStoreBranding();
@@ -5037,15 +5094,16 @@ function _isAutoPromo(d) { return d.auto !== false; }
 function _promoIsScoped(d) { return !!(d && d.productIds && d.productIds.length); }
 function _promoCovers(d, p) { return !_promoIsScoped(d) || d.productIds.map(String).indexOf(String(p.id)) !== -1; }
 
-let _spMemo = { a: null, p: null, day: '', v: [] };
+let _spMemo = { a: null, p: null, day: '', on: true, v: [] };
 /** Promos customers can see today. A promo whose selected flowers are all gone is hidden. */
 function _shopPromos() {
-  const day = _localYmd(new Date());
-  if (_spMemo.a === STATE.autoDiscounts && _spMemo.p === STATE.products && _spMemo.day === day) return _spMemo.v;
+  const day = _localYmd(new Date()), on = _deliveryOn();
+  if (_spMemo.a === STATE.autoDiscounts && _spMemo.p === STATE.products && _spMemo.day === day && _spMemo.on === on) return _spMemo.v;
   const ids = new Set((STATE.products || []).map(x => String(x.id)));
   const v = (STATE.autoDiscounts || []).filter(_isActiveToday)
+    .filter(d => on || d.type !== 'freeship')            // no "free delivery" promos while delivery is off
     .filter(d => !_promoIsScoped(d) || d.productIds.some(x => ids.has(String(x))));
-  _spMemo = { a: STATE.autoDiscounts, p: STATE.products, day, v };
+  _spMemo = { a: STATE.autoDiscounts, p: STATE.products, day, on, v };
   return v;
 }
 function _promoBadgeText(d) {
@@ -5061,7 +5119,7 @@ function _promoEnds(d) {
 /** Free delivery from the shop's own setting ("Free delivery from \u20B1X" in Settings), if there is one. */
 function _storeFreeShipMin() {
   const cfg = _feeCfg();
-  return (_feeConfigured(cfg) && _num(cfg.freeDeliveryMin) > 0) ? _num(cfg.freeDeliveryMin) : 0;
+  return (_deliveryOn() && _feeConfigured(cfg) && _num(cfg.freeDeliveryMin) > 0) ? _num(cfg.freeDeliveryMin) : 0;
 }
 /** What the promos mean for one flower: the promos that cover it and, when the price really drops, the sale price. */
 function _promoInfo(p) {
@@ -5195,13 +5253,13 @@ function _renderPromoFilterBar() {
 /** Changes in promos or delivery settings (so the shop notices them without a reload). */
 function _promoSigOf(snap) {
   const s = (snap && snap.settings) || {};
-  return JSON.stringify([snap && snap.discounts || [], s.freeDeliveryMin, s.deliveryFee, s.deliveryZones]);
+  return JSON.stringify([snap && snap.discounts || [], s.freeDeliveryMin, s.deliveryFee, s.deliveryZones, s.deliveryEnabled, s.musicEnabled, s.musicUrl, s.musicVolume]);
 }
 
 /** Everything shown in the cart for the current cart, delivery choice and promo code. */
 function currentPricing() {
   const sub   = cartSelectedTotal();
-  const mode  = (document.querySelector('input[name="fl-mode"]:checked') || {}).value || 'delivery';
+  const mode  = _flMode();
   const zone  = (document.getElementById('fl-zone') || {}).value || '';
   const cfg   = _feeCfg();
   const typed = STATE.promo ? STATE.promo.code : '';
@@ -5220,6 +5278,32 @@ function currentPricing() {
   return { sub, mode, zone, cfg, cands, disc, totals: t, needZone, lines };
 }
 
+/** Is the delivery service switched on? (Admin → Settings → Delivery.) A missing setting means ON. */
+function _deliveryOn() {
+  const v = _readLocalSettings().deliveryEnabled;
+  return !(v === false || String(v).toLowerCase() === 'false');
+}
+/** 'delivery' or 'pickup' as chosen in the cart. Always 'pickup' while delivery is off. */
+function _flMode() {
+  if (!_deliveryOn()) return 'pickup';
+  const r = document.querySelector('input[name="fl-mode"]:checked');
+  return r ? r.value : 'delivery';
+}
+/** Shows / hides the Delivery choice in the cart. While off, the cart is pickup only. */
+function _applyDeliveryAvailability() {
+  const on   = _deliveryOn();
+  const del  = document.querySelector('input[name="fl-mode"][value="delivery"]');
+  const pick = document.querySelector('input[name="fl-mode"][value="pickup"]');
+  if (!del || !pick) return;
+  const lab = del.closest('label'), seg = document.querySelector('.fl-seg');
+  if (lab) lab.style.display = on ? '' : 'none';
+  if (seg) seg.classList.toggle('single', !on);
+  if (!on && del.checked) pick.checked = true;
+  if (typeof _flRefreshMode === 'function') _flRefreshMode();
+  _fillZoneSelect();
+  _updateCartTotals();
+}
+
 /** Is a delivery fee set up at all? (If not, the cart hides the fee line completely.) */
 function _feeConfigured(cfg) {
   return _parseZones(cfg.deliveryZones).length > 0 || _num(cfg.deliveryFee) > 0;
@@ -5232,7 +5316,7 @@ function _fillZoneSelect() {
   if (!sel || !wrap) return;
   const cfg   = _feeCfg();
   const zones = _parseZones(cfg.deliveryZones);
-  const mode  = (document.querySelector('input[name="fl-mode"]:checked') || {}).value || 'delivery';
+  const mode  = _flMode();
   const keep  = sel.value;
   if (!zones.length) { sel.innerHTML = ''; wrap.style.display = 'none'; return; }
   let html = '<option value="">Select your area…</option>' +
@@ -5250,7 +5334,7 @@ function _renderPriceSummary() {
   const $ = id => document.getElementById(id);
   if (!$('cart-total')) return;
   const p = currentPricing(), t = p.totals, hints = [];
-  const configured = _feeConfigured(p.cfg);
+  const configured = _feeConfigured(p.cfg) && _deliveryOn();
 
   $('cart-subtotal').textContent = peso(p.sub);
 
@@ -5301,7 +5385,7 @@ function _renderPriceSummary() {
     const scoped = _promoIsScoped(d), elig = _eligibleSubtotal(d, p.sub, p.lines);
     if (scoped && elig <= 0)                          hints.push(`${d.code} is only for selected flowers. Add one of them to use it.`);
     else if (elig < min)                              hints.push(`Add ${peso(min - elig)} more ${scoped ? 'of the promo flowers ' : ''}to use ${d.code}.`);
-    else if (d.type === 'freeship' && p.mode !== 'delivery') hints.push(`${d.code} gives free delivery — choose Delivery to use it.`);
+    else if (d.type === 'freeship' && p.mode !== 'delivery') hints.push(_deliveryOn() ? `${d.code} gives free delivery — choose Delivery to use it.` : `Delivery is not available right now, so ${d.code} cannot be used.`);
     else if (d.type === 'freeship' && t.freeByMinimum) hints.push('Delivery is already free on this order.');
   }
   const freeMin = _num(p.cfg.freeDeliveryMin);
@@ -5637,6 +5721,10 @@ async function _placeOrderCore() {
       removePromo(true);                       // the code stopped working — let them continue without it
       _updateCartTotals();
       showToast(err.message + ' The code was removed — please check your total and try again.', 'error', 7000);
+    } else if (d && d.deliveryOff) {
+      DataCache.del('store_snapshot');         // the shop switched delivery off: pick up the new setting
+      _revalidateStoreSnapshot();
+      showToast(err.message, 'error', 7000);
     } else if (d && d.totalChanged) {
       DataCache.del('store_snapshot');         // pick up the new prices / fee / discounts
       _revalidateStoreSnapshot();
@@ -6470,17 +6558,21 @@ function showStore() {
   // Admin sync tasks self-check visibility, so no explicit stop needed
   // Trigger a product refresh since stock may have changed while in admin
   SyncEngine.resetCooldown('products');
+  if (typeof _musicViewChanged === 'function') _musicViewChanged();
 }
 
 function showAdmin() {
   document.getElementById('app-store').style.display = 'none';
   document.getElementById('app-admin').style.display = '';
+  if (typeof _musicViewChanged === 'function') _musicViewChanged();
   document.getElementById('admin-login-view').style.display =
     STATE.adminToken ? 'none' : 'flex';
   document.getElementById('admin-dashboard-view').style.display =
     STATE.adminToken ? '' : 'none';
   document.getElementById('sync-indicator').style.display =
     STATE.adminToken ? 'inline-flex' : 'none';
+  document.getElementById('btn-refresh-dashboard').style.display = STATE.adminToken ? '' : 'none';
+  document.getElementById('btn-admin-logout').style.display      = STATE.adminToken ? '' : 'none';
   if (STATE.adminToken) {
     if (STATE.adminOrders.length || STATE.adminProducts.length) {
       // Data already in memory — show instantly, revalidate silently
@@ -6510,6 +6602,9 @@ async function doAdminLogin() {
   try {
     const { token } = await api('adminLogin', { password: pass });
     STATE.adminToken = token;
+    lsSet(LS_ADMIN_TOKEN, token);                       // stay logged in on this device
+    document.getElementById('admin-pass').value = '';
+    document.getElementById('btn-admin-logout').style.display = '';
     document.getElementById('admin-login-view').style.display     = 'none';
     document.getElementById('admin-dashboard-view').style.display = '';
     document.getElementById('btn-refresh-dashboard').style.display = '';
@@ -6522,6 +6617,31 @@ async function doAdminLogin() {
     btn.disabled    = false;
     btn.textContent = 'Login';
   }
+}
+
+/** The saved login key no longer works: go back to the login form. */
+function adminSessionExpired() {
+  if (!STATE.adminToken) return;
+  STATE.adminToken = null;
+  lsDel(LS_ADMIN_TOKEN);
+  STATE.adminOrders = []; STATE.adminProducts = [];
+  STATE.adminChat.activeOrderId = null;
+  DataCache.del('admin_snapshot');
+  if (document.getElementById('app-admin').style.display !== 'none') showAdmin();
+  showToast('Your admin login ended. Please log in again.', 'info', 5000);
+}
+
+/** "Log out" button: forget the login on this device. */
+function adminLogout() {
+  const tok = STATE.adminToken;
+  STATE.adminToken = null;
+  lsDel(LS_ADMIN_TOKEN);
+  STATE.adminOrders = []; STATE.adminProducts = [];
+  STATE.adminChat.activeOrderId = null;
+  DataCache.del('admin_snapshot');
+  if (tok) api('adminLogout', { token: tok }).catch(() => {});
+  showAdmin();
+  showToast('Logged out.', 'info', 2500);
 }
 
 // ─────────────────────────────────────────────
@@ -7070,7 +7190,8 @@ window.addEventListener('resize', () => {
 const DEFAULT_SETTINGS = {
   storeName: 'Janice FlowerShop', storePhone: '', storeEmail: '', storeAddress: '',
   storeOpen: '', storeClose: '', announcement: '', announcementSpeed: 'normal', heroImage: '', storeLat: '', storeLng: '',
-  deliveryFee: '', deliveryZones: '', freeDeliveryMin: '',
+  musicEnabled: false, musicUrl: '', musicVolume: 40,
+  deliveryEnabled: true, deliveryFee: '', deliveryZones: '', freeDeliveryMin: '',
   liveSync: true, syncSpeed: 'normal', soundOrder: false, soundMsg: false,
 };
 let _settingsCache = null;
@@ -7340,7 +7461,12 @@ async function loadSettingsIntoForm() {
   document.getElementById('set-delivery-fee').value   = settings.deliveryFee == null ? '' : settings.deliveryFee;
   document.getElementById('set-free-min').value       = settings.freeDeliveryMin == null ? '' : settings.freeDeliveryMin;
   document.getElementById('set-delivery-zones').value = settings.deliveryZones || '';
+  document.getElementById('set-delivery-enabled').checked = !(settings.deliveryEnabled === false || String(settings.deliveryEnabled).toLowerCase() === 'false');
   refreshDeliveryPreview();
+  document.getElementById('set-music-enabled').checked = settings.musicEnabled === true || String(settings.musicEnabled).toLowerCase() === 'true';
+  document.getElementById('set-music-url').value = settings.musicUrl || '';
+  { const mv = parseInt(settings.musicVolume, 10); document.getElementById('set-music-volume').value = isNaN(mv) ? 40 : mv; }
+  if (typeof refreshMusicLinkUI === 'function') refreshMusicLinkUI();
   if (typeof loadDiscounts === 'function') loadDiscounts();
   document.getElementById('set-live-sync').checked   = settings.liveSync !== false;
   document.getElementById('set-sync-speed').value    = settings.syncSpeed || 'normal';
@@ -7364,6 +7490,10 @@ function _readSettingsFromForm() {
     deliveryFee:     (document.getElementById('set-delivery-fee').value || '').trim(),
     freeDeliveryMin: (document.getElementById('set-free-min').value || '').trim(),
     deliveryZones:   (document.getElementById('set-delivery-zones').value || '').replace(/\r/g, '').trim(),
+    deliveryEnabled: document.getElementById('set-delivery-enabled').checked,
+    musicEnabled: document.getElementById('set-music-enabled').checked,
+    musicUrl:     (document.getElementById('set-music-url').value || '').trim(),
+    musicVolume:  (() => { const v = parseInt(document.getElementById('set-music-volume').value, 10); return isNaN(v) ? 40 : Math.min(100, Math.max(0, v)); })(),
     liveSync:     document.getElementById('set-live-sync').checked,
     syncSpeed:    document.getElementById('set-sync-speed').value,
     soundOrder:   document.getElementById('set-sound-order').checked,
@@ -7438,7 +7568,7 @@ async function _verifyDeliveryOnServer(settings) {
     const snap = await api('getStoreSnapshot');
     const p = (snap && snap.settings) || {};
     const same = k => String(p[k] == null ? '' : p[k]).trim() === String(settings[k] == null ? '' : settings[k]).trim();
-    if (!(same('deliveryFee') && same('freeDeliveryMin') && same('deliveryZones'))) {
+    if (!(same('deliveryFee') && same('freeDeliveryMin') && same('deliveryZones') && same('deliveryEnabled'))) {
       if (statusEl) { statusEl.textContent = '⚠ Delivery fee saved on this device only — the server (Code.gs) did not keep it, so customers cannot see it yet'; statusEl.className = 'set-sync-status warn'; statusEl.style.display = ''; }
       showToast('The delivery fee did not reach the server. Update Code.gs to the new version and deploy it again.', 'error', 9000);
     }
@@ -7466,6 +7596,16 @@ async function saveSettings() {
     document.getElementById('set-delivery-fee')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
     return;
   }
+  if (settings.musicUrl && musicLinkProblem(settings.musicUrl)) {
+    showToast(musicLinkProblem(settings.musicUrl), 'error', 6000);
+    document.getElementById('set-music-url')?.focus();
+    return;
+  }
+  if (settings.musicEnabled && !settings.musicUrl) {
+    showToast('Music is ON but there is no music link. Paste a link or turn music off.', 'error', 6000);
+    document.getElementById('set-music-url')?.focus();
+    return;
+  }
   btn.disabled = true; btn.textContent = 'Saving…'; msg.style.display = 'none';
   let serverSaveFailed = null;
   try {
@@ -7479,6 +7619,8 @@ async function saveSettings() {
     renderAnnouncementBanner();
     applyStoreBranding();
     applyHeroBackground();
+    _applyDeliveryAvailability();
+    applyBackgroundMusic();
     msg.style.display = 'inline';
     if (serverSaveFailed) {
       if (statusEl) { statusEl.textContent = `⚠ Saved on this device only — server sync failed (${serverSaveFailed})`; statusEl.className = 'set-sync-status warn'; statusEl.style.display = ''; }
@@ -7489,6 +7631,7 @@ async function saveSettings() {
       _verifyHeroOnServer(settings.heroImage);   // checks what customers will really receive
       _verifyLocationOnServer(settings.storeLat, settings.storeLng);
       _verifyDeliveryOnServer(settings);
+      _verifyMusicOnServer(settings);
     }
   } catch (err) {
     showToast('Could not save settings: ' + err.message, 'error');
@@ -7561,6 +7704,7 @@ document.getElementById('admin-back-link').addEventListener('click', e => {
   e.preventDefault(); showStore();
 });
 document.getElementById('btn-admin-login').addEventListener('click', doAdminLogin);
+document.getElementById('btn-admin-logout').addEventListener('click', adminLogout);
 document.getElementById('admin-pass').addEventListener('keydown', e => {
   if (e.key === 'Enter') doAdminLogin();
 });
@@ -7577,13 +7721,13 @@ document.getElementById('btn-orders-refresh').addEventListener('click', loadCust
 // ─────────────────────────────────────────────
 
 const PICKER = {
-  productId:   null,
+  onPick:      null,     // called with the chosen Drive link
   selectedUrl: null,
   activeTab:   'drive',
   driveCached: null,
 };
 
-const DRIVE_FOLDER_ID = '1rHCUNy2KXs2B3a7vh6Md_Pso-5bt_ye-';
+const DRIVE_FOLDER_ID = '1AN270QmI30XV35jGOnoiMzKSkJweH_H6';
 
 function isValidImageUrl(url) {
   if (!url || typeof url !== 'string') return false;
@@ -7598,33 +7742,29 @@ function isValidImageUrl(url) {
   } catch { return false; }
 }
 
-function openImagePicker(productId) {
-  PICKER.productId   = productId;
+/** Opens the photo chooser. onPick(url) gets the Drive link of the photo the admin chose or uploaded. */
+function openImagePicker(label, onPick) {
+  PICKER.onPick      = typeof onPick === 'function' ? onPick : null;
   PICKER.selectedUrl = null;
   PICKER.activeTab   = 'drive';
 
-  const prod = STATE.adminProducts.find(p => String(p.id) === String(productId));
-  document.getElementById('img-picker-product-name').textContent = prod ? prod.name : '';
+  document.getElementById('img-picker-product-name').textContent = label || '';
   document.getElementById('img-picker-sel-info').innerHTML = 'No image selected';
   document.getElementById('btn-picker-save').disabled = true;
+  document.querySelectorAll('.img-pick-item.selected').forEach(el => el.classList.remove('selected'));
+  if (typeof window._resetUploadTab === 'function') window._resetUploadTab();
 
   _switchPickerTab('drive');
   document.getElementById('img-picker-overlay').classList.add('open');
 
-  if (!PICKER.driveCached) _loadDriveImages();
-  else _renderDriveImages(PICKER.driveCached);
+  _loadDriveImages();                       // always ask for the newest list of the folder
 }
 
 function closeImagePicker() {
   document.getElementById('img-picker-overlay').classList.remove('open');
-  PICKER.productId   = null;
+  PICKER.onPick      = null;
   PICKER.selectedUrl = null;
   document.querySelectorAll('.img-pick-item.selected').forEach(el => el.classList.remove('selected'));
-  document.getElementById('img-manual-url').value = '';
-  document.getElementById('img-manual-url').classList.remove('valid', 'invalid');
-  document.getElementById('img-url-err').style.display = 'none';
-  const prev = document.getElementById('img-url-preview-wrap');
-  if (prev) prev.classList.remove('show');
   document.getElementById('img-picker-sel-info').innerHTML = 'No image selected';
   document.getElementById('btn-picker-save').disabled = true;
 }
@@ -7635,10 +7775,14 @@ async function _loadDriveImages() {
   const emptyEl = document.getElementById('img-picker-empty');
   const gridEl  = document.getElementById('img-picker-grid');
 
-  loading.style.display = '';
   errEl.style.display   = 'none';
   emptyEl.style.display = 'none';
-  gridEl.innerHTML      = '';
+  if (PICKER.driveCached) {
+    _renderDriveImages(PICKER.driveCached);      // show the last list at once, refresh below
+  } else {
+    loading.style.display = '';
+    gridEl.innerHTML      = '';
+  }
 
   try {
     const { images } = await api('adminListDriveImages', {
@@ -7676,7 +7820,7 @@ function _renderDriveImages(images) {
   }
 
   gridEl.innerHTML = images.map(img => {
-    const thumbSrc = `https://lh3.googleusercontent.com/d/${img.id}`;
+    const thumbSrc = `https://lh3.googleusercontent.com/d/${img.id}=w300`;
     return `
       <div class="img-pick-item" data-url="${esc(img.url)}" onclick="_selectDriveImage(this, '${esc(img.url)}')">
         <img src="${esc(thumbSrc)}" alt="${esc(img.name)}" loading="lazy"
@@ -7746,82 +7890,12 @@ function _updatePickerSelInfo(name) {
   }
 }
 
-function _syncUrlTabSelection() {
-  const input   = document.getElementById('img-manual-url');
-  const errEl   = document.getElementById('img-url-err');
-  const prev    = document.getElementById('img-url-preview-wrap');
-  const prevImg = document.getElementById('img-url-preview-img');
-  const saveBtn = document.getElementById('btn-picker-save');
-  const val     = input.value.trim();
-
-  if (!val) {
-    input.classList.remove('valid', 'invalid');
-    errEl.style.display = 'none';
-    prev.classList.remove('show');
-    PICKER.selectedUrl = null;
-    saveBtn.disabled = true;
-    document.getElementById('img-picker-sel-info').innerHTML = 'No image selected';
-    return;
-  }
-
-  if (!isValidImageUrl(val)) {
-    input.classList.remove('valid');
-    input.classList.add('invalid');
-    errEl.textContent   = 'Invalid URL. Must be a Google Drive link or a direct image URL.';
-    errEl.style.display = '';
-    prev.classList.remove('show');
-    PICKER.selectedUrl  = null;
-    saveBtn.disabled    = true;
-    document.getElementById('img-picker-sel-info').innerHTML = 'No image selected';
-    return;
-  }
-
-  input.classList.remove('invalid');
-  input.classList.add('valid');
-  errEl.style.display  = 'none';
-  PICKER.selectedUrl   = val;
-  saveBtn.disabled     = false;
-  _updatePickerSelInfo(val.length > 55 ? val.substring(0, 52) + '…' : val);
-
-  const previewSrc = driveImgUrl(val);
-  prevImg.src = previewSrc;
-  prevImg.onerror = () => { prev.classList.remove('show'); };
-  prevImg.onload  = () => { prev.classList.add('show'); };
-}
-
-async function confirmImageSelection() {
-  const url     = PICKER.selectedUrl;
-  const prodId  = PICKER.productId;
-
-  if (!url || !prodId) return;
-  if (!isValidImageUrl(url)) {
-    showToast('Invalid image URL — please select a valid image.', 'error');
-    return;
-  }
-
-  const saveBtn = document.getElementById('btn-picker-save');
-  saveBtn.disabled = true;
-  saveBtn.textContent = 'Saving…';
-
-  try {
-    await api('adminUpdateProduct', {
-      token:   STATE.adminToken,
-      product: { id: prodId, imageUrl: url.trim() },
-    });
-
-    const prod = STATE.adminProducts.find(p => String(p.id) === String(prodId));
-    if (prod) prod.imageUrl = url.trim();
-
-    renderAdminProducts();
-    closeImagePicker();
-    showToast('Image saved successfully! ✓', 'success');
-    refreshPublicProducts();
-
-  } catch (err) {
-    showToast('Error saving image: ' + err.message, 'error');
-    saveBtn.disabled    = false;
-    saveBtn.textContent = 'Save Image';
-  }
+function confirmImageSelection() {
+  const url = PICKER.selectedUrl, cb = PICKER.onPick;
+  if (!url) return;
+  if (!isValidImageUrl(url)) { showToast('Invalid image URL — please select a valid image.', 'error'); return; }
+  closeImagePicker();
+  if (cb) cb(url.trim());
 }
 
 async function removeProductImage(productId) {
@@ -7869,7 +7943,6 @@ document.querySelectorAll('.ipt-btn').forEach(btn => {
   btn.addEventListener('click', () => _switchPickerTab(btn.dataset.ipt));
 });
 
-document.getElementById('img-manual-url').addEventListener('input', _syncUrlTabSelection);
 
 // Upload tab logic
 (function initUploadTab() {
@@ -7881,7 +7954,7 @@ document.getElementById('img-manual-url').addEventListener('input', _syncUrlTabS
   const errEl      = document.getElementById('img-upload-err');
   const progressEl = document.getElementById('img-upload-progress');
 
-  const MAX_BYTES = 5 * 1024 * 1024; // 5 MB
+  const MAX_BYTES = 25 * 1024 * 1024; // photos are made smaller before upload
 
   function showUploadErr(msg) {
     errEl.textContent    = msg;
@@ -7889,6 +7962,7 @@ document.getElementById('img-manual-url').addEventListener('input', _syncUrlTabS
   }
 
   function resetUploadUI() {
+    input.value               = '';
     previewWrap.style.display = 'none';
     previewImg.src            = '';
     filenameEl.textContent    = '';
@@ -7897,6 +7971,35 @@ document.getElementById('img-manual-url').addEventListener('input', _syncUrlTabS
     PICKER.selectedUrl = null;
     _updatePickerSelInfo();
     label.querySelector('.img-upload-text').textContent = 'Choose image file…';
+  }
+
+  window._resetUploadTab = resetUploadUI;
+
+  /** Makes big phone photos smaller (max 1600 px, JPEG) so they upload fast and fit easily. */
+  function prepareFile(file) {
+    return new Promise((resolve, reject) => {
+      const raw = () => {
+        const r = new FileReader();
+        r.onload  = () => resolve({ base64: String(r.result).split(',')[1], mimeType: file.type, filename: file.name });
+        r.onerror = () => reject(new Error('Failed to read file'));
+        r.readAsDataURL(file);
+      };
+      if (file.type === 'image/gif') { raw(); return; }
+      const objUrl = URL.createObjectURL(file), img = new Image();
+      img.onload = () => {
+        try {
+          const MAX = 1600, scale = Math.min(1, MAX / Math.max(img.naturalWidth, img.naturalHeight));
+          const w = Math.max(1, Math.round(img.naturalWidth * scale)), h = Math.max(1, Math.round(img.naturalHeight * scale));
+          const c = document.createElement('canvas'); c.width = w; c.height = h;
+          const ctx = c.getContext('2d'); ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, w, h); ctx.drawImage(img, 0, 0, w, h);
+          const dataUrl = c.toDataURL('image/jpeg', 0.85);
+          URL.revokeObjectURL(objUrl);
+          resolve({ base64: dataUrl.split(',')[1], mimeType: 'image/jpeg', filename: (file.name.replace(/\.[^.]+$/, '') || 'photo') + '.jpg' });
+        } catch (e) { URL.revokeObjectURL(objUrl); raw(); }
+      };
+      img.onerror = () => { URL.revokeObjectURL(objUrl); raw(); };
+      img.src = objUrl;
+    });
   }
 
   async function handleFile(file) {
@@ -7908,7 +8011,7 @@ document.getElementById('img-manual-url').addEventListener('input', _syncUrlTabS
       return;
     }
     if (file.size > MAX_BYTES) {
-      showUploadErr(`File too large (${(file.size/1024/1024).toFixed(1)} MB). Max is 5 MB.`);
+      showUploadErr(`File too large (${(file.size/1024/1024).toFixed(1)} MB). Max is 25 MB.`);
       return;
     }
 
@@ -7926,18 +8029,14 @@ document.getElementById('img-manual-url').addEventListener('input', _syncUrlTabS
     document.getElementById('btn-picker-save').disabled = true;
 
     try {
-      const base64 = await new Promise((res, rej) => {
-        const r = new FileReader();
-        r.onload  = () => res(r.result.split(',')[1]);
-        r.onerror = () => rej(new Error('Failed to read file'));
-        r.readAsDataURL(file);
-      });
+      const prepared = await prepareFile(file);
+      if (prepared.base64.length > 7000000) throw new Error('Photo is still too large after resizing. Please choose a smaller one.');
 
       const result = await api('adminUploadImageToDrive', {
         token:    STATE.adminToken,
-        filename: file.name,
-        base64:   base64,
-        mimeType: file.type,
+        filename: prepared.filename,
+        base64:   prepared.base64,
+        mimeType: prepared.mimeType,
       });
 
       progressEl.style.display = 'none';
@@ -7945,7 +8044,8 @@ document.getElementById('img-manual-url').addEventListener('input', _syncUrlTabS
       if (PICKER.driveCached) PICKER.driveCached.unshift(result.image);
       _updatePickerSelInfo(file.name);
       document.getElementById('btn-picker-save').disabled = false;
-      showToast('Image uploaded to Drive ✓');
+      showToast('Photo saved to the Drive folder ✓');
+      confirmImageSelection();                       // use the uploaded photo right away
     } catch (err) {
       progressEl.style.display = 'none';
       showUploadErr('Upload failed: ' + err.message);
@@ -8908,6 +9008,13 @@ const _origLoadAdminChatMessages = typeof _loadAdminChatMessages !== 'undefined'
   restoreCustomerInfo();
   initCustomerAutosave();
   restoreViewMode();
+
+  // Admin stays logged in on this device (the server gives a login key; the password is never saved).
+  const _savedAdminTok = lsGet(LS_ADMIN_TOKEN);
+  if (typeof _savedAdminTok === 'string' && _savedAdminTok.length > 20) {
+    STATE.adminToken = _savedAdminTok;
+    api('adminCheck', { token: _savedAdminTok }).catch(() => {});   // a dead key logs out by itself (see api())
+  }
   renderAnnouncementBanner(); // show cached announcement immediately from localStorage
   applyStoreBranding();       // logo / footer name from saved settings
   applyHeroBackground();      // hero picture from saved settings
@@ -9039,7 +9146,7 @@ const _origLoadAdminChatMessages = typeof _loadAdminChatMessages !== 'undefined'
     if (e.key === 'Escape') {
       if (document.getElementById('chat-modal-overlay').classList.contains('open')) closeCustomerChat();
       if (document.getElementById('admin-chat-popup-overlay')?.classList.contains('open')) closeAdminChatPopup();
-      if (document.getElementById('add-product-overlay')?.classList.contains('open')) closeAddProductModal();
+      if (document.getElementById('add-product-overlay')?.classList.contains('open') && !document.getElementById('img-picker-overlay').classList.contains('open')) closeAddProductModal();
       if (document.getElementById('print-chooser-overlay')?.classList.contains('open')) closePrintChooser();
     }
   });
@@ -9148,10 +9255,10 @@ function _flRefreshMode() {
   document.getElementById('fl-delivery-only').style.display = pickup ? 'none' : '';
   document.getElementById('fl-date-lbl').textContent = pickup ? 'Pickup date *' : 'Delivery date *';
   const cut = FLOWER_CFG.sameDayCutoffHour, hr = cut > 12 ? (cut - 12) + ' PM' : cut + ' AM';
-  document.getElementById('fl-hint').textContent = 'Order before ' + hr + ' for same-day ' + (pickup ? 'pickup' : 'delivery') + '. Flowers are cut and arranged fresh for your date.';
+  document.getElementById('fl-hint').textContent = (_deliveryOn() ? '' : 'Delivery is not available right now — pickup only. ') + 'Order before ' + hr + ' for same-day ' + (pickup ? 'pickup' : 'delivery') + '. Flowers are cut and arranged fresh for your date.';
 }
 function collectFlowerDetails() {
-  const mode = document.querySelector('input[name="fl-mode"]:checked').value;
+  const mode = _flMode();
   const v = id => document.getElementById(id).value.trim();
   const date = v('fl-date'), slot = v('fl-slot');
   if (!date) return { error: 'Please choose a ' + (mode === 'pickup' ? 'pickup' : 'delivery') + ' date.', field: 'fl-date' };
@@ -9282,7 +9389,7 @@ function _apfGalPreview(n) {
   if (!input || !thumb) return;
   const val = input.value.trim();
   item && item.classList.remove('bad');
-  if (!val) { thumb.textContent = 'No preview'; return; }
+  if (!val) { thumb.textContent = 'No photo'; return; }
   if (!isValidImageUrl(val)) { thumb.textContent = 'Not a valid link'; item && item.classList.add('bad'); return; }
   const img = new Image();
   img.alt = 'Extra photo ' + n;
@@ -9297,7 +9404,35 @@ function _apfSetGallery(list) {
     if (el) el.value = (list && list[n - 1]) ? String(list[n - 1]) : '';
     _apfGalPreview(n);
   }
+  _apfRefreshSlotButtons();
 }
+/** Photo slot 0 = main photo, 1–4 = extra photos. Puts a Drive link in the slot and updates its preview. */
+function _apfSetSlot(n, url) {
+  const el = document.getElementById(n === 0 ? 'apf-image' : 'apf-gal-' + n);
+  if (!el) return;
+  el.value = url || '';
+  el.dispatchEvent(new Event('input', { bubbles: true }));   // redraws the preview
+  _apfRefreshSlotButtons();
+}
+function _apfRefreshSlotButtons() {
+  for (let n = 0; n <= 4; n++) {
+    const el  = document.getElementById(n === 0 ? 'apf-image' : 'apf-gal-' + n);
+    const has = !!(el && el.value.trim());
+    const ch = document.getElementById('apf-choose-' + n), rm = document.getElementById('apf-rm-' + n);
+    if (ch) ch.textContent = has ? '🔄 Change' : '🖼️ Add photo';
+    if (rm) rm.style.display = has ? '' : 'none';
+  }
+}
+function _apfChoosePhoto(n) {
+  const name = (document.getElementById('apf-name')?.value || '').trim();
+  openImagePicker((name ? name + ' · ' : '') + (n === 0 ? 'Main photo' : 'Extra photo ' + n), url => _apfSetSlot(n, url));
+}
+document.getElementById('add-product-overlay')?.addEventListener('click', e => {
+  const c = e.target.closest('[data-slot-choose]');
+  if (c) { _apfChoosePhoto(parseInt(c.dataset.slotChoose, 10)); return; }
+  const r = e.target.closest('[data-slot-remove]');
+  if (r) _apfSetSlot(parseInt(r.dataset.slotRemove, 10), '');
+});
 function _apfGetGallery() {
   const out = [];
   for (let n = 1; n <= 4; n++) out.push((document.getElementById('apf-gal-' + n)?.value || '').trim());
@@ -9684,6 +9819,295 @@ _dcEl('disc-list')?.addEventListener('click', async e => {
   } catch (err) { showToast(err.message, 'error', 5000); b.disabled = false; }
 });
 _dcSyncTypeUI();
+</script>
+<script>
+/* ── Background music ───────────────────────────────────────────────────── */
+const LS_MUSIC_OFF = 'mystore_music_off';      // true = the customer paused the music (we respect that)
+const MUSIC = { audio: null, src: '', ready: false, loading: false, wantPlay: false, failed: false, blob: null, dataTried: false,
+                userPaused: lsGet(LS_MUSIC_OFF) === true, resume: false, resumeStore: false };
+const _musicBlobs = {};                        // Drive file id -> { url, blob } (kept for this visit)
+let _musicTestWarm = '';
+
+function _musicDriveId(u) {
+  const m = /\/d\/([a-zA-Z0-9_-]{15,})/.exec(u) || /[?&]id=([a-zA-Z0-9_-]{15,})/.exec(u);
+  return m ? m[1] : '';
+}
+/** '' = the link can be used. Otherwise a plain-language problem. */
+function musicLinkProblem(url) {
+  const u = String(url || '').trim();
+  if (!u) return 'Paste the music link first.';
+  if (/\/folders\//i.test(u)) return 'That is a folder link. Open the music file itself, then copy its link.';
+  if (/youtube\.com|youtu\.be|spotify\.com|soundcloud\.com/i.test(u)) return 'YouTube, Spotify and SoundCloud links cannot be used. Use an MP3 file from Google Drive.';
+  if (/^https?:\/\/(drive|docs)\.google\.com\//i.test(u)) return _musicDriveId(u) ? '' : 'This Google Drive link is not a file link. Right-click the MP3 in Drive → Share → Copy link.';
+  if (/^https:\/\//i.test(u)) return '';
+  if (/^http:\/\//i.test(u)) return 'The link must start with https://';
+  return 'This is not a valid link. Paste a Google Drive file link or an https link to an MP3.';
+}
+/** { driveId } for a Google Drive link (played through the script), { direct } for any other https link. */
+function _musicInfo(url) {
+  const u = String(url || '').trim();
+  if (musicLinkProblem(u)) return { driveId: '', direct: '' };
+  return /^https?:\/\/(drive|docs)\.google\.com\//i.test(u) ? { driveId: _musicDriveId(u), direct: '' } : { driveId: '', direct: u };
+}
+function _musicCfg() {
+  const s = _readLocalSettings(), v = Number(s.musicVolume);
+  return {
+    on:  s.musicEnabled === true || String(s.musicEnabled).toLowerCase() === 'true',
+    url: String(s.musicUrl || '').trim(),
+    vol: (isFinite(v) && s.musicVolume !== '' ? Math.min(100, Math.max(0, v)) : 40) / 100,
+  };
+}
+function _musicAdminOpen() { const a = document.getElementById('app-admin'); return !!a && a.style.display !== 'none'; }
+function _blobToDataUrl(blob) {
+  return new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(r.result); r.onerror = () => rej(r.error); r.readAsDataURL(blob); });
+}
+
+/**
+ * Gets a Google Drive MP3 through the script (Drive blocks playing its files directly in a page).
+ * Customers keep a copy in the browser, so the file is downloaded only once.
+ * opts: { token, fresh } — the admin test sends the admin token and skips the saved copies.
+ */
+async function _musicLoadDrive(id, opts) {
+  opts = opts || {};
+  if (!opts.fresh && _musicBlobs[id]) return _musicBlobs[id];
+  const key = 'https://shop-music.invalid/' + id;
+  let blob = null;
+  if (!opts.fresh) {
+    try { if (window.caches) { const c = await caches.open('shop-music-v1'); const hit = await c.match(key); if (hit) blob = await hit.blob(); } } catch (_) {}
+  }
+  if (!blob) {
+    const res = await api('getMusic', opts.token ? { id, token: opts.token } : { id });
+    const bin = atob(res.base64), bytes = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+    blob = new Blob([bytes], { type: res.mimeType || 'audio/mpeg' });
+    try { if (window.caches) { const c = await caches.open('shop-music-v1'); await c.put(key, new Response(blob, { headers: { 'Content-Type': blob.type } })); } } catch (_) {}
+  }
+  return (_musicBlobs[id] = { url: URL.createObjectURL(blob), blob });
+}
+
+function _musicFail() {
+  MUSIC.failed = true; MUSIC.loading = false; MUSIC.wantPlay = false;
+  console.warn('Background music could not be loaded.');
+  _musicRefreshBtn();
+}
+function _musicEnsureAudio() {
+  if (MUSIC.audio) return MUSIC.audio;
+  const a = new Audio();
+  a.loop = true;
+  a.preload = 'auto';
+  a.addEventListener('play',  _musicRefreshBtn);
+  a.addEventListener('pause', _musicRefreshBtn);
+  a.addEventListener('error', () => {
+    if (!MUSIC.src || !a.getAttribute('src')) return;
+    if (MUSIC.blob && !MUSIC.dataTried) {               // the browser refused the blob: address → try a data: address
+      MUSIC.dataTried = true;
+      _blobToDataUrl(MUSIC.blob).then(u => {
+        a.src = u;
+        if (MUSIC.wantPlay && !MUSIC.userPaused && !_musicAdminOpen()) a.play().catch(() => {});
+      }).catch(_musicFail);
+      return;
+    }
+    _musicFail();
+  });
+  MUSIC.audio = a;
+  return a;
+}
+/** Downloads / prepares the song (once). Called a few seconds after the shop opens, so the first tap can play at once. */
+async function _musicPrepare() {
+  if (MUSIC.ready || MUSIC.loading || MUSIC.failed || !MUSIC.src || !MUSIC.audio) return;
+  const src = MUSIC.src, info = _musicInfo(src);
+  if (info.direct) { MUSIC.audio.src = info.direct; MUSIC.ready = true; if (MUSIC.wantPlay) _musicTryPlay(); return; }
+  if (!info.driveId) return;
+  MUSIC.loading = true; _musicRefreshBtn();
+  try {
+    const item = await _musicLoadDrive(info.driveId);
+    MUSIC.loading = false;
+    if (MUSIC.src !== src) { _musicPrepare(); return; }  // another song was chosen meanwhile
+    MUSIC.blob = item.blob; MUSIC.dataTried = false;
+    MUSIC.audio.src = item.url;
+    MUSIC.ready = true;
+  } catch (err) {
+    console.warn('Music:', err && err.message);
+    MUSIC.loading = false;
+    _musicFail();
+    return;
+  }
+  _musicRefreshBtn();
+  if (MUSIC.wantPlay) _musicTryPlay();
+}
+function _musicTryPlay() {
+  const a = MUSIC.audio;
+  if (!a || !MUSIC.src || MUSIC.failed) return;
+  MUSIC.wantPlay = true;
+  if (_musicAdminOpen()) return;                 // no music while the admin works
+  if (!MUSIC.ready) { _musicPrepare(); _musicRefreshBtn(); return; }
+  if (!a.paused) return;
+  const p = a.play();
+  if (p && p.catch) p.catch(() => {});    // blocked until the customer taps: the next tap tries again
+}
+function _musicRefreshBtn() {
+  const btn = document.getElementById('music-btn');
+  if (!btn) return;
+  const show = !!MUSIC.audio && !!MUSIC.src && !MUSIC.failed && !_musicAdminOpen();
+  btn.style.display = show ? '' : 'none';
+  const playing = !!MUSIC.audio && !MUSIC.audio.paused;
+  const waiting = !playing && MUSIC.wantPlay && !MUSIC.ready && !MUSIC.failed;
+  btn.classList.toggle('playing', playing);
+  btn.textContent = playing ? '🎵' : (waiting ? '⏳' : '🔇');
+  btn.setAttribute('aria-pressed', String(playing));
+  btn.setAttribute('aria-label', playing ? 'Pause background music' : 'Play background music');
+  btn.title = playing ? 'Pause music' : (waiting ? 'Loading music…' : 'Play music');
+}
+
+/** Reads the shop settings and switches the music on / off / to another song. Safe to call often. */
+function applyBackgroundMusic() {
+  const c = _musicCfg();
+  if (!c.on || !c.url || musicLinkProblem(c.url)) {      // music off, or no usable link
+    if (MUSIC.audio) { MUSIC.audio.pause(); MUSIC.audio.removeAttribute('src'); MUSIC.audio.load(); }
+    MUSIC.src = ''; MUSIC.ready = false; MUSIC.failed = false; MUSIC.wantPlay = false; MUSIC.blob = null;
+    _musicRefreshBtn();
+    return;
+  }
+  const a = _musicEnsureAudio();
+  a.volume = c.vol;
+  if (MUSIC.src !== c.url) {                            // first time, or a new song chosen in Admin → Settings
+    a.pause(); a.removeAttribute('src');
+    MUSIC.src = c.url; MUSIC.ready = false; MUSIC.failed = false; MUSIC.blob = null; MUSIC.dataTried = false;
+    MUSIC.wantPlay = !MUSIC.userPaused;          // PLAY BY DEFAULT (unless this customer paused it before)
+    _musicPrepare();                              // load now, then try to play at once
+  }
+  _musicRefreshBtn();
+}
+
+function toggleMusic() {
+  const a = MUSIC.audio;
+  if (!a || !MUSIC.src) return;
+  const playing = !a.paused, waiting = MUSIC.wantPlay && !MUSIC.ready;
+  if (!playing && !waiting) { MUSIC.userPaused = false; lsDel(LS_MUSIC_OFF); _musicTryPlay(); }
+  else { MUSIC.userPaused = true; MUSIC.wantPlay = false; lsSet(LS_MUSIC_OFF, true); a.pause(); _musicRefreshBtn(); }
+}
+
+/** The shop page and the admin page switch: no music while the admin works. */
+function _musicViewChanged() {
+  const a = MUSIC.audio;
+  if (a) {
+    if (_musicAdminOpen()) { if (!a.paused) { MUSIC.resumeStore = true; a.pause(); } }
+    else if (MUSIC.resumeStore || MUSIC.wantPlay) { MUSIC.resumeStore = false; if (!MUSIC.userPaused) _musicTryPlay(); }
+  }
+  _musicRefreshBtn();
+}
+
+(function initBackgroundMusic() {
+  document.getElementById('music-btn')?.addEventListener('click', toggleMusic);
+
+  // Browsers only allow sound after a tap/click/key press: start with the customer's first one.
+  const firstGesture = e => {
+    if (e.target && e.target.closest && e.target.closest('#music-btn')) return;
+    if (!MUSIC.audio || !MUSIC.src || MUSIC.failed || MUSIC.userPaused || _musicAdminOpen()) return;
+    if (!MUSIC.audio.paused) return;
+    _musicTryPlay();
+  };
+  ['pointerdown', 'touchend', 'click', 'keydown'].forEach(ev =>
+    document.addEventListener(ev, firstGesture, { capture: true, passive: true }));
+
+  // Quiet while the tab is hidden
+  document.addEventListener('visibilitychange', () => {
+    const a = MUSIC.audio; if (!a) return;
+    if (document.hidden) { if (!a.paused) { MUSIC.resume = true; a.pause(); } }
+    else if (MUSIC.resume) { MUSIC.resume = false; if (!MUSIC.userPaused && !_musicAdminOpen()) _musicTryPlay(); }
+  });
+})();
+
+/* ── Admin → Settings → Background music ── */
+let _musicTest = null;
+function _musicMsg(text, ok) {
+  const el = document.getElementById('set-music-msg'); if (!el) return;
+  el.textContent = text || '';
+  el.style.display = text ? '' : 'none';
+  el.style.color = ok ? 'var(--green)' : '';
+}
+function musicTestStop() {
+  if (_musicTest) { try { _musicTest.pause(); _musicTest.removeAttribute('src'); } catch (_) {} _musicTest = null; }
+  const b = document.getElementById('btn-music-test'); if (b) b.textContent = '▶ Test music';
+}
+function refreshMusicLinkUI() {
+  const input = document.getElementById('set-music-url'); if (!input) return true;
+  const url = input.value.trim(), problem = url ? musicLinkProblem(url) : '';
+  document.getElementById('set-music-vol-val').textContent = document.getElementById('set-music-volume').value;
+  document.getElementById('btn-music-test').disabled  = !url || !!problem;
+  document.getElementById('btn-music-clear').disabled = !url;
+  _musicMsg(problem, false);
+  return !problem;
+}
+async function musicTestToggle() {
+  if (_musicTest) { musicTestStop(); return; }
+  const url = document.getElementById('set-music-url').value.trim();
+  const problem = musicLinkProblem(url);
+  if (problem) { _musicMsg(problem, false); return; }
+  const info = _musicInfo(url);
+  const a = new Audio();
+  a.volume = (parseInt(document.getElementById('set-music-volume').value, 10) || 0) / 100;
+  _musicTest = a;
+  let blob = null, dataTried = false;
+  a.addEventListener('playing', () => { if (_musicTest === a) _musicMsg('✓ The music is playing. If you can hear it, it works.', true); });
+  a.addEventListener('error', () => {
+    if (_musicTest !== a || !a.getAttribute('src')) return;
+    if (blob && !dataTried) {
+      dataTried = true;
+      _blobToDataUrl(blob).then(u => { if (_musicTest === a) { a.src = u; a.play().catch(() => {}); } });
+      return;
+    }
+    musicTestStop();
+    _musicMsg('This music file cannot be played. Check that it is an MP3 (or M4A) file.', false);
+  });
+  document.getElementById('btn-music-test').textContent = '■ Stop test';
+  try {
+    if (info.direct) {
+      _musicMsg('Loading the music…', true);
+      a.src = info.direct;
+    } else {
+      _musicMsg('Loading the music from Google Drive… this can take a few seconds.', true);
+      const item = await _musicLoadDrive(info.driveId, { token: STATE.adminToken, fresh: _musicTestWarm !== info.driveId });
+      _musicTestWarm = info.driveId;
+      if (_musicTest !== a) return;                      // stopped while loading
+      blob = item.blob; a.src = item.url;
+    }
+    await a.play();
+  } catch (err) {
+    if (_musicTest !== a) return;
+    musicTestStop();
+    if (err && err.name === 'NotAllowedError') { _musicMsg('The music is loaded, but the browser blocked the sound. Press "Test music" again.', false); return; }
+    if (err && err.name === 'AbortError') return;
+    const m = String((err && err.message) || err || '');
+    _musicMsg(/Unknown action/i.test(m) ? 'The server does not know the music action yet. Update Code.gs, then deploy a new version.' : m || 'This music file cannot be played.', false);
+  }
+}
+async function _verifyMusicOnServer(s) {
+  if (!s.musicUrl) return;
+  try {
+    const snap = await api('getStoreSnapshot');
+    const p = (snap && snap.settings) || {};
+    if (String(p.musicUrl || '').trim() !== s.musicUrl) {
+      showToast('The music is saved on this device only. Update Code.gs to the new version and deploy it again.', 'error', 9000);
+    }
+  } catch (_) { /* silent */ }
+}
+(function wireMusicSettings() {
+  const url = document.getElementById('set-music-url'), vol = document.getElementById('set-music-volume');
+  url?.addEventListener('input', () => { musicTestStop(); _musicTestWarm = ''; refreshMusicLinkUI(); });
+  vol?.addEventListener('input', () => {
+    document.getElementById('set-music-vol-val').textContent = vol.value;
+    if (_musicTest) _musicTest.volume = (parseInt(vol.value, 10) || 0) / 100;
+  });
+  document.getElementById('btn-music-test')?.addEventListener('click', musicTestToggle);
+  document.getElementById('btn-music-clear')?.addEventListener('click', () => {
+    musicTestStop(); _musicTestWarm = ''; url.value = ''; refreshMusicLinkUI();
+    showToast('Music link removed — press Save Settings to apply.', 'info', 3500);
+  });
+  document.querySelectorAll('.admin-tab').forEach(b => b.addEventListener('click', musicTestStop));
+  document.getElementById('btn-back-store')?.addEventListener('click', musicTestStop);
+  document.getElementById('admin-back-link')?.addEventListener('click', musicTestStop);
+})();
 </script>
 </body>
 </html>
