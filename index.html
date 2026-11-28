@@ -2846,6 +2846,25 @@ details.set-more summary { cursor: pointer; font-size: 12px; font-weight: 700; c
 .apt-row-meta { font-size: 11px; color: var(--muted); white-space: nowrap; }
 .apt-play { flex-shrink: 0; width: 30px; height: 30px; border-radius: 50%; border: 1.5px solid var(--border); background: #fff; color: var(--dark); font-size: 12px; cursor: pointer; }
 .apt-play:hover { border-color: var(--amber); }
+.cat-add-row { display: flex; gap: 8px; }
+.cat-add-row .apf-input { flex: 1; min-width: 0; }
+.cat-list { display: flex; flex-direction: column; gap: 8px; }
+.cat-row { display: flex; align-items: center; gap: 8px; padding: 8px 10px; border: 1.5px solid var(--border); border-radius: var(--radius-sm); background: var(--cream); flex-wrap: wrap; }
+.cat-row-name { flex: 1 1 140px; min-width: 0; font-weight: 700; font-size: 14px; word-break: break-word; }
+.cat-row-count { font-size: 12px; color: var(--muted); white-space: nowrap; }
+.cat-edit-input { flex: 1 1 160px; min-width: 0; }
+.cat-ico { width: 30px; height: 30px; border: 1.5px solid var(--border); border-radius: 8px; background: #fff; color: var(--dark); font-size: 15px; cursor: pointer; }
+.cat-ico:hover:not([disabled]) { border-color: var(--amber); }
+.cat-ico[disabled] { opacity: .35; cursor: default; }
+.cat-del { color: var(--red) !important; }
+.music-gate { position: fixed; inset: 0; z-index: 9000; display: flex; align-items: center; justify-content: center; padding: 20px; background: linear-gradient(115deg, var(--dark) 0%, #4A1D3A 100%); }
+.music-gate-card { text-align: center; color: #fff; max-width: 340px; }
+.music-gate-emoji { font-size: 54px; margin-bottom: 8px; }
+.music-gate-title { font-family: 'PesoSign', 'Fraunces', Georgia, serif; font-size: clamp(24px, 6vw, 34px); font-weight: 700; line-height: 1.15; }
+.music-gate-sub { margin: 10px 0 22px; color: rgba(255,255,255,.78); font-size: 14px; line-height: 1.5; }
+.music-gate-btn { border: 0; border-radius: 999px; padding: 13px 28px; background: var(--amber); color: #fff; font: 700 16px var(--fb); cursor: pointer; box-shadow: 0 6px 20px rgba(0,0,0,.3); }
+.music-gate-btn:hover { background: var(--amber-dk); }
+.music-gate-skip { display: block; margin: 14px auto 0; background: none; border: 0; color: rgba(255,255,255,.6); font: 600 13px var(--fb); text-decoration: underline; cursor: pointer; }
 .fv-retry { margin-top: 10px; border: 0; border-radius: 999px; padding: 8px 16px; background: var(--amber); color: #fff; font: 700 13px var(--fb); cursor: pointer; }
 </style>
 </head>
@@ -3162,7 +3181,7 @@ details.set-more summary { cursor: pointer; font-size: 12px; font-weight: 700; c
       <!-- Products Tab -->
       <div class="admin-tab-pane" id="tab-products">
         <div class="legacy-note" id="legacy-note" style="display:none"></div>
-        <div class="admin-toolbar"><div class="admin-toolbar-title">Flower &amp; product inventory</div><div class="admin-toolbar-actions"><button class="btn-admin-util btn-add-product" id="btn-add-product" onclick="openAddProductModal()">＋ Add Product</button><button class="btn-admin-util" id="btn-export-products">Export Products CSV</button><button class="btn-admin-util" id="btn-print-products">Print Products</button></div></div>
+        <div class="admin-toolbar"><div class="admin-toolbar-title">Flower &amp; product inventory</div><div class="admin-toolbar-actions"><button class="btn-admin-util btn-add-product" id="btn-add-product" onclick="openAddProductModal()">＋ Add Product</button><button class="btn-admin-util" id="btn-manage-cats" onclick="openCategoryManager()">🏷️ Categories</button><button class="btn-admin-util" id="btn-export-products">Export Products CSV</button><button class="btn-admin-util" id="btn-print-products">Print Products</button></div></div>
         <div class="tbl-wrap">
           <table>
             <thead>
@@ -3321,7 +3340,7 @@ details.set-more summary { cursor: pointer; font-size: 12px; font-weight: 700; c
 
           <div class="settings-card">
             <div class="settings-card-title">🚚 Delivery (transport) fee</div>
-            <div class="set-sub">What customers pay to have their flowers delivered. Pickup is always free. Leave everything empty for free delivery. Press <strong>Save Settings</strong> (bottom of the page) to apply.</div>
+            <div class="set-sub">What customers pay to have their flowers delivered. Pickup is always free. Leave everything empty for free delivery. To make delivery free for certain flowers only, tick <strong>Free delivery</strong> when you add or edit that flower. Press <strong>Save Settings</strong> (bottom of the page) to apply.</div>
             <div class="set-row set-toggle-row">
               <div>
                 <div class="set-toggle-label">Delivery service</div>
@@ -3408,6 +3427,16 @@ details.set-more summary { cursor: pointer; font-size: 12px; font-weight: 700; c
               </div>
               <label class="set-switch">
                 <input type="checkbox" id="set-music-enabled">
+                <span class="set-switch-slider"></span>
+              </label>
+            </div>
+            <div class="set-row set-toggle-row">
+              <div>
+                <div class="set-toggle-label">Welcome screen</div>
+                <div class="set-hint">Browsers never start sound by themselves — the visitor must tap once. When the browser blocks it, a welcome screen asks for that one tap and the music then starts at once. Turn OFF to skip it (the music then starts on the visitor's first tap). It is not shown when the browser allows music right away.</div>
+              </div>
+              <label class="set-switch">
+                <input type="checkbox" id="set-music-gate" checked>
                 <span class="set-switch-slider"></span>
               </label>
             </div>
@@ -3641,6 +3670,9 @@ details.set-more summary { cursor: pointer; font-size: 12px; font-weight: 700; c
         </div>
       </div>
       <div class="apf-row">
+        <label class="set-check"><input type="checkbox" id="apf-freeship"> <span>🚚 <strong>Free delivery</strong> for this flower <span style="font-size:11px;color:var(--muted)">— when a customer orders it with Delivery, the delivery fee of the whole order is free</span></span></label>
+      </div>
+      <div class="apf-row">
         <label class="apf-label">Search tags <span style="font-size:11px;color:var(--muted)">(optional · comma-separated · for search only, never shown to customers)</span></label>
         <input type="text" class="apf-input" id="apf-tags" placeholder="e.g. birthday, anniversary, red roses, romantic" maxlength="300" autocomplete="off">
       </div>
@@ -3812,6 +3844,40 @@ details.set-more summary { cursor: pointer; font-size: 12px; font-weight: 700; c
       <span class="loc-coords" id="loc-coords"></span>
       <a class="loc-open" id="loc-open" href="#" target="_blank" rel="noopener">Open in Google Maps ↗</a>
     </div>
+  </div>
+</div>
+
+<div class="music-gate" id="music-gate" style="display:none" role="dialog" aria-modal="true" aria-labelledby="music-gate-title">
+  <div class="music-gate-card">
+    <div class="music-gate-emoji">🌸</div>
+    <div class="music-gate-title" id="music-gate-title">Welcome</div>
+    <div class="music-gate-sub">Tap to enter the shop with music.</div>
+    <button type="button" class="music-gate-btn" id="music-gate-enter">🎵 Enter the shop</button>
+    <button type="button" class="music-gate-skip" id="music-gate-skip">Continue without music</button>
+  </div>
+</div>
+
+<div class="add-product-overlay" id="cat-mgr-overlay" role="dialog" aria-modal="true" aria-labelledby="cat-mgr-title">
+  <div class="add-product-modal">
+    <div class="add-product-header">
+      <div>
+        <div class="add-product-title" id="cat-mgr-title">🏷️ Product Categories</div>
+        <div class="add-product-subtitle">Create categories for your flowers. A category shows in the shop once it has at least one active flower.</div>
+      </div>
+      <button class="add-product-close" id="cat-mgr-close" aria-label="Close">✕</button>
+    </div>
+    <div class="add-product-body">
+      <div class="apf-row">
+        <label class="apf-label" for="cat-new-name">New category</label>
+        <div class="cat-add-row">
+          <input type="text" class="apf-input" id="cat-new-name" placeholder="e.g. Anniversary Bouquets" maxlength="60" autocomplete="off">
+          <button type="button" class="btn-apf-save" id="btn-cat-add">＋ Add</button>
+        </div>
+      </div>
+      <div class="apf-err" id="cat-err" style="display:none"></div>
+      <div class="cat-list" id="cat-list"><div class="disc-empty">Loading categories…</div></div>
+    </div>
+    <div class="add-product-footer"><button class="btn-apf-cancel" id="btn-cat-close">Close</button></div>
   </div>
 </div>
 
@@ -4149,12 +4215,12 @@ function _flowerCategories(cats, prods) {
     take({ name, slug: _slugifyCat(name), sortOrder: 9999 });
   });
 
-  return out.sort((a, b) => rank(a) - rank(b) || (a.sortOrder - b.sortOrder) || String(a.name).localeCompare(String(b.name)));
+  return out.sort((a, b) => (a.sortOrder - b.sortOrder) || rank(a) - rank(b) || String(a.name).localeCompare(String(b.name)));   // the order set in Admin → Categories
 }
 /** Signature of everything the storefront shows — used to decide if a background refresh must redraw. */
 function _catalogSig(prods, cats) {
   return JSON.stringify([
-    (prods || []).map(p => [p.id, p.stock, p.price, p.name, p.category, p.description, p.imageUrl, (p.gallery || []).join('|'), p.packQty]),
+    (prods || []).map(p => [p.id, p.stock, p.price, p.name, p.category, p.description, p.imageUrl, (p.gallery || []).join('|'), p.packQty, p.freeShip]),
     (cats  || []).map(c => [c.slug, c.name])
   ]);
 }
@@ -5053,7 +5119,7 @@ function _parseZones(text) {
 }
 
 /** Delivery fee for one order. Pickup is always free. Returns { fee, zoneName, free } or { error }. */
-function _deliveryFeeFor(cfg, mode, zoneInput, afterDiscount) {
+function _deliveryFeeFor(cfg, mode, zoneInput, afterDiscount, freeItem) {
   if (mode !== 'delivery') return { fee: 0, zoneName: '', free: false };
   const zones   = _parseZones(cfg.deliveryZones);
   const hasBase = String(cfg.deliveryFee == null ? '' : cfg.deliveryFee).trim() !== '';
@@ -5067,7 +5133,7 @@ function _deliveryFeeFor(cfg, mode, zoneInput, afterDiscount) {
     else return { error: 'Please choose your delivery area.' };
   }
   const freeMin = Math.max(0, _num(cfg.freeDeliveryMin));
-  const free    = fee > 0 && freeMin > 0 && afterDiscount >= freeMin;
+  const free    = fee > 0 && (freeItem === true || (freeMin > 0 && afterDiscount >= freeMin));
   return { fee: free ? 0 : fee, zoneName: zoneName, free: free };
 }
 
@@ -5105,7 +5171,8 @@ function _computeTotals(subtotal, mode, zoneInput, cfg, disc, lines) {
   subtotal = _round2(subtotal);
   const elig = _eligibleSubtotal(disc, subtotal, lines);
   const itemsOff = _itemsDiscount(disc, elig);
-  const f = _deliveryFeeFor(cfg, mode, zoneInput, _round2(subtotal - itemsOff));
+  const freeItem = (lines || []).some(function (l) { return l && l.freeShip === true; });   // a free-delivery flower is in the cart
+  const f = _deliveryFeeFor(cfg, mode, zoneInput, _round2(subtotal - itemsOff), freeItem);
   if (f.error) return { error: f.error };
   let saving = itemsOff;
   if (disc && disc.type === 'freeship' && elig > 0 && elig >= _num(disc.minSubtotal)) saving = f.fee;
@@ -5116,6 +5183,7 @@ function _computeTotals(subtotal, mode, zoneInput, cfg, disc, lines) {
     total:          _round2(subtotal + f.fee - saving),
     zoneName:       f.zoneName,
     freeByMinimum:  f.free,
+    freeByItem:     f.free && freeItem,
   };
 }
 
@@ -5211,12 +5279,12 @@ function _promoInfo(p) {
   });
   const main = sale ? sale.promo : (promos.filter(d => d.type !== 'freeship')[0] || null);
   const ship = promos.filter(d => d.type === 'freeship')[0] || null;
-  return { promos, sale, main, ship };
+  return { promos, sale, main, ship, freeItem: !!p.freeShip && _deliveryOn() };
 }
 /** Part of the card signature: when a promo changes, the card is redrawn. */
 function _promoSig(p) {
   const i = _promoInfo(p);
-  return JSON.stringify([i.promos.map(d => [d.code, d.type, d.value, d.minSubtotal, d.maxDiscount, d.expiresOn, d.description, d.auto]), _storeFreeShipMin()]);
+  return JSON.stringify([i.promos.map(d => [d.code, d.type, d.value, d.minSubtotal, d.maxDiscount, d.expiresOn, d.description, d.auto]), _storeFreeShipMin(), i.freeItem]);
 }
 function _priceBlockHTML(p, info) {
   const price = parseFloat(p.price) || 0;
@@ -5227,7 +5295,7 @@ function _priceBlockHTML(p, info) {
 /** Badge on the photo. Tapping it shows only the flowers of that promo (when the promo is for selected flowers). */
 function promoBadgeHTML(info) {
   const d = info.main || info.ship;
-  if (!d) return '';
+  if (!d) return info.freeItem ? '<span class="promo-badge ship">🚚 FREE DELIVERY</span>' : '';
   const cls = 'promo-badge' + (d.type === 'freeship' ? ' ship' : '');
   return _promoIsScoped(d)
     ? `<button type="button" class="${cls}" data-promo="${esc(d.code)}" onclick="filterByPromo(this.dataset.promo)" title="See all flowers in this promo">🏷️ ${esc(_promoBadgeText(d))}</button>`
@@ -5243,7 +5311,9 @@ function promoNotesHTML(info) {
       ? `<button type="button" class="promo-chip" data-promo="${esc(d.code)}" onclick="filterByPromo(this.dataset.promo)" title="See all flowers in this promo">${esc(txt)}</button>`
       : `<span class="promo-chip">${esc(txt)}</span>`);
   }
-  if (info.ship) {
+  if (info.freeItem) {
+    chips.push('<span class="promo-chip ship">🚚 Free delivery with this flower</span>');
+  } else if (info.ship) {
     chips.push(`<span class="promo-chip ship">🚚 ${esc(info.ship.description || discountText(info.ship))}${_promoEnds(info.ship) ? ' · ' + esc(_promoEnds(info.ship)) : ''}</span>`);
   } else if (_storeFreeShipMin() > 0) {
     chips.push(`<span class="promo-chip ship">🚚 Free delivery on orders of ${esc(_pesoShort(_storeFreeShipMin()))}+</span>`);
@@ -5327,7 +5397,7 @@ function _renderPromoFilterBar() {
 /** Changes in promos or delivery settings (so the shop notices them without a reload). */
 function _promoSigOf(snap) {
   const s = (snap && snap.settings) || {};
-  return JSON.stringify([snap && snap.discounts || [], s.freeDeliveryMin, s.deliveryFee, s.deliveryZones, s.deliveryEnabled, s.musicEnabled, s.musicUrl, s.musicVolume]);
+  return JSON.stringify([snap && snap.discounts || [], s.freeDeliveryMin, s.deliveryFee, s.deliveryZones, s.deliveryEnabled, s.musicEnabled, s.musicUrl, s.musicVolume, s.musicGate]);
 }
 
 /** Everything shown in the cart for the current cart, delivery choice and promo code. */
@@ -5340,7 +5410,10 @@ function currentPricing() {
   // only automatic promos apply by themselves (a promo code the shop advertises still has to be typed)
   const cands = (STATE.autoDiscounts || []).filter(d => _isAutoPromo(d) && _isActiveToday(d)).slice();
   if (STATE.promo) cands.unshift(STATE.promo);
-  const lines = STATE.cart.filter(i => i.selected !== false).map(i => ({ id: i.id, price: parseFloat(i.price) || 0, qty: i.qty }));
+  const lines = STATE.cart.filter(i => i.selected !== false).map(i => {
+    const live = (STATE.products || []).find(x => String(x.id) === String(i.id));
+    return { id: i.id, price: parseFloat(i.price) || 0, qty: i.qty, freeShip: !!(live ? live.freeShip : i.freeShip) };
+  });
   let disc = _bestDiscount(cands, sub, mode, zone, cfg, typed, lines);
   let t    = _computeTotals(sub, mode, zone, cfg, disc, lines);
   let needZone = false;
@@ -5436,7 +5509,7 @@ function _renderPriceSummary() {
       $('cs-fee-val').textContent   = 'choose your area';
       hints.push('Choose your delivery area to see the delivery fee.');
     } else {
-      $('cs-fee-label').textContent = '🚚 Delivery fee' + (t.zoneName ? ' (' + t.zoneName + ')' : '');
+      $('cs-fee-label').textContent = '🚚 Delivery fee' + (t.zoneName ? ' (' + t.zoneName + ')' : '') + (t.freeByItem ? ' · free delivery flower' : '');
       $('cs-fee-val').textContent   = t.freeByMinimum ? 'FREE' : peso(t.deliveryFee);
     }
   }
@@ -5483,14 +5556,18 @@ function _renderPriceSummary() {
 /** Small "🏷️ 10% OFF" tag under each cart flower the applied promo works on. */
 function _refreshCartPromoTags(p) {
   const dd = (p && p.disc && p.totals && p.totals.discount > 0 && p.disc.type !== 'freeship') ? p.disc : null;
+  const delivering = !!p && p.mode === 'delivery' && _deliveryOn();
   STATE.cart.forEach(item => {
     const info = document.querySelector(`.cart-item[data-id="${cssId(String(item.id))}"] .cart-item-info`);
     if (!info) return;
     let tag = info.querySelector('.cart-item-promo');
-    const on = dd && item.selected !== false && _promoCovers(dd, item);
-    if (!on) { if (tag) tag.remove(); return; }
+    const live = (STATE.products || []).find(x => String(x.id) === String(item.id));
+    const parts = [];
+    if (dd && item.selected !== false && _promoCovers(dd, item)) parts.push('🏷️ ' + _promoBadgeText(dd));
+    if (delivering && item.selected !== false && (live ? live.freeShip : item.freeShip)) parts.push('🚚 Free delivery');
+    if (!parts.length) { if (tag) tag.remove(); return; }
     if (!tag) { tag = document.createElement('div'); tag.className = 'cart-item-promo'; info.appendChild(tag); }
-    tag.textContent = '🏷️ ' + _promoBadgeText(dd);
+    tag.textContent = parts.join(' · ');
   });
 }
 
@@ -6914,7 +6991,7 @@ function renderAdminProducts() {
     return `
     <tr>
       <td style="font-size:12px;color:var(--muted)">${safeId}</td>
-      <td><strong>${esc(p.name)}</strong>${_isLegacyCat(p.category) ? '<div class="legacy-flag">Hidden category · not shown in shop</div>' : ''}</td>
+      <td><strong>${esc(p.name)}</strong>${_isLegacyCat(p.category) ? '<div class="legacy-flag">Hidden category · not shown in shop</div>' : ''}${p.freeShip ? '<div class="legacy-flag" style="color:var(--green)">🚚 Free delivery</div>' : ''}</td>
       <td style="font-family:'PesoSign',monospace;font-size:12px;color:var(--muted)">${esc(p.barcode || '—')}</td>
       <td>${esc(p.category)}</td>
       <td style="color:var(--green);font-weight:700">${parseFloat(p.price||0).toFixed(2)}</td>
@@ -7264,7 +7341,7 @@ window.addEventListener('resize', () => {
 const DEFAULT_SETTINGS = {
   storeName: 'Janice FlowerShop', storePhone: '', storeEmail: '', storeAddress: '',
   storeOpen: '', storeClose: '', announcement: '', announcementSpeed: 'normal', heroImage: '', storeLat: '', storeLng: '',
-  musicEnabled: false, musicUrl: '', musicName: '', musicVolume: 40,
+  musicEnabled: false, musicGate: true, musicUrl: '', musicName: '', musicVolume: 40,
   deliveryEnabled: true, deliveryFee: '', deliveryZones: '', freeDeliveryMin: '',
   liveSync: true, syncSpeed: 'normal', soundOrder: false, soundMsg: false,
 };
@@ -7540,6 +7617,7 @@ async function loadSettingsIntoForm() {
   document.getElementById('set-music-enabled').checked = settings.musicEnabled === true || String(settings.musicEnabled).toLowerCase() === 'true';
   document.getElementById('set-music-url').value = settings.musicUrl || '';
   document.getElementById('set-music-name').value = settings.musicName || '';
+  document.getElementById('set-music-gate').checked = !(settings.musicGate === false || String(settings.musicGate).toLowerCase() === 'false');
   { const mv = parseInt(settings.musicVolume, 10); document.getElementById('set-music-volume').value = isNaN(mv) ? 40 : mv; }
   if (typeof refreshMusicLinkUI === 'function') refreshMusicLinkUI();
   if (typeof loadDiscounts === 'function') loadDiscounts();
@@ -7569,6 +7647,7 @@ function _readSettingsFromForm() {
     musicEnabled: document.getElementById('set-music-enabled').checked,
     musicUrl:     (document.getElementById('set-music-url').value || '').trim(),
     musicName:    (document.getElementById('set-music-name').value || '').trim(),
+    musicGate:    document.getElementById('set-music-gate').checked,
     musicVolume:  (() => { const v = parseInt(document.getElementById('set-music-volume').value, 10); return isNaN(v) ? 40 : Math.min(100, Math.max(0, v)); })(),
     liveSync:     document.getElementById('set-live-sync').checked,
     syncSpeed:    document.getElementById('set-sync-speed').value,
@@ -8867,6 +8946,8 @@ function openAddProductModal(prefillBarcode) {
   }
   const statusEl = document.getElementById('apf-status');
   if (statusEl) statusEl.value = 'true';
+  const fsEl = document.getElementById('apf-freeship');
+  if (fsEl) fsEl.checked = false;
   const prevWrap = document.getElementById('apf-img-preview-wrap');
   if (prevWrap) prevWrap.style.display = 'none';
   _apfSetGallery([]);
@@ -8898,6 +8979,7 @@ function openEditProductModal(productId) {
   document.getElementById('apf-stock').value    = p.stock != null ? p.stock : '';
   document.getElementById('apf-status').value   = p.isActive ? 'true' : 'false';
   document.getElementById('apf-desc').value     = p.description || '';
+  document.getElementById('apf-freeship').checked = !!p.freeShip;
   document.getElementById('apf-image').value    = p.imageUrl || '';
 
   const prevWrap = document.getElementById('apf-img-preview-wrap');
@@ -8944,6 +9026,7 @@ async function submitAddProduct() {
   const desc     = (document.getElementById('apf-desc')?.value || '').trim();
   const imageUrl = (document.getElementById('apf-image')?.value || '').trim();
   const gallery  = _apfGetGallery();
+  const freeShip = !!document.getElementById('apf-freeship')?.checked;
 
   const errEl = document.getElementById('apf-err');
   errEl.style.display = 'none';
@@ -8971,12 +9054,12 @@ async function submitAddProduct() {
     if (isEdit) {
       await api('adminUpdateProduct', {
         token: STATE.adminToken,
-        product: { id: _apfEditingId, name, barcode, category, price, stock, isActive, description: desc, imageUrl, gallery, tags },
+        product: { id: _apfEditingId, name, barcode, category, price, stock, isActive, description: desc, imageUrl, gallery, tags, freeShip },
       });
     } else {
       await api('adminAddProduct', {
         token: STATE.adminToken,
-        product: { name, barcode, category, price, stock, isActive, description: desc, imageUrl, gallery, tags },
+        product: { name, barcode, category, price, stock, isActive, description: desc, imageUrl, gallery, tags, freeShip },
       });
     }
 
@@ -9935,8 +10018,14 @@ function _musicPausedSet(v) {
 }
 lsDel(LS_MUSIC_OFF);                           // older versions remembered a pause for ever: forget it
 
+/* 0.1 second of silence. Playing it during a tap "unlocks" the audio element, so the real song can start
+   the moment it has finished loading (phones need this), and playing it with no tap tells us whether the
+   browser allows music to start by itself. */
+const SILENT_WAV = 'data:audio/wav;base64,UklGRkQDAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YSADAACAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgA==';
+
 const MUSIC = { audio: null, src: '', ready: false, loading: false, wantPlay: false, failed: false, blocked: false, tries: 0,
-                blob: null, dataTried: false, userPaused: _musicPausedGet(), resume: false, resumeStore: false };
+                blob: null, dataTried: false, silent: false, autoOK: null, probed: false, entered: false,
+                userPaused: _musicPausedGet(), resume: false, resumeStore: false };
 const _musicBlobs = {};                        // Drive file id -> { url, blob } (kept for this visit)
 let _musicTestWarm = '';
 
@@ -9964,12 +10053,15 @@ function _musicInfo(url) {
 function _musicCfg() {
   const s = _readLocalSettings(), v = Number(s.musicVolume);
   return {
-    on:  s.musicEnabled === true || String(s.musicEnabled).toLowerCase() === 'true',
-    url: String(s.musicUrl || '').trim(),
-    vol: (isFinite(v) && s.musicVolume !== '' ? Math.min(100, Math.max(0, v)) : 40) / 100,
+    on:   s.musicEnabled === true || String(s.musicEnabled).toLowerCase() === 'true',
+    gate: !(s.musicGate === false || String(s.musicGate).toLowerCase() === 'false'),   // welcome screen (default ON)
+    url:  String(s.musicUrl || '').trim(),
+    vol:  (isFinite(v) && s.musicVolume !== '' ? Math.min(100, Math.max(0, v)) : 40) / 100,
   };
 }
 function _musicAdminOpen() { const a = document.getElementById('app-admin'); return !!a && a.style.display !== 'none'; }
+/** Is the real song (not the silent unlock sound) playing? */
+function _musicIsPlaying() { return !!MUSIC.audio && !MUSIC.audio.paused && !MUSIC.silent; }
 function _blobToDataUrl(blob) {
   return new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(r.result); r.onerror = () => rej(r.error); r.readAsDataURL(blob); });
 }
@@ -9998,7 +10090,7 @@ async function _musicLoadDrive(id, opts) {
 }
 
 function _musicFail() {
-  MUSIC.failed = true; MUSIC.loading = false; MUSIC.wantPlay = false;
+  MUSIC.failed = true; MUSIC.loading = false; MUSIC.wantPlay = false; MUSIC.silent = false;
   console.warn('Background music could not be loaded.');
   _musicRefreshBtn();
 }
@@ -10007,10 +10099,11 @@ function _musicEnsureAudio() {
   const a = new Audio();
   a.loop = true;
   a.preload = 'auto';
-  a.addEventListener('play',  () => { MUSIC.blocked = false; _musicRefreshBtn(); });
+  a.addEventListener('play',  () => { if (!MUSIC.silent) MUSIC.blocked = false; _musicRefreshBtn(); });
   a.addEventListener('pause', _musicRefreshBtn);
   a.addEventListener('error', () => {
     if (!MUSIC.src || !a.getAttribute('src')) return;
+    if (MUSIC.silent) { MUSIC.silent = false; return; }   // the unlock sound is not supported here: not a problem
     if (MUSIC.blob && !MUSIC.dataTried) {               // the browser refused the blob: address → try a data: address
       MUSIC.dataTried = true;
       _blobToDataUrl(MUSIC.blob).then(u => {
@@ -10024,12 +10117,12 @@ function _musicEnsureAudio() {
   MUSIC.audio = a;
   return a;
 }
-/** Downloads / prepares the song (once). Runs as soon as the shop opens, so the first tap can play at once. */
+/** Downloads / prepares the song (once). Runs as soon as the shop opens, so it can play the moment the browser allows. */
 async function _musicPrepare() {
   if (MUSIC.ready || MUSIC.loading || MUSIC.failed || !MUSIC.src || !MUSIC.audio) return;
   if (_musicAdminOpen()) return;                         // loaded when the admin goes back to the shop
   const src = MUSIC.src, info = _musicInfo(src);
-  if (info.direct) { MUSIC.audio.src = info.direct; MUSIC.ready = true; if (MUSIC.wantPlay) _musicTryPlay(); return; }
+  if (info.direct) { MUSIC.silent = false; MUSIC.audio.src = info.direct; MUSIC.ready = true; if (MUSIC.wantPlay) _musicTryPlay(); return; }
   if (!info.driveId) return;
   MUSIC.loading = true; _musicRefreshBtn();
   try {
@@ -10037,6 +10130,7 @@ async function _musicPrepare() {
     MUSIC.loading = false;
     if (MUSIC.src !== src) { _musicPrepare(); return; }  // another song was chosen meanwhile
     MUSIC.blob = item.blob; MUSIC.dataTried = false; MUSIC.tries = 0;
+    MUSIC.silent = false;
     MUSIC.audio.src = item.url;
     MUSIC.ready = true;
   } catch (err) {
@@ -10056,12 +10150,21 @@ async function _musicPrepare() {
   _musicRefreshBtn();
   if (MUSIC.wantPlay) _musicTryPlay();
 }
+/** Inside a tap, before the song has loaded: play the silent sound so this audio element is allowed to play later. */
+function _musicUnlock() {
+  const a = MUSIC.audio;
+  if (!a || MUSIC.silent || MUSIC.ready || !a.paused) return;
+  MUSIC.silent = true;
+  a.src = SILENT_WAV;
+  const p = a.play();
+  if (p && p.catch) p.catch(() => { MUSIC.silent = false; });
+}
 function _musicTryPlay() {
   const a = MUSIC.audio;
   if (!a || !MUSIC.src || MUSIC.failed) return;
   MUSIC.wantPlay = true;
   if (_musicAdminOpen()) return;                         // no music while the admin works
-  if (!MUSIC.ready) { _musicPrepare(); _musicRefreshBtn(); return; }
+  if (!MUSIC.ready) { _musicUnlock(); _musicPrepare(); _musicRefreshBtn(); return; }
   if (!a.paused) return;
   const p = a.play();
   if (p && p.catch) p.catch(err => {                     // blocked until the customer taps: the next tap tries again
@@ -10070,17 +10173,67 @@ function _musicTryPlay() {
 }
 function _musicRefreshBtn() {
   const btn = document.getElementById('music-btn');
-  if (!btn) return;
-  const show = !!MUSIC.audio && !!MUSIC.src && !MUSIC.failed && !_musicAdminOpen();
-  btn.style.display = show ? '' : 'none';
-  const playing = !!MUSIC.audio && !MUSIC.audio.paused;
-  const waiting = !playing && MUSIC.wantPlay && !MUSIC.ready && !MUSIC.failed;
-  btn.classList.toggle('playing', playing);
-  btn.classList.toggle('blocked', !playing && MUSIC.blocked && !MUSIC.userPaused);
-  btn.textContent = playing ? '🎵' : (waiting ? '⏳' : '🔇');
-  btn.setAttribute('aria-pressed', String(playing));
-  btn.setAttribute('aria-label', playing ? 'Pause background music' : 'Play background music');
-  btn.title = playing ? 'Pause music' : (waiting ? 'Loading music…' : 'Play music');
+  if (btn) {
+    const show = !!MUSIC.audio && !!MUSIC.src && !MUSIC.failed && !_musicAdminOpen();
+    btn.style.display = show ? '' : 'none';
+    const playing = _musicIsPlaying();
+    const waiting = !playing && MUSIC.wantPlay && !MUSIC.ready && !MUSIC.failed;
+    btn.classList.toggle('playing', playing);
+    btn.classList.toggle('blocked', !playing && MUSIC.blocked && !MUSIC.userPaused);
+    btn.textContent = playing ? '🎵' : (waiting ? '⏳' : '🔇');
+    btn.setAttribute('aria-pressed', String(playing));
+    btn.setAttribute('aria-label', playing ? 'Pause background music' : 'Play background music');
+    btn.title = playing ? 'Pause music' : (waiting ? 'Loading music…' : 'Play music');
+  }
+  _musicGateRefresh();
+}
+
+/* ── Welcome screen ──
+   Browsers never let a site start SOUND before the visitor does something (tap, click, key press); no code can
+   get around that. So when the browser blocks it, a welcome screen asks for one tap — the music then starts at
+   once (it is already downloaded). When the browser allows it, no welcome screen is shown at all. */
+let _gatePrevOverflow = '';
+function _musicGateRefresh() {
+  const g = document.getElementById('music-gate'); if (!g) return;
+  const c = _musicCfg();
+  const need = c.on && c.gate && !!MUSIC.src && !MUSIC.failed && MUSIC.autoOK === false &&
+               !MUSIC.userPaused && !MUSIC.entered && !_musicIsPlaying() && !_musicAdminOpen();
+  const open = g.style.display !== 'none';
+  if (need && !open) {
+    const nm = String(_readLocalSettings().storeName || '').trim();
+    document.getElementById('music-gate-title').textContent = nm ? 'Welcome to ' + nm : 'Welcome';
+    g.style.display = 'flex';
+    _gatePrevOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    setTimeout(() => { const b = document.getElementById('music-gate-enter'); if (b) b.focus({ preventScroll: true }); }, 60);
+  } else if (!need && open) {
+    g.style.display = 'none';
+    document.body.style.overflow = _gatePrevOverflow || '';
+  }
+}
+function _musicGateEnter() {
+  if (MUSIC.entered) return;
+  MUSIC.entered = true; MUSIC.userPaused = false; _musicPausedSet(false);
+  _musicTryPlay();                                       // this runs inside the tap, so the browser allows the sound
+  _musicRefreshBtn();                                    // closes the welcome screen
+}
+function _musicGateSkip() {
+  MUSIC.entered = true; MUSIC.userPaused = true; MUSIC.wantPlay = false; _musicPausedSet(true);
+  if (MUSIC.audio) MUSIC.audio.pause();
+  _musicRefreshBtn();
+}
+/** Asks the browser (silently) whether sound may start without a tap. */
+function _musicProbeAutoplay() {
+  if (MUSIC.probed) return;
+  MUSIC.probed = true;
+  try {
+    const t = new Audio(SILENT_WAV);
+    const p = t.play();
+    if (p && p.then) {
+      p.then(() => { MUSIC.autoOK = true;  try { t.pause(); } catch (_) {} _musicRefreshBtn(); if (MUSIC.wantPlay) _musicTryPlay(); })
+       .catch(() => { MUSIC.autoOK = false; _musicRefreshBtn(); });
+    } else { MUSIC.autoOK = false; _musicRefreshBtn(); }
+  } catch (_) { MUSIC.autoOK = false; _musicRefreshBtn(); }
 }
 
 /** Reads the shop settings and switches the music on / off / to another song. Safe to call often. */
@@ -10088,17 +10241,20 @@ function applyBackgroundMusic() {
   const c = _musicCfg();
   if (!c.on || !c.url || musicLinkProblem(c.url)) {      // music off, or no usable link
     if (MUSIC.audio) { MUSIC.audio.pause(); MUSIC.audio.removeAttribute('src'); MUSIC.audio.load(); }
-    MUSIC.src = ''; MUSIC.ready = false; MUSIC.failed = false; MUSIC.wantPlay = false; MUSIC.blob = null; MUSIC.tries = 0;
+    MUSIC.src = ''; MUSIC.ready = false; MUSIC.failed = false; MUSIC.wantPlay = false; MUSIC.blob = null; MUSIC.tries = 0; MUSIC.silent = false;
     _musicRefreshBtn();
     return;
   }
   const a = _musicEnsureAudio();
   a.volume = c.vol;
+  _musicProbeAutoplay();
   if (MUSIC.src !== c.url) {                            // first time, or a new song chosen in Admin → Settings
+    const keepUnlock = MUSIC.silent;                    // a tap already unlocked this element: keep it that way
     a.pause(); a.removeAttribute('src');
-    MUSIC.src = c.url; MUSIC.ready = false; MUSIC.failed = false; MUSIC.blob = null; MUSIC.dataTried = false; MUSIC.tries = 0;
+    MUSIC.src = c.url; MUSIC.ready = false; MUSIC.failed = false; MUSIC.blob = null; MUSIC.dataTried = false; MUSIC.tries = 0; MUSIC.silent = false;
     MUSIC.wantPlay = !MUSIC.userPaused;                 // PLAY BY DEFAULT (unless this customer paused it during this visit)
-    _musicPrepare();                                    // load now, then try to play at once
+    if (keepUnlock && MUSIC.wantPlay) _musicUnlock();
+    _musicPrepare();                                    // load now, then play as soon as the browser allows
   }
   _musicRefreshBtn();
 }
@@ -10106,7 +10262,7 @@ function applyBackgroundMusic() {
 function toggleMusic() {
   const a = MUSIC.audio;
   if (!a || !MUSIC.src) return;
-  const playing = !a.paused, waiting = MUSIC.wantPlay && !MUSIC.ready;
+  const playing = _musicIsPlaying(), waiting = MUSIC.wantPlay && !MUSIC.ready;
   if (!playing && !waiting) { MUSIC.userPaused = false; _musicPausedSet(false); _musicTryPlay(); }
   else { MUSIC.userPaused = true; MUSIC.wantPlay = false; _musicPausedSet(true); a.pause(); _musicRefreshBtn(); }
 }
@@ -10123,12 +10279,18 @@ function _musicViewChanged() {
 
 (function initBackgroundMusic() {
   document.getElementById('music-btn')?.addEventListener('click', toggleMusic);
+  document.getElementById('music-gate-skip')?.addEventListener('click', _musicGateSkip);
 
   // Browsers only allow sound after a tap/click/key press: start with the customer's first one.
   const firstGesture = e => {
+    const g = document.getElementById('music-gate');
+    if (g && g.style.display !== 'none') {              // welcome screen open: a click on it = "Enter"
+      if (e.type === 'click' && g.contains(e.target) && !(e.target.closest && e.target.closest('#music-gate-skip'))) _musicGateEnter();
+      return;
+    }
     if (e.target && e.target.closest && e.target.closest('#music-btn')) return;
     if (!MUSIC.audio || !MUSIC.src || MUSIC.failed || MUSIC.userPaused || _musicAdminOpen()) return;
-    if (!MUSIC.audio.paused) return;
+    if (_musicIsPlaying()) return;
     _musicTryPlay();
   };
   ['pointerdown', 'pointerup', 'mouseup', 'touchend', 'click', 'keydown'].forEach(ev =>
@@ -10417,6 +10579,134 @@ function confirmAudioSelection() {
   });
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape' && _aptEl('aud-picker-overlay')?.classList.contains('open')) closeAudioPicker();
+  });
+})();
+</script>
+<script>
+/* ── Admin: product categories (add / rename / reorder / delete) ───────── */
+STATE.adminCategories = [];
+let _catEditId = null;
+const _catEl = id => document.getElementById(id);
+function _catErr(msg) { const e = _catEl('cat-err'); if (!e) return; e.textContent = msg || ''; e.style.display = msg ? '' : 'none'; }
+function openCategoryManager() {
+  if (!STATE.adminToken) return;
+  _catEditId = null; _catErr('');
+  _catEl('cat-new-name').value = '';
+  _catEl('cat-mgr-overlay').classList.add('open');
+  _catRender();
+  _catLoad();
+  setTimeout(() => { const i = _catEl('cat-new-name'); if (i) i.focus(); }, 100);
+}
+function closeCategoryManager() { _catEl('cat-mgr-overlay').classList.remove('open'); _catEditId = null; }
+async function _catLoad() {
+  try {
+    const res = await api('adminGetCategories', { token: STATE.adminToken });
+    STATE.adminCategories = res.data || [];
+    _catRender();
+  } catch (e) {
+    if (!(STATE.adminCategories || []).length) {
+      _catEl('cat-list').innerHTML = '<div class="disc-empty">Could not load categories: ' +
+        esc(/Unknown action/i.test(e.message) ? 'update Code.gs and deploy a new version.' : e.message) + '</div>';
+    }
+  }
+}
+function _catRender() {
+  const box = _catEl('cat-list'); if (!box) return;
+  const list = STATE.adminCategories || [];
+  if (!list.length) { box.innerHTML = '<div class="disc-empty">No categories yet. Add your first one above.</div>'; return; }
+  box.innerHTML = list.map((c, i) => {
+    const id = esc(c.id), n = Number(c.products) || 0;
+    if (_catEditId === c.id) {
+      return `<div class="cat-row">
+        <input type="text" class="apf-input cat-edit-input" id="cat-edit-input" value="${esc(c.name)}" maxlength="60" autocomplete="off">
+        <button type="button" class="btn-admin-util" data-act="save" data-id="${id}">Save</button>
+        <button type="button" class="btn-admin-util" data-act="cancel">Cancel</button></div>`;
+    }
+    return `<div class="cat-row">
+      <div class="cat-row-name">${esc(c.name)}${_isLegacyCat(c.name) ? ' <span class="disc-tag bad">hidden in shop</span>' : ''}</div>
+      <div class="cat-row-count">${n} flower${n === 1 ? '' : 's'}</div>
+      <button type="button" class="cat-ico" data-act="up" data-id="${id}" title="Move up"${i === 0 ? ' disabled' : ''}>↑</button>
+      <button type="button" class="cat-ico" data-act="down" data-id="${id}" title="Move down"${i === list.length - 1 ? ' disabled' : ''}>↓</button>
+      <button type="button" class="btn-admin-util" data-act="edit" data-id="${id}">Rename</button>
+      <button type="button" class="btn-admin-util cat-del" data-act="delete" data-id="${id}">Delete</button></div>`;
+  }).join('');
+  if (_catEditId) { const inp = _catEl('cat-edit-input'); if (inp) { inp.focus(); inp.select(); } }
+}
+/** After any change: show the new list and make the flower form + shop pick it up. */
+function _catApply(res) {
+  STATE.adminCategories = res.data || [];
+  STATE.sheetCategories = null;               // the Category list in Add / Edit flower is reloaded next time
+  DataCache.del('store_snapshot');
+  _catRender();
+}
+function _catNameProblem(name) {
+  if (!name) return 'Please type the category name.';
+  if (_isLegacyCat(name)) return 'That name is used for hidden old-store categories, so it would not show in the shop. Please choose another name.';
+  return '';
+}
+async function _catAdd() {
+  const name = _catEl('cat-new-name').value.replace(/\s+/g, ' ').trim();
+  const bad = _catNameProblem(name);
+  if (bad) { _catErr(bad); return; }
+  const btn = _catEl('btn-cat-add'); btn.disabled = true;
+  try {
+    const res = await api('adminAddCategory', { token: STATE.adminToken, name });
+    _catApply(res); _catErr('');
+    _catEl('cat-new-name').value = ''; _catEl('cat-new-name').focus();
+    showToast('Category "' + res.name + '" added ✓', 'success');
+  } catch (e) { _catErr(/Unknown action/i.test(e.message) ? 'The server does not know this action yet. Update Code.gs and deploy a new version.' : e.message); }
+  finally { btn.disabled = false; }
+}
+async function _catSaveEdit(id) {
+  const name = (_catEl('cat-edit-input').value || '').replace(/\s+/g, ' ').trim();
+  const bad = _catNameProblem(name);
+  if (bad) { _catErr(bad); return; }
+  const old = (STATE.adminCategories || []).find(c => c.id === id);
+  if (old && old.name === name) { _catEditId = null; _catErr(''); _catRender(); return; }
+  try {
+    const res = await api('adminRenameCategory', { token: STATE.adminToken, id, name });
+    _catEditId = null; _catErr(''); _catApply(res);
+    if (res.moved) {                          // the flowers now carry the new name: reload them
+      try { const { data } = await api('adminGetProducts', { token: STATE.adminToken }); STATE.adminProducts = data || []; renderAdminProducts(); } catch (_) {}
+      DataCache.del('admin_snapshot'); refreshPublicProducts();
+    }
+    showToast('Category renamed ✓' + (res.moved ? ' · ' + res.moved + ' flower' + (res.moved === 1 ? '' : 's') + ' updated' : ''), 'success');
+  } catch (e) { _catErr(e.message); }
+}
+async function _catDelete(id) {
+  const c = (STATE.adminCategories || []).find(x => x.id === id);
+  if (!c) return;
+  if (c.products > 0) { _catErr('"' + c.name + '" still has ' + c.products + ' flower(s). Move them to another category first (Flowers → Edit), then delete it.'); return; }
+  if (!confirm('Delete the category "' + c.name + '"?\n\nThis cannot be undone.')) return;
+  try { const res = await api('adminDeleteCategory', { token: STATE.adminToken, id }); _catErr(''); _catApply(res); showToast('Category deleted.', 'info'); }
+  catch (e) { _catErr(e.message); }
+}
+async function _catMove(id, dir) {
+  try { const res = await api('adminMoveCategory', { token: STATE.adminToken, id, dir }); _catErr(''); _catApply(res); refreshPublicProducts(); }
+  catch (e) { _catErr(e.message); }
+}
+(function wireCategoryManager() {
+  _catEl('btn-cat-add')?.addEventListener('click', _catAdd);
+  _catEl('cat-new-name')?.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); _catAdd(); } });
+  _catEl('cat-mgr-close')?.addEventListener('click', closeCategoryManager);
+  _catEl('btn-cat-close')?.addEventListener('click', closeCategoryManager);
+  _catEl('cat-mgr-overlay')?.addEventListener('click', e => { if (e.target === e.currentTarget) closeCategoryManager(); });
+  _catEl('cat-list')?.addEventListener('click', e => {
+    const b = e.target.closest('[data-act]'); if (!b) return;
+    const act = b.dataset.act, id = b.dataset.id;
+    if (act === 'edit')   { _catEditId = id; _catErr(''); _catRender(); }
+    else if (act === 'cancel') { _catEditId = null; _catErr(''); _catRender(); }
+    else if (act === 'save')   _catSaveEdit(id);
+    else if (act === 'delete') _catDelete(id);
+    else if (act === 'up' || act === 'down') _catMove(id, act);
+  });
+  _catEl('cat-list')?.addEventListener('keydown', e => {
+    if (e.target.id !== 'cat-edit-input') return;
+    if (e.key === 'Enter')  { e.preventDefault(); if (_catEditId) _catSaveEdit(_catEditId); }
+    if (e.key === 'Escape') { e.stopPropagation(); _catEditId = null; _catErr(''); _catRender(); }
+  });
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && _catEl('cat-mgr-overlay')?.classList.contains('open') && !_catEditId) closeCategoryManager();
   });
 })();
 </script>
